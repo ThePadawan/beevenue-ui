@@ -1,0 +1,19 @@
+.beevenue-rating {
+  line-height: 1.25em;
+}
+
+.beevenue-ratings {
+  display: flex;
+}
+
+@media screen and (max-width: 768px) {
+  .beevenue-ratings {
+    flex-direction: column;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .beevenue-ratings {
+    flex-direction: row;
+  }
+}

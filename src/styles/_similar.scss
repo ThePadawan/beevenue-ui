@@ -1,0 +1,13 @@
+.beevenue-similar-media {
+  max-height: 15rem;
+  overflow: hidden;
+}
+
+.beevenue-similar-medium {
+  width: 18%;
+  float: left;
+}
+
+.beevenue-similar-medium:nth-child(n+2) {
+  padding-left: 1em;
+}
