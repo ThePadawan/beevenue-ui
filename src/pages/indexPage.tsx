@@ -91,6 +91,7 @@ class IndexPage extends Component<IndexPageProps, any, any> {
   };
 
   private loadMedia = (params: LoadMediaParameters) => {
+    this.clearMedia();
     Api.loadMedia(params).then(
       res => {
         this.setState({ media: res.data });

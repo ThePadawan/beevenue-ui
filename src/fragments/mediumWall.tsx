@@ -6,6 +6,7 @@ import {Location} from "history";
 import { backendUrl } from "../config.json";
 import { BeevenuePagination } from "./beevenuePagination";
 import { Link } from "react-router-dom";
+import { BeevenueSpinner } from "./beevenueSpinner";
 
 export interface Thumbs
 {
@@ -34,35 +35,44 @@ interface MediumWallProps {
     onPageSizeSelect: (n: number) => void;
 }
 
-class MediumWall extends Component<MediumWallProps, any, any> {
+interface MediumWallState {
+  loadedImageCount: number;
+}
+
+class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
   public constructor(props: MediumWallProps) {
     super(props);
-    this.state = { allImagesLoaded: true};
+    this.state = { loadedImageCount: 0 };
   }
 
-  public onLayoutComplete = () => {
+  public onImageLoaded = (image: any) => {
     // Don't be an idiot and remove this, it will lead to an infinite loop.
-    // if (this.state.allImagesLoaded) return;
-    // this.setState({ allImagesLoaded: true });
+    if (this.props.media.items && (this.state.loadedImageCount === this.props.media.items.length)) return;
+
+    // Note: This describes the degree of parallelism with which <img> elements are added
+    // to the DOM, so directly influences reactivity of the UI vs thumbnail loading performance!
+    this.setState({ loadedImageCount: this.state.loadedImageCount + 10 });
   }
 
   public onPageSelect = (n: number) => {
-    // this.setState({ allImagesLoaded: false });
+    this.setState({ loadedImageCount: 0 });
     this.props.onPageSelect(n);
   }
   
   public onPageSizeSelect = (n: number) => {
-    // this.setState({ allImagesLoaded: false });
+    this.setState({ loadedImageCount: 0 });
     this.props.onPageSizeSelect(n);
   }
 
-  private masonryClasses = (m: MediumWallPaginationItem) => {
+  private masonryClasses = (isDoneLoading: boolean, m: MediumWallPaginationItem) => {
     const thresholds = [1.4, 1.8, 2.2];
 
-    // TODO: Create CSS class only showing on small display and show small thumb
-    // Same with large thumb.
-
     const result = ["beevenue-masonry-item"];
+
+    if (!isDoneLoading) {
+      result.push("beevenue-masonry-hidden");
+    }
+
     if (m.aspectRatio === null) {
       return result.join(' ');
     }
@@ -110,22 +120,25 @@ class MediumWall extends Component<MediumWallProps, any, any> {
       )
     }
 
+    const isDoneLoading = this.state.loadedImageCount >= this.props.media.items.length;
+
     return (
       <Masonry
-        className={this.state.allImagesLoaded ? undefined : 'beevenue-masonry-hidden'}
         options={{
           columnWidth: ".beevenue-masonry-sizer",
           gutter: 20,
-          transitionDuration: 50
+          transitionDuration: 0
         }}
         elementType={"ul"}
-        updateOnEachImageLoad={false}
-        onLayoutComplete={() => this.onLayoutComplete()}
+        disableImagesLoaded={false}
+        updateOnEachImageLoad={true}
+        onImagesLoaded={i => this.onImageLoaded(i)}
       >
         <li className="beevenue-masonry-sizer" />
+        {isDoneLoading ? undefined : <BeevenueSpinner />}
         {this.props.media.items.map((r: MediumWallPaginationItem) => {
           return (
-            <li className={this.masonryClasses(r)} key={r.id}>
+            <li className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
               <Link to={`/show/${r.id}`}>
                 {thumbs(r)}
               </Link>

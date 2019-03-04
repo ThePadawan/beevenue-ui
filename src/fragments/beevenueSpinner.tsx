@@ -7,7 +7,7 @@ class BeevenueSpinner extends Component<any, any, any> {
   }
 
   render() {
-    return <RingLoader />;
+    return <RingLoader {...this.props} />;
   }
 }
 
