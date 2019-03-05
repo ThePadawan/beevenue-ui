@@ -11,9 +11,11 @@ interface BeevenueStore {
   loggedInUser: BeevenueUser;
   loggedInRole: string | null;
   sfwSession: boolean;
+
+  serverVersion: string;
 }
 
-const initialState = { loggedInUser: Unknown, loggedInRole: null, sfwSession: true };
+const initialState = { loggedInUser: Unknown, loggedInRole: null, sfwSession: true, serverVersion: 'unknown' };
 
 const login = (
   state: BeevenueStore = initialState,
@@ -25,6 +27,7 @@ const login = (
         ...state,
         loggedInUser: action.payload.id,
         loggedInRole: action.payload.role,
+        serverVersion: action.payload.version,
         sfwSession: action.payload.sfwSession
       };
       return result;
@@ -66,6 +69,10 @@ export const getLoggedInRole = (store: BeevenueStore) => {
 
 export const isSessionSfw = (store: BeevenueStore) => {
   return store.sfwSession;
+}
+
+export const getServerVersion = (store: BeevenueStore) => {
+  return store.serverVersion;
 }
 
 export default login;

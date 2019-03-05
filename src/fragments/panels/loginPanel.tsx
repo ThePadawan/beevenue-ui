@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import { Api } from "../../api/api";
 import { login, logout, redirect } from "../../redux/actions";
-import { getLoggedInUser, Anonymous } from "../../redux/reducers/login";
+import { getLoggedInUser, Anonymous, getServerVersion } from "../../redux/reducers/login";
 import { SfwButton } from "../sfwButton";
 import { BeevenueSpinner } from "../beevenueSpinner";
 
@@ -22,6 +22,8 @@ interface LoginPanelProps
   logout: typeof logout;
   redirect: typeof redirect;
   loggedInUser: string;
+
+  serverVersion: string;
 }
 
 
@@ -129,7 +131,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
         <div className="content">
           <SfwButton />
           <div>
-            Server version: TBD
+            Server version: {this.props.serverVersion}
           </div>
           <div>
             UI version: {commitId}
@@ -160,7 +162,10 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
 }
 
 const mapStateToProps = (state: any) => {
-  return { loggedInUser: getLoggedInUser(state.login) };
+  return {
+    loggedInUser: getLoggedInUser(state.login),
+    serverVersion: getServerVersion(state.login)
+  };
 };
 
 const x = connect(
