@@ -7,6 +7,8 @@ import { getLoggedInUser, Anonymous } from "../../redux/reducers/login";
 import { SfwButton } from "../sfwButton";
 import { BeevenueSpinner } from "../beevenueSpinner";
 
+import { commitId } from "../../config.json"
+
 interface LoginPanelState {
   username: string;
   password: string;
@@ -126,11 +128,19 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
         <div className="card-content">
         <div className="content">
           <SfwButton />
-          <form onSubmit={e => this.submitLogout(e)}>
-            <div className="field">
-              <button className="button">Logout</button>
-            </div>
-          </form>
+          <div>
+            Server version: TBD
+          </div>
+          <div>
+            UI version: {commitId}
+          </div>
+          <div>
+            <form onSubmit={e => this.submitLogout(e)}>
+              <div className="field">
+                <button className="button">Logout</button>
+              </div>
+            </form>
+          </div>
         </div>
         </div>
       </div>
