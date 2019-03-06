@@ -74,6 +74,10 @@ const Api = {
     return axiosClient.post("medium", fd);
   },
 
+  regenerateThumbnail(mediumId: number): AxiosPromise<any> {
+    return axiosClient.patch(`thumbnail/${mediumId}`);
+  },
+
   login(data: LoginParameters): AxiosPromise<any> {
     return axiosClient.post("login", data);
   },

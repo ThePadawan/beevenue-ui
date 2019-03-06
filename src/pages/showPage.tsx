@@ -20,6 +20,7 @@ import { MissingTags } from "../fragments/missingTags";
 import { QuickTagger } from "../fragments/quickTagger";
 
 import { isSessionSfw, getLoggedInRole } from "../redux/reducers/login";
+import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
 
 interface UnitializedShowPageState {
   ViewModel: ShowViewModel | null;
@@ -281,6 +282,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
             onAddTag={tag => this.addTag(tag)}
           />
           <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
+          <RegenerateThumbnailButton mediumId={this.mediumId} />
           </> : null
           }
         </>
