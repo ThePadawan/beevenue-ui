@@ -67,7 +67,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
               {this.state.tags.map(t => (
                 <tr>
                   <td>
-                    <Link to={`/search/${t.tag}`}>{t.tag}</Link>
+                    <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
                   </td>
                   <td>{t.count}</td>
                 </tr>

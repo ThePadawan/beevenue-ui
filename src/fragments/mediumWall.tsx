@@ -114,7 +114,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
       const srcset = sources.join(', ')
       return (
         <img
-         sizes="(max-width: 768px) 85vw, (min-width: 1600px) 20vw, 32vw"
+         sizes="(max-width: 768px) 100%, (min-width: 1600px) 24%, 47%"
          srcSet={srcset}
          src={`${backendUrl}${r.thumbs[240]}`} />
       )

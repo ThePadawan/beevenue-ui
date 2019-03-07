@@ -21,6 +21,7 @@ import { QuickTagger } from "../fragments/quickTagger";
 
 import { isSessionSfw, getLoggedInRole } from "../redux/reducers/login";
 import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
+import { Link } from "react-router-dom";
 
 interface UnitializedShowPageState {
   ViewModel: ShowViewModel | null;
@@ -72,7 +73,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
   }
 
   private get userIsAdmin() {
-    return this.props.loggedInRole === 'admin';
+    return this.props.loggedInRole === "admin";
   }
 
   private loadMedium(mediumId: number) {
@@ -157,7 +158,9 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
       return (
         <div className="control" key={key}>
           <div {...other}>
-            <span className="tag">{getTagDisplayValue(tag)}</span>
+            <Link to={`/tag/${getTagDisplayValue(tag)}`}>
+              <span className="tag">{getTagDisplayValue(tag)}</span>
+            </Link>
             {!disabled && (
               <a className="tag is-delete" onClick={e => onRemove(key)} />
             )}
@@ -184,9 +187,9 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
               addKeys={[9, 13, 32, 188]} // Tab, Enter, Space, Comma
               onChange={(e: any) => this.onTagsChange(e)}
             />
-           </div>
-         </div>
-       </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -249,7 +252,9 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
         </header>
         <div className="card-content">
           <div className="content">
-            <div className="field beevenue-ratings">{ratings.map(ratingElementFor)}</div>
+            <div className="field beevenue-ratings">
+              {ratings.map(ratingElementFor)}
+            </div>
           </div>
         </div>
       </div>
@@ -274,17 +279,17 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
           <Medium {...viewModel} />
           {this.renderTags(viewModel)}
           {this.renderRating(viewModel)}
-          { this.userIsAdmin ?
-          <>
-          <MissingTags {...viewModel} />
-          <QuickTagger
-            tags={viewModel.tags}
-            onAddTag={tag => this.addTag(tag)}
-          />
-          <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
-          <RegenerateThumbnailButton mediumId={this.mediumId} />
-          </> : null
-          }
+          {this.userIsAdmin ? (
+            <>
+              <MissingTags {...viewModel} />
+              <QuickTagger
+                tags={viewModel.tags}
+                onAddTag={tag => this.addTag(tag)}
+              />
+              <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
+              <RegenerateThumbnailButton mediumId={this.mediumId} />
+            </>
+          ) : null}
         </>
       );
     } else {
@@ -300,7 +305,10 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
 }
 
 const mapStateToProps = (state: any) => {
-  return { loggedInRole: getLoggedInRole(state.login), isSessionSfw: isSessionSfw(state.login) };
+  return {
+    loggedInRole: getLoggedInRole(state.login),
+    isSessionSfw: isSessionSfw(state.login)
+  };
 };
 
 const x = connect(

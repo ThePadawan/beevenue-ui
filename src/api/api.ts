@@ -44,6 +44,10 @@ const Api = {
     return axiosClient.get(`medium/${id}`);
   },
 
+  showTag(name: string): AxiosPromise<any> {
+    return axiosClient.get(`tag/${name}`);
+  },
+
   getTagStatistics(): AxiosPromise<any> {
     return axiosClient.get('tags');
   },

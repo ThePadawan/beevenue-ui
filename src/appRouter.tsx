@@ -4,7 +4,11 @@ import { Router, Route, Switch } from "react-router-dom";
 import { debounce } from "lodash-es";
 import { BeevenueSpinner } from "./fragments/beevenueSpinner";
 
-import { IndexPage, SearchResultsPage, ShowPage, BatchUploadPage, TagStatisticsPage, WildcardPage } from "./pages";
+import {
+  IndexPage, SearchResultsPage, ShowPage, 
+  BatchUploadPage, TagStatisticsPage, TagShowPage,
+  WildcardPage 
+} from "./pages";
 import { Api } from "./api/api";
 import { login, loginAnonymous, stopRedirecting } from "./redux/actions";
 import { getRedirectionTarget } from "./redux/reducers/redirect";
@@ -74,6 +78,7 @@ class AppRouter extends Component<AppRouterProps, any, any> {
             <Route path="/show/:id" component={ShowPage} />
             <Route path="/upload" component={BatchUploadPage} />
             <Route path="/tags" component={TagStatisticsPage} />
+            <Route path="/tag/:name" component={TagShowPage} />
             <Route path="/:whatever" component={WildcardPage} />
           </Switch>
       </Router>

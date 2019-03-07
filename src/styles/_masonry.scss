@@ -1,6 +1,6 @@
 
 .beevenue-masonry-sizer {
-  width: 32vw;
+  width: 47%;
 }
 
 .beevenue-masonry-hidden {
@@ -10,7 +10,7 @@
 .beevenue-masonry-item {
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   margin-bottom: 1em;
-  width: 32vw;
+  width: 47%;
 }
 
 .beevenue-masonry-item img {
@@ -21,23 +21,23 @@
 
 @media screen and (max-width: 768px) {
   .beevenue-masonry-sizer {
-    width: 85vw;
+    width: 100%;
   }
   .beevenue-masonry-item {
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
     margin-bottom: 1em;
-    width: 85vw;
+    width: 100%;
   }
 }
 
 
 @media screen and (min-width: 1600px) {
   .beevenue-masonry-sizer {
-    width: 20vw;
+    width: 24%;
   }
   .beevenue-masonry-item {
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
     margin-bottom: 1em;
-    width: 20vw;
+    width: 24%;
   }
 }
