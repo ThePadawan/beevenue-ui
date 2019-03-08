@@ -16,25 +16,11 @@ class SimilarMedia extends Component<SimilarMediaProps, any, any> {
   render() {
 
     const thumbs = (r: PartialShowViewModel) => {
-      const sources = []
-
-      for (let size in r.thumbs) {
-        const sizePx = parseInt(size)
-        let sizeSelector = '1x'
-        if (sizePx < 600) {
-          sizeSelector = '4x'
-        }
-        sources.push(
-          `${backendUrl}${r.thumbs[size]} ${sizeSelector}`
-        )
-      }
-
-      const srcset = sources.join(', ')
       return (
-        <img
-         sizes="(max-width: 768px) 100%, (min-width: 1600px) 24%, 47%"
-         srcSet={srcset}
-         src={`${backendUrl}${r.thumbs[240]}`} />
+        <picture>
+          <source srcSet={`${backendUrl}${r.thumbs[600]}`} media="(min-width: 769px)" />
+          <img src={`${backendUrl}${r.thumbs[240]}`} />
+        </picture>
       )
     }
 
