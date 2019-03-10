@@ -7,7 +7,8 @@ import { BeevenueSpinner } from "./fragments/beevenueSpinner";
 import {
   IndexPage, SearchResultsPage, ShowPage, 
   BatchUploadPage, TagStatisticsPage, TagShowPage,
-  WildcardPage 
+  WildcardPage, 
+  InvestigateProblemsPage
 } from "./pages";
 import { Api } from "./api/api";
 import { login, loginAnonymous, stopRedirecting } from "./redux/actions";
@@ -79,6 +80,7 @@ class AppRouter extends Component<AppRouterProps, any, any> {
             <Route path="/upload" component={BatchUploadPage} />
             <Route path="/tags" component={TagStatisticsPage} />
             <Route path="/tag/:name" component={TagShowPage} />
+            <Route parh="/problems" component={InvestigateProblemsPage} />
             <Route path="/:whatever" component={WildcardPage} />
           </Switch>
       </Router>

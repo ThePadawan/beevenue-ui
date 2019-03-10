@@ -1,10 +1,11 @@
-import React, { Component, FormEvent } from "react";
+import React, { Component } from "react";
 
 import { Api } from "../api/api";
 import { sortBy } from "lodash-es";
 import { NeedsLoginPage } from "./needsLoginPage";
 import { Link } from "react-router-dom";
 import { Rating } from "../api/show";
+import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 
 interface Tag {
   tag: string;
@@ -30,26 +31,26 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
   };
 
   public deleteOrphanTags = () => {
-    this.setState({...this.state, tags: []});
-    Api.deleteOrphanTags().then(_ => this.loadTags());
+    this.setState({ ...this.state, tags: [] });
+    Api.Tags.deleteOrphans().then(_ => this.loadTags());
   };
 
   private loadTags = () => {
-    Api.getTagStatistics().then(
-        res => {
-          let tags = res.data;
-          tags = sortBy(tags, t => t.count).reverse();
-          this.setState({ ...this.state, tags: tags });
-        },
-        err => {
-          console.error(err);
-        }
-      );
-  }
+    Api.Tags.getStatistics().then(
+      res => {
+        let tags = res.data;
+        tags = sortBy(tags, t => t.count).reverse();
+        this.setState({ ...this.state, tags: tags });
+      },
+      err => {
+        console.error(err);
+      }
+    );
+  };
 
-  render() {
+  private getTable = () => {
     return (
-      <NeedsLoginPage>
+      <>
         <div>
           <button className="button" onClick={e => this.deleteOrphanTags()}>
             Delete orphan tags
@@ -65,7 +66,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
             </thead>
             <tbody>
               {this.state.tags.map(t => (
-                <tr>
+                <tr key={t.tag}>
                   <td>
                     <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
                   </td>
@@ -75,8 +76,15 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
             </tbody>
           </table>
         </div>
-      </NeedsLoginPage>
+      </>
     );
+  };
+
+  render() {
+    const content =
+      this.state.tags.length > 0 ? this.getTable() : <BeevenueSpinner />;
+
+    return <NeedsLoginPage>{content}</NeedsLoginPage>;
   }
 }
 

@@ -1,10 +1,9 @@
-import { SearchResultsPage } from "./searchResultsPage";
-import { ShowPage } from "./showPage";
-import { IndexPage } from "./indexPage";
+export { SearchResultsPage } from "./searchResultsPage";
+export { ShowPage } from "./showPage";
+export { IndexPage } from "./indexPage";
 
-import { WildcardPage } from "./wildcardPage";
-import { BatchUploadPage } from "./batchUploadPage";
-import { TagStatisticsPage } from "./tagStatisticsPage";
-import { TagShowPage } from "./tagShowPage";
-
-export { SearchResultsPage, ShowPage, IndexPage, WildcardPage, BatchUploadPage, TagStatisticsPage, TagShowPage }
+export { WildcardPage } from "./wildcardPage";
+export { BatchUploadPage } from "./batchUploadPage";
+export { TagStatisticsPage } from "./tagStatisticsPage";
+export { TagShowPage } from "./tagShowPage";
+export { InvestigateProblemsPage } from "./investigateProblemsPage";

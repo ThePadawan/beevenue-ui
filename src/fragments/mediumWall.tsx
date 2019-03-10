@@ -45,7 +45,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     this.state = { loadedImageCount: 0 };
   }
 
-  public onImageLoaded = (image: any) => {
+  private onImageLoaded = () => {
     // Don't be an idiot and remove this, it will lead to an infinite loop.
     if (this.props.media.items && (this.state.loadedImageCount === this.props.media.items.length)) return;
 
@@ -118,7 +118,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
         elementType={"ul"}
         disableImagesLoaded={false}
         updateOnEachImageLoad={true}
-        onImagesLoaded={i => this.onImageLoaded(i)}
+        onImagesLoaded={i => this.onImageLoaded()}
       >
         <li className="beevenue-masonry-sizer" />
         {isDoneLoading ? undefined : <BeevenueSpinner />}

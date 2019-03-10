@@ -59,7 +59,7 @@ class QuickTagger extends Component<QuickTaggerProps, QuickTaggerState, any> {
   };
 
   componentDidMount = () => {
-    Api.getTagStatistics().then(
+    Api.Tags.getStatistics().then(
       res => {
         const allTags = orderBy(res.data, t => t.count).reverse();
 

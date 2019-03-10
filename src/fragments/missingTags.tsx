@@ -33,7 +33,7 @@ class MissingTags extends Component<MissingTagsProps, MissingTagsState, any> {
 
   private load = () => {
     this.setState({...this.state, missing: null });
-    Api.getMissingTags(this.props.id).then(
+    Api.Tags.getMissing(this.props.id).then(
       res => {
         this.setState({
           ...this.state,

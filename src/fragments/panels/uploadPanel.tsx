@@ -4,14 +4,18 @@ import { connect } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { Api } from "../../api/api";
-import { addNotification, setFileUploaded } from '../../redux/actions';
+import { setFileUploaded } from '../../redux/actions';
+
+interface UploadPanelProps {
+  setFileUploaded: typeof setFileUploaded;
+}
 
 interface UploadPanelState {
   file: File | null;
 }
 
-class UploadPanel extends Component<any, UploadPanelState, any> {
-  public constructor(props: any) {
+class UploadPanel extends Component<UploadPanelProps, UploadPanelState, any> {
+  public constructor(props: UploadPanelProps) {
     super(props);
     this.state = { file: null };
   }
@@ -25,11 +29,7 @@ class UploadPanel extends Component<any, UploadPanelState, any> {
 
     Api.uploadMedium(this.state.file).then(
       (res: any) => {
-        this.props.addNotification(res.data);
         this.props.setFileUploaded();
-      },
-      (err: any) => {
-        this.props.addNotification(err.response.data);
       }
     );
   };
@@ -85,5 +85,5 @@ class UploadPanel extends Component<any, UploadPanelState, any> {
   }
 }
 
-const x = connect(null, { addNotification, setFileUploaded })(UploadPanel);
+const x = connect(null, { setFileUploaded })(UploadPanel);
 export { x as UploadPanel };

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 
 import { Api } from "../api/api";
 import { NeedsLoginPage } from "./needsLoginPage";
@@ -6,9 +6,15 @@ import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { AddAliasField } from "../fragments/tag/addAliasField";
+import { ImplicationsCard } from "../fragments/tag/implicationsCard";
 
 interface ShowTagViewModel {
+  aliases: string[];
   count: number;
+
+  implied_by_this: string[];
+  implying_this: string[];
 }
 
 interface TagShowPageState {
@@ -32,13 +38,50 @@ class TagShowPage extends Component<any, TagShowPageState, any> {
   };
 
   private loadTag = () => {
-    Api.showTag(this.tagName).then(
+    Api.Tags.show(this.tagName).then(
       res => {
         let tag = res.data;
         this.setState({ ...this.state, tag });
       },
       err => {
-        this.setState({ ...this.state, tagNotFound: true })
+        this.setState({ ...this.state, tagNotFound: true });
+      }
+    );
+  };
+
+  private onAliasAdded = (a: string): void => {
+    const tag = this.state.tag;
+    if (!tag) return;
+
+    // Signal React to behave
+    const newAliases = tag.aliases.slice();
+    newAliases.push(a);
+    tag.aliases = newAliases;
+
+    this.setState({ ...this.state, tag });
+  };
+
+  private onAliasRemoved = (a: string): void => {
+    const tag = this.state.tag;
+    if (!tag) return;
+
+    // Signal React to behave
+    const newAliases = tag.aliases.slice();
+
+    const maybeIdx = newAliases.indexOf(a);
+    if (maybeIdx > -1) {
+      newAliases.splice(maybeIdx, 1);
+    }
+
+    tag.aliases = newAliases;
+
+    this.setState({ ...this.state, tag });
+  };
+
+  private removeAlias = (a: string): void => {
+    Api.Tags.removeAlias(this.tagName, a).then(
+      _ => {
+        this.onAliasRemoved(a);
       }
     );
   };
@@ -47,29 +90,89 @@ class TagShowPage extends Component<any, TagShowPageState, any> {
     if (this.state.tagNotFound) {
       return <div>No such tag</div>;
     }
-    
+
     if (!this.state.tag) return <BeevenueSpinner />;
 
+    const cardGetters = [
+      this.getUsageCard,
+      this.getAliasesCard,
+      this.getImplicationsCard
+    ];
+
+    // TODO Define better type
+    const wrapper = (x: Function, idx: number) => {
+      return (
+        <nav className="level" key={idx}>
+          <div className="level-item">{x.bind(this)(this.state.tag)}</div>
+        </nav>
+      );
+    };
+
+    return <>{cardGetters.map((g, idx) => wrapper.bind(this)(g, idx))}</>;
+  }
+  private getAliasesCard(tag: ShowTagViewModel): JSX.Element | null {
+    // TODO Sort alphabetically
+    const getCurrentAliases = () => {
+      if (tag.aliases.length == 0) return null;
+      return (
+        <ul>
+          {tag.aliases.map(a => (
+            <Fragment key={a}>
+              <li>
+                {a}
+                <a
+                  className="beevenue-alias-delete delete is-small"
+                  onClick={e => this.removeAlias(a)}
+                />
+              </li>
+            </Fragment>
+          ))}
+        </ul>
+      );
+    };
+
     return (
-      <div className="card">
+      <div className="card beevenue-sidebar-card">
         <header className="card-header">
-          <p className="card-header-title">Usage</p>
+          <p className="card-header-title">Aliases</p>
         </header>
         <div className="card-content">
           <div className="content">
-            Used {this.state.tag.count} times
+            {getCurrentAliases()}
+            <AddAliasField
+              tag={this.tagName}
+              onAliasAdded={a => this.onAliasAdded(a)}
+            />
           </div>
         </div>
       </div>
     );
-  };
+  }
+
+  private getImplicationsCard(tag: ShowTagViewModel): JSX.Element | null {
+    if (!this.state.tag) return null;
+    return <ImplicationsCard tag={this.state.tag} tagName={this.tagName} />
+  }
+
+  private getUsageCard(tag: ShowTagViewModel): JSX.Element | null {
+    return (
+      <div className="card beevenue-sidebar-card">
+        <header className="card-header">
+          <p className="card-header-title">Usage</p>
+        </header>
+        <div className="card-content">
+          <div className="content">Used {tag.count} times</div>
+        </div>
+      </div>
+    );
+  }
 
   render() {
     return (
       <NeedsLoginPage>
         <div>
           <h2 className="title">
-          "{this.tagName}" tag
+            "{this.tagName}" tag
             <Link to={`/search/${this.tagName}`} className="beevenue-h2-link">
               <FontAwesomeIcon icon={faSearch} />
             </Link>

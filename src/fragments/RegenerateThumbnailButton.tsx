@@ -26,9 +26,6 @@ class RegenerateThumbnailButton extends Component<RegenerateThumbnailButtonProps
                     "Successfully created new thumbnails."
                 ]
             });
-        },
-        (err: any) => {
-            this.props.addNotification(err.response.data);
         }
       );
   };

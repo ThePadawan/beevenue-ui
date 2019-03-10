@@ -84,8 +84,6 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
       err => {
         if (err.response.status == 401) {
           this.props.addNotLoggedInNotification();
-        } else {
-          this.props.addNotification(err.response.data);
         }
 
         this.props.redirect("/");
