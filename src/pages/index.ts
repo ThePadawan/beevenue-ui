@@ -7,3 +7,4 @@ export { BatchUploadPage } from "./batchUploadPage";
 export { TagStatisticsPage } from "./tagStatisticsPage";
 export { TagShowPage } from "./tagShowPage";
 export { InvestigateProblemsPage } from "./investigateProblemsPage";
+export { RulesPage } from "./rulesPage";

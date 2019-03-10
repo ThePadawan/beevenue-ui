@@ -103,6 +103,10 @@ const Api = {
       ));
     }
   },
+  
+  getRules(): AxiosPromise<any> {
+    return _notification_wrapper(axiosClient.get(`rules`));
+  },
 
   getProblems(): AxiosPromise<any> {
     return _notification_wrapper(axiosClient.get(`thumbnails/missing`));

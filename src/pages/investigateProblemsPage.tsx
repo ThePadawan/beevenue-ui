@@ -19,9 +19,7 @@ class InvestigateProblemsPage extends Component<any, InvestigateProblemsPageStat
     Api.getProblems().then(
       res => {
         this.setState({ problems: res.data });
-      },
-      // TODO Show error notification
-      _ => {}
+      }
     );
   };
 

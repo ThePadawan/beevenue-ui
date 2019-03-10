@@ -13,6 +13,7 @@ class LinksPanel extends Component {
             <li><Link to="/upload">Batch upload</Link></li>
             <li><Link to="/tags">Tag statistics</Link></li>
             <li><Link to="/problems">Investigate problems</Link></li>
+            <li><Link to="/rules">Configure rules</Link></li>
           </ul>
         </div>
       </div>

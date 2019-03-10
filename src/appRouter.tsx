@@ -8,7 +8,8 @@ import {
   IndexPage, SearchResultsPage, ShowPage, 
   BatchUploadPage, TagStatisticsPage, TagShowPage,
   WildcardPage, 
-  InvestigateProblemsPage
+  InvestigateProblemsPage,
+  RulesPage
 } from "./pages";
 import { Api } from "./api/api";
 import { login, loginAnonymous, stopRedirecting } from "./redux/actions";
@@ -50,6 +51,11 @@ class AppRouter extends Component<AppRouterProps, any, any> {
   componentWillUpdate(newProps: AppRouterProps) {
     // To be nice, we clean up after ourselves and remove
     // the last redirection target
+
+    if (this.props.redirecting) {
+      history.push(this.props.redirecting);
+    }
+
     if (newProps.redirecting) {
       const r = this.props.stopRedirecting;
       if (r) {r()};
@@ -67,10 +73,6 @@ class AppRouter extends Component<AppRouterProps, any, any> {
       );
     }
 
-    if (this.props.redirecting) {
-      history.push(this.props.redirecting);
-    }
-
     return (
       <Router history={history}>
           <Switch>
@@ -80,7 +82,8 @@ class AppRouter extends Component<AppRouterProps, any, any> {
             <Route path="/upload" component={BatchUploadPage} />
             <Route path="/tags" component={TagStatisticsPage} />
             <Route path="/tag/:name" component={TagShowPage} />
-            <Route parh="/problems" component={InvestigateProblemsPage} />
+            <Route path="/problems" component={InvestigateProblemsPage} />
+            <Route path="/rules" component={RulesPage} />
             <Route path="/:whatever" component={WildcardPage} />
           </Switch>
       </Router>
