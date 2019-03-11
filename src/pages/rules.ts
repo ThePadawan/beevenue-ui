@@ -90,7 +90,10 @@ const _ifText = (rulePart: RulePart): string => {
 };
 
 const _thenTextHasRating = (p: HasRatingRulePart): string => {
-  return `should have a rating of ${p.data}`;
+  if (p.data) {
+    return `should have a rating of ${p.data}`;
+  }
+  return "should have a rating";
 };
 
 const _thenTextHasAnyTagsIn = (p: HasAnyTagsInRulePart): string => {
@@ -115,8 +118,7 @@ const _thenText = (rulePart: RulePart): string => {
 };
 
 export const displayText = (rule: Rule): string => {
-  // TODO Thens, comma-separated
   const thensTexts = rule.then.map(_thenText);
-  const thensText = _arrayToFragment(thensTexts, { finalSeparator: ' and ' })
+  const thensText = _arrayToFragment(thensTexts, { finalSeparator: " and " });
   return `${_ifText(rule.if)} ${thensText}.`;
 };
