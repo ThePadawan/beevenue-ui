@@ -5,7 +5,7 @@ import TagsInput from "react-tagsinput";
 
 import { Api } from "../api/api";
 import { ShowViewModel, Rating } from "../api/show";
-import { BeevenuePage } from "./beevenuePage";
+import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 import { Medium } from "../fragments/medium";
 import { connect } from "react-redux";
 import {
@@ -33,7 +33,7 @@ interface InitializedShowPageState {
 
 type ShowPageState = UnitializedShowPageState | InitializedShowPageState;
 
-interface ShowPageProps {
+interface ShowPageProps extends BeevenuePageProps {
   isSessionSfw: boolean;
   loggedInRole: string | null;
 
@@ -295,7 +295,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
     }
 
     return (
-      <BeevenuePage>
+      <BeevenuePage {...this.props}>
         <div className="beevenue-show-page">{view}</div>
       </BeevenuePage>
     );

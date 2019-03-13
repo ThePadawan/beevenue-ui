@@ -147,7 +147,7 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
       );
     }
 
-    return <BeevenuePage>{inner}</BeevenuePage>;
+    return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;
   }
 }
 

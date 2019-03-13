@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { BeevenuePage } from "./beevenuePage";
+import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 
 import { redirect } from "../redux/actions";
 import { match } from "react-router";
@@ -10,7 +10,7 @@ interface WildcardPageParams {
   whatever: string;
 }
 
-interface WildcardPageProps
+interface WildcardPageProps extends BeevenuePageProps
 {
   match: match<WildcardPageParams>
   redirect: typeof redirect;
@@ -29,7 +29,7 @@ class WildcardPage extends Component<WildcardPageProps, any, any> {
 
   render() {
     return (
-      <BeevenuePage>
+      <BeevenuePage {...this.props}>
         <div className="column">
           <h1 className="title">Title</h1>
         </div>

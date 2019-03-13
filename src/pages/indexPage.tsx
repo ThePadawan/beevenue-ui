@@ -122,7 +122,7 @@ class IndexPage extends Component<IndexPageProps, any, any> {
 
   render = () => {
     return (
-      <BeevenuePage>
+      <BeevenuePage {...this.props}>
         <MediumWall
           location={this.props.location}
           media={this.state.media}

@@ -3,9 +3,9 @@ import { connect } from "react-redux";
 
 import { addNotLoggedInNotification, redirect } from "../redux/actions";
 import { getLoggedInUser, getLoggedInRole } from "../redux/reducers/login";
-import { BeevenuePage } from "./beevenuePage";
+import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 
-interface NeedsLoginPageProps {
+interface NeedsLoginPageProps extends BeevenuePageProps {
   addNotLoggedInNotification: typeof addNotLoggedInNotification;
   redirect: typeof redirect;
   IsLoggedIn: boolean;

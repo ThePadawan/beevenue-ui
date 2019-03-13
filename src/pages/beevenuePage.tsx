@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import { Sidebar } from "../fragments/sidebar";
+import {Location} from "history";
 
 import { NotificationsPanel } from "../fragments/panels/notificationsPanel";
 
+export interface BeevenuePageProps {
+  location: Location;
+}
+
 export abstract class BeevenuePage<
-  P = any,
+  P extends BeevenuePageProps,
   S = any,
   SS = any
 > extends Component<P, S, SS> {
@@ -15,7 +20,7 @@ export abstract class BeevenuePage<
         <section className="section">
           <div className="columns">
             <div className="column is-narrow">
-              <Sidebar />
+              <Sidebar {...this.props} />
             </div>
             <div className="column">
               <NotificationsPanel />

@@ -3,26 +3,46 @@ import { connect } from "react-redux";
 
 import { getSearchQuery } from "../../redux/reducers/search";
 import { addSearchResults, redirect } from "../../redux/actions";
+import { Location } from "history";
+import qs from "qs";
 
 interface SearchPanelState {
   searchTerms: string;
 }
 
-class SearchPanel extends Component<any, SearchPanelState, any> {
+interface SearchPanelProps {
+  location: Location;
+  searchTerms: string | null;
+  redirect: typeof redirect;
+}
+
+class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
   public constructor(props: any) {
     super(props);
     this.state = { searchTerms: this.props.searchTerms || "" };
   }
 
   componentDidUpdate = (prevProps: any) => {
-    if (this.props.searchTerms !== prevProps.searchTerms) {
+    if (this.props.searchTerms !== prevProps.searchTerms && this.props.searchTerms) {
       this.setState({ ...this.state, searchTerms: this.props.searchTerms });
     }
   }
 
   onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    this.props.redirect(`/search/${this.state.searchTerms.replace(/ /g, '/')}`);
+
+    // Redirect to new search results. Keep query parameter "pageSize"
+    // if it is set.
+    const query = qs.parse(this.props.location.search, {ignoreQueryPrefix: true});
+    const { pageSize } = query;
+    const newQ = qs.stringify({ pageSize });
+
+    let newPath = `/search/${this.state.searchTerms.replace(/ /g, '/')}`;
+    if (newQ) {
+      newPath = `${newPath}?${newQ}`;
+    }
+
+    this.props.redirect(newPath);
   }
 
   onChange(newSearchTerms: string) {

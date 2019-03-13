@@ -10,8 +10,10 @@ import {
   getLoggedInRole,
   BeevenueUser,
 } from "../redux/reducers/login";
+import { Location } from "history";
 
 interface SidebarProps {
+  location: Location;
   loggedInUser: BeevenueUser;
   loggedInRole: string | null;
 }
@@ -25,14 +27,14 @@ class Sidebar extends Component<SidebarProps, any, any> {
     let elements: JSX.Element[];
     if (this.props.loggedInRole === 'admin') {
       elements = [
-        <SearchPanel />,
+        <SearchPanel {...this.props} />,
         <UploadPanel />,
         <LinksPanel />,
         <LoginPanel />
       ];
     } else {
       elements = [
-        <SearchPanel />,
+        <SearchPanel {...this.props} />,
         <LoginPanel />
       ];
     }
