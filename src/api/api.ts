@@ -65,6 +65,10 @@ const Api = {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));
     },
 
+    cleanUp(name: string): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.patch(`tag/${name}/clean`));
+    },
+
     getStatistics(): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get("tags"));
     },
