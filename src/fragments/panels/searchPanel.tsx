@@ -33,10 +33,12 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
 
     // Redirect to new search results. Keep query parameter "pageSize"
     // if it is set.
-    const query = qs.parse(this.props.location.search, {ignoreQueryPrefix: true});
-    const { pageSize } = query;
-    const newQ = qs.stringify({ pageSize });
-
+    let newQ = '';
+    if (this.props.location) {
+      const query = qs.parse(this.props.location.search, {ignoreQueryPrefix: true});
+      const { pageSize } = query;
+      newQ = qs.stringify({ pageSize });
+    }
     let newPath = `/search/${this.state.searchTerms.replace(/ /g, '/')}`;
     if (newQ) {
       newPath = `${newPath}?${newQ}`;
