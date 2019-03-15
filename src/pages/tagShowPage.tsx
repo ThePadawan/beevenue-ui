@@ -2,12 +2,15 @@ import React, { Component, Fragment } from "react";
 
 import { Api } from "../api/api";
 import { NeedsLoginPage } from "./needsLoginPage";
-import { Link } from "react-router-dom";
+import { Link, match } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { AddAliasField } from "../fragments/tag/addAliasField";
 import { ImplicationsCard } from "../fragments/tag/implicationsCard";
+import { EditableTitleField } from "../fragments/tag/editableTitleField";
+import { redirect } from "../redux/actions";
+import { connect } from "react-redux";
 
 interface ShowTagViewModel {
   aliases: string[];
@@ -23,8 +26,17 @@ interface TagShowPageState {
   tagNotFound: boolean;
 }
 
-class TagShowPage extends Component<any, TagShowPageState, any> {
-  public constructor(props: any) {
+interface TagShowPageParams {
+  name: string;
+}
+
+interface TagShowPageProps {
+  redirect: typeof redirect;
+  match: match<TagShowPageParams>;
+}
+
+class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
+  public constructor(props: TagShowPageProps) {
     super(props);
     this.state = { tag: null, tagNotFound: false };
   }
@@ -167,12 +179,16 @@ class TagShowPage extends Component<any, TagShowPageState, any> {
     );
   }
 
+  private onTitleChanged = (newTitle: string): void => {
+    this.props.redirect(`/tag/${newTitle}`);
+  }
+
   render() {
     return (
       <NeedsLoginPage>
         <div>
           <h2 className="title">
-            "{this.tagName}" tag
+            <EditableTitleField initialTitle={this.tagName} onTitleChanged={t => this.onTitleChanged(t)} />
             <Link to={`/search/${this.tagName}`} className="beevenue-h2-link">
               <FontAwesomeIcon icon={faSearch} />
             </Link>
@@ -184,4 +200,8 @@ class TagShowPage extends Component<any, TagShowPageState, any> {
   }
 }
 
-export { TagShowPage };
+const x = connect(
+  null,
+  { redirect }
+)(TagShowPage);
+export { x as TagShowPage };

@@ -89,6 +89,10 @@ const Api = {
       return _notification_wrapper(axiosClient.delete(`tag/${tag}/aliases/${alias}`));
     },
 
+    rename(tag: string, newName: string): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.patch(`tag/${tag}`, { newName }));
+    },
+
     addImplication(
       implying_this: string,
       implied_by_this: string
