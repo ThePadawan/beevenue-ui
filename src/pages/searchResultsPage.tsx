@@ -13,6 +13,7 @@ import { isSessionSfw } from "../redux/reducers/login";
 import { Thumbs, MediumWall } from "../fragments/mediumWall";
 import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
+import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 
 interface SearchResultItem {
   id: any;
@@ -42,9 +43,19 @@ interface SearchResultsPageProps {
   isSessionSfw: boolean;
 }
 
-class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
+interface SearchResultsPageState {
+  results: SearchResults | null;
+  doShowSpinner: boolean;
+}
+
+class SearchResultsPage extends Component<
+  SearchResultsPageProps,
+  SearchResultsPageState,
+  any
+> {
   public constructor(props: SearchResultsPageProps) {
     super(props);
+    this.state = { results: null, doShowSpinner: false };
   }
 
   componentDidMount = () => {
@@ -52,9 +63,15 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
   };
 
   private doSearch(params: SearchParameters) {
+    this.setState({ ...this.state, results: null, doShowSpinner: true });
     Api.search(params).then(
       res => {
         this.props.addSearchResults(res.data);
+        this.setState({
+          ...this.state,
+          results: res.data,
+          doShowSpinner: false
+        });
       },
       _ => {}
     );
@@ -105,10 +122,12 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
 
   render() {
     let inner = null;
-    if (!this.props.results || !this.props.results.items) {
+    if (this.state.doShowSpinner) {
+      inner = <BeevenueSpinner />;
+    } else if (!this.state.results || !this.state.results.items) {
       inner = <h2 className="title is-2">No results found.</h2>;
     } else {
-      inner = <MediumWall media={this.props.results} {...this.props} />;
+      inner = <MediumWall media={this.state.results} {...this.props} />;
     }
 
     return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;

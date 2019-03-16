@@ -49,8 +49,9 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     if (
       this.props.media.items &&
       this.state.loadedImageCount === this.props.media.items.length
-    )
+    ) {
       return;
+    }
 
     // Note: This describes the degree of parallelism with which <img> elements are added
     // to the DOM, so directly influences reactivity of the UI vs thumbnail loading performance!
