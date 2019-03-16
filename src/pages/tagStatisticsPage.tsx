@@ -14,8 +14,6 @@ interface Tag {
   id: number;
 }
 
-// TODO Implement rating picker, update API call
-
 interface TagStatisticsPageState {
   tags: Tag[];
 }
@@ -49,13 +47,11 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
   };
 
   private cleanUp = (tag: string): void => {
-    Api.Tags.cleanUp(tag).then(
-      _ => {
-        console.log("Success");
-      }
-    )
+    Api.Tags.cleanUp(tag).then(_ => {
+      console.log("Success");
+    });
     return;
-  }
+  };
 
   private getTable = () => {
     return (
@@ -71,7 +67,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
               <tr>
                 <th>Tag</th>
                 <th>Media</th>
-                <th></th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -81,7 +77,14 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
                     <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
                   </td>
                   <td>{t.count}</td>
-                  <td><button className="button" onClick={e => this.cleanUp(t.tag)}>Clean up</button> </td>
+                  <td>
+                    <button
+                      className="button"
+                      onClick={e => this.cleanUp(t.tag)}
+                    >
+                      Clean up
+                    </button>{" "}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,38 +1,36 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import Masonry from "react-masonry-component";
-import {Location} from "history";
+import { Location } from "history";
 
 import { backendUrl } from "../config.json";
 import { BeevenuePagination } from "./beevenuePagination";
 import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "./beevenueSpinner";
 
-export interface Thumbs
-{
+export interface Thumbs {
   [index: number]: string;
 }
 
 interface MediumWallPaginationItem {
-    id: number;
-    aspectRatio: string | null;
-    hash: string;
-    thumbs: Thumbs;
-  }
+  id: number;
+  aspectRatio: string | null;
+  hash: string;
+  thumbs: Thumbs;
+}
 
-export interface MediumWallPagination
-{
-    items: MediumWallPaginationItem[];
-    pageCount: number;
-    pageNumber: number;
-    pageSize: number;
+export interface MediumWallPagination {
+  items: MediumWallPaginationItem[];
+  pageCount: number;
+  pageNumber: number;
+  pageSize: number;
 }
 
 interface MediumWallProps {
-    location: Location;
-    media: MediumWallPagination;
-    onPageSelect: (n: number) => void;
-    onPageSizeSelect: (n: number) => void;
+  location: Location;
+  media: MediumWallPagination;
+  onPageSelect: (n: number) => void;
+  onPageSizeSelect: (n: number) => void;
 }
 
 interface MediumWallState {
@@ -47,24 +45,31 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
   private onImageLoaded = () => {
     // Don't be an idiot and remove this, it will lead to an infinite loop.
-    if (this.props.media.items && (this.state.loadedImageCount === this.props.media.items.length)) return;
+    if (
+      this.props.media.items &&
+      this.state.loadedImageCount === this.props.media.items.length
+    )
+      return;
 
     // Note: This describes the degree of parallelism with which <img> elements are added
     // to the DOM, so directly influences reactivity of the UI vs thumbnail loading performance!
     this.setState({ loadedImageCount: this.state.loadedImageCount + 10 });
-  }
+  };
 
   public onPageSelect = (n: number) => {
     this.setState({ loadedImageCount: 0 });
     this.props.onPageSelect(n);
-  }
-  
+  };
+
   public onPageSizeSelect = (n: number) => {
     this.setState({ loadedImageCount: 0 });
     this.props.onPageSizeSelect(n);
-  }
+  };
 
-  private masonryClasses = (isDoneLoading: boolean, m: MediumWallPaginationItem) => {
+  private masonryClasses = (
+    isDoneLoading: boolean,
+    m: MediumWallPaginationItem
+  ) => {
     const thresholds = [1.4, 1.8, 2.2];
 
     const result = ["beevenue-masonry-item"];
@@ -74,7 +79,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     }
 
     if (m.aspectRatio === null) {
-      return result.join(' ');
+      return result.join(" ");
     }
 
     const aspectRatio = parseFloat(m.aspectRatio);
@@ -84,13 +89,12 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
       if (aspectRatio > threshold) {
         result.push(`beevenue-masonry-item-${idx + 2}`);
-        return result.join(" ")
+        return result.join(" ");
       }
     }
 
-    return result.join(' ')
-  }
-
+    return result.join(" ");
+  };
 
   public results = () => {
     if (!this.props.media || !this.props.media.items) {
@@ -100,13 +104,17 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     const thumbs = (r: MediumWallPaginationItem) => {
       return (
         <picture>
-          <source srcSet={`${backendUrl}${r.thumbs[600]}`} media="(min-width: 769px)" />
+          <source
+            srcSet={`${backendUrl}${r.thumbs[600]}`}
+            media="(min-width: 769px)"
+          />
           <img src={`${backendUrl}${r.thumbs[240]}`} />
         </picture>
-      )
-    }
+      );
+    };
 
-    const isDoneLoading = this.state.loadedImageCount >= this.props.media.items.length;
+    const isDoneLoading =
+      this.state.loadedImageCount >= this.props.media.items.length;
 
     return (
       <Masonry
@@ -125,9 +133,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
         {this.props.media.items.map((r: MediumWallPaginationItem) => {
           return (
             <li className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
-              <Link to={`/show/${r.id}`}>
-                {thumbs(r)}
-              </Link>
+              <Link to={`/show/${r.id}`}>{thumbs(r)}</Link>
             </li>
           );
         })}
@@ -144,7 +150,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
           onPageSelect={n => this.onPageSelect(n)}
           onPageSizeSelect={n => this.onPageSizeSelect(n)}
         >
-        {this.results()}
+          {this.results()}
         </BeevenuePagination>
       </>
     );

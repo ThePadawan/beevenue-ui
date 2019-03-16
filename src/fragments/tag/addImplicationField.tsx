@@ -37,7 +37,11 @@ class AddImplicationField extends Component<
         Api.Tags.addImplication(this.props.tag, name).then(
           res => {
             this.props.onImplicationAdded(name);
-            this.setState({ ...this.state, currentName: null, isSubmitting: false });
+            this.setState({
+              ...this.state,
+              currentName: null,
+              isSubmitting: false
+            });
           },
           err => {
             this.setState({ ...this.state, isSubmitting: false });
@@ -49,7 +53,11 @@ class AddImplicationField extends Component<
         Api.Tags.addImplication(name, this.props.tag).then(
           res => {
             this.props.onImplicationAdded(name);
-            this.setState({ ...this.state, currentName: null, isSubmitting: false });
+            this.setState({
+              ...this.state,
+              currentName: null,
+              isSubmitting: false
+            });
           },
           err => {
             this.setState({ ...this.state, isSubmitting: false });

@@ -12,6 +12,8 @@ import { Api, SearchParameters } from "../api/api";
 import { isSessionSfw } from "../redux/reducers/login";
 import { Thumbs, MediumWall } from "../fragments/mediumWall";
 import { Location } from "history";
+import { paginationParamsFromQuery } from "./pagination";
+import { addToQs } from "./queryString";
 
 interface SearchResultItem {
   id: any;
@@ -80,19 +82,9 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
     this.props.setSearchQuery(tags);
 
     let q = this.currentQueryString;
-
-    let pageNumber: number = parseInt(q.pageNr, 10) || 1;
-    if (pageNumber < 1) pageNumber = 1;
-
-    let pageSize: number = parseInt(q.pageSize, 10) || 10;
-    if (pageSize < 10) pageSize = 10;
-    if (pageSize > 100) pageSize = 100;
-
-    this.doSearch({
-      q: tags,
-      pageNumber: pageNumber,
-      pageSize: pageSize
-    });
+    const paginationParams = paginationParamsFromQuery(q);
+    const queryParams = { ...paginationParams, q: tags };
+    this.doSearch(queryParams);
   }
 
   componentDidUpdate = (prevProps: SearchResultsPageProps, _: any) => {
@@ -111,25 +103,13 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
       return;
     }
   };
-  
+
   onPageSelect = (n: number): void => {
-    this.addToQs({ pageNr: n });
+    addToQs(this.props, { pageNr: n });
   };
 
-  private addToQs(q: object) {
-    const currentLocation = this.props.location;
-    const currentQs = this.currentQueryString;
-    const newQs = { ...currentQs, ...q };
-    const newLocation = {
-      ...currentLocation,
-      search: qs.stringify(newQs, { addQueryPrefix: true })
-    };
-
-    this.props.redirect(newLocation.pathname + newLocation.search);
-  }
-
   onPageSizeSelect = (n: number): void => {
-    this.addToQs({ pageSize: n });
+    addToQs(this.props, { pageSize: n });
   };
 
   render() {

@@ -21,4 +21,3 @@ export const getRedirectionTarget = (store: any) => {
 };
 
 export default redirect;
-

@@ -1,10 +1,8 @@
 import React, { Component, FormEvent } from "react";
-import { connect } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
 import { Api } from "../api/api";
-import { BeevenuePage } from "./beevenuePage";
 import { NeedsLoginPage } from "./needsLoginPage";
 
 interface BatchUploadPageState {
@@ -46,58 +44,66 @@ class BatchUploadPage extends Component<any, BatchUploadPageState, any> {
     this.setState({ ...this.state, files: files });
   }
 
-  render() {
-    const progressBarClasses = () => {
-      let result = "beevenue-batch-upload progress";
-      if (this.state.files) {
-        if (this.state.doneCount == this.state.files.length) {
-          result += " is-success";
-        } else {
-          result += " is-warning";
-        }
-      }
-
+  private get progressBarClasses() {
+    let result = "beevenue-batch-upload progress";
+    if (!this.state.files) {
       return result;
     }
 
+    if (this.state.doneCount == this.state.files.length) {
+      return result + " is-success";
+    }
+
+    return result + " is-warning";
+  }
+
+  private get box() {
+    return (
+      <div className="file is-boxed">
+        <label className="file-label">
+          <input
+            className="file-input"
+            multiple={true}
+            type="file"
+            name="medium"
+            onChange={e => this.onChange(e.target.files)}
+          />
+          <span className="file-cta">
+            <FontAwesomeIcon icon={faUpload} />
+            <span className="file-label">Select files</span>
+          </span>
+          {this.state.files === null ? null : (
+            <progress
+              className={this.progressBarClasses}
+              value={this.state.doneCount}
+              max={this.state.files.length}
+            />
+          )}
+        </label>
+      </div>
+    );
+  }
+
+  private get form() {
+    return (
+      <form method="POST" onSubmit={e => this.onSubmit(e)}>
+        <div className="field">{this.box}</div>
+        <div className="field">
+          <input
+            type="submit"
+            className="button"
+            disabled={this.state.files === null}
+            value="Go"
+          />
+        </div>
+      </form>
+    );
+  }
+
+  render() {
     return (
       <NeedsLoginPage>
-        <div>
-          <form method="POST" onSubmit={e => this.onSubmit(e)}>
-            <div className="field">
-              <div className="file is-boxed">
-                <label className="file-label">
-                  <input
-                    className="file-input"
-                    multiple={true}
-                    type="file"
-                    name="medium"
-                    onChange={e => this.onChange(e.target.files)}
-                  />
-                  <span className="file-cta">
-                    <FontAwesomeIcon icon={faUpload} />
-                    <span className="file-label">Select files</span>
-                  </span>
-                  {this.state.files === null ? null : (
-                    <progress
-                      className={progressBarClasses()}
-                      value={this.state.doneCount}
-                      max={this.state.files.length}
-                    />
-                  )}
-                </label>
-              </div>
-            </div>
-            <div className="field">
-              <input
-                type="submit"
-                className="button"
-                disabled={this.state.files === null}
-                value="Go"
-              />
-            </div>
-          </form>
-        </div>
+        <div>{this.form}</div>
       </NeedsLoginPage>
     );
   }

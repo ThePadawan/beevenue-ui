@@ -10,9 +10,8 @@ interface WildcardPageParams {
   whatever: string;
 }
 
-interface WildcardPageProps extends BeevenuePageProps
-{
-  match: match<WildcardPageParams>
+interface WildcardPageProps extends BeevenuePageProps {
+  match: match<WildcardPageParams>;
   redirect: typeof redirect;
 }
 
@@ -38,5 +37,8 @@ class WildcardPage extends Component<WildcardPageProps, any, any> {
   }
 }
 
-const x = connect(null, { redirect })(WildcardPage)
+const x = connect(
+  null,
+  { redirect }
+)(WildcardPage);
 export { x as WildcardPage };

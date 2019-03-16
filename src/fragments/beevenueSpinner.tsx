@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { RingLoader, ReactSpinners } from "react-spinners";
 
-interface BeevenueSpinnerProps extends ReactSpinners.RingLoaderProps {
-
-}
+interface BeevenueSpinnerProps extends ReactSpinners.RingLoaderProps {}
 
 class BeevenueSpinner extends Component<BeevenueSpinnerProps, {}, {}> {
   public constructor(props: BeevenueSpinnerProps) {

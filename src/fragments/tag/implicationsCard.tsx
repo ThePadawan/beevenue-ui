@@ -4,8 +4,7 @@ import { AddImplicationField, Mode } from "./addImplicationField";
 
 type AddOrRemove = "Add" | "Remove";
 
-export interface TagImplicationsViewModel
-{
+export interface TagImplicationsViewModel {
   implied_by_this: string[];
   implying_this: string[];
 }
@@ -28,7 +27,6 @@ class ImplicationsCard extends Component<
     super(props);
     this.state = { tag: props.tag };
   }
-
 
   private getImpliedByThis(): any {
     const tag = this.props.tag;
@@ -64,7 +62,7 @@ class ImplicationsCard extends Component<
       </div>
     );
   }
-  
+
   private removeImpliedByThis = (a: string): void => {
     Api.Tags.removeImplication(this.props.tagName, a).then(
       res => {
@@ -72,34 +70,43 @@ class ImplicationsCard extends Component<
         console.log(res);
       },
       err => {
-        console.log(err);}
+        console.log(err);
+      }
     );
-  }
-  
+  };
+
   private removeImplyingThis = (a: string): void => {
     Api.Tags.removeImplication(a, this.props.tagName).then(
       res => {
         this.updateArrays("Remove", "ImplyingThis", a);
       },
       err => {
-        console.log(err);}
+        console.log(err);
+      }
     );
-  }
+  };
 
   private onImpliedByThisAdded = (a: string): void => {
     this.updateArrays("Add", "ImpliedByThis", a);
-  }
+  };
 
   private onImplyingThisAdded = (a: string): void => {
     this.updateArrays("Add", "ImplyingThis", a);
-  }
+  };
 
-  private updateArrays = (addOrRemove: AddOrRemove, mode: Mode, tagName: string) => {
+  private updateArrays = (
+    addOrRemove: AddOrRemove,
+    mode: Mode,
+    tagName: string
+  ) => {
     const tag = this.state.tag;
     if (!tag) return;
 
     // Signal React to behave
-    const target = mode == "ImpliedByThis" ? this.props.tag.implied_by_this : this.props.tag.implying_this;
+    const target =
+      mode == "ImpliedByThis"
+        ? this.props.tag.implied_by_this
+        : this.props.tag.implying_this;
 
     const newArray = target.slice();
     if (addOrRemove == "Add") {
@@ -118,11 +125,11 @@ class ImplicationsCard extends Component<
     }
 
     this.setState({ ...this.state, tag });
-  }
+  };
 
   private getImplyingThis(): any {
     const tag = this.props.tag;
-    
+
     const getInner = () => {
       if (tag.implying_this.length == 0) return null;
       return (

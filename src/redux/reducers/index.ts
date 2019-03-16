@@ -5,4 +5,10 @@ import search from "./search";
 import notifications from "./notifications";
 import redirect from "./redirect";
 
-export default combineReducers({ fileUpload, login, search, notifications, redirect });
+export default combineReducers({
+  fileUpload,
+  login,
+  search,
+  notifications,
+  redirect
+});

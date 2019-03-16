@@ -21,7 +21,7 @@ class MediumDeleteButton extends Component<MediumDeleteButtonProps, any, any> {
   public onConfirm = () => {
     this.props.onConfirm();
     this.onCloseModal();
-  }
+  };
 
   render() {
     let maybeModal = null;

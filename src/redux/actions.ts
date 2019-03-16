@@ -16,8 +16,7 @@ import {
   makeNotificationFromTemplate
 } from "../notifications";
 
-interface LoginDetails
-{
+interface LoginDetails {
   id: string;
   sfwSession: boolean;
 }
@@ -33,8 +32,8 @@ export const setSfwSession = (sfw: boolean) => {
   return {
     type: SET_SFW_SESSION,
     payload: sfw
-  }
-}
+  };
+};
 
 export const loginAnonymous = () => {
   return {
@@ -88,4 +87,4 @@ export const redirect = (location: string) => ({
 export const setFileUploaded = () => ({
   type: SET_FILE_UPLOADED,
   payload: +new Date()
-})
+});

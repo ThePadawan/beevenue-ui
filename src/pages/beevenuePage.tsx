@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Sidebar } from "../fragments/sidebar";
-import {Location} from "history";
+import { Location } from "history";
 
 import { NotificationsPanel } from "../fragments/panels/notificationsPanel";
 

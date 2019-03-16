@@ -22,7 +22,7 @@ class NeedsLoginPage<
   }
 
   componentDidMount() {
-    if (!this.props.IsLoggedIn || this.props.loggedInRole !== 'admin') {
+    if (!this.props.IsLoggedIn || this.props.loggedInRole !== "admin") {
       this.props.addNotLoggedInNotification();
       this.props.redirect("/");
     }
@@ -30,7 +30,11 @@ class NeedsLoginPage<
 }
 
 const mapStateToProps = (state: any): NeedsLoginPageProps => {
-  return { ...state, IsLoggedIn: typeof getLoggedInUser(state.login) === "string", loggedInRole: getLoggedInRole(state.login) };
+  return {
+    ...state,
+    IsLoggedIn: typeof getLoggedInUser(state.login) === "string",
+    loggedInRole: getLoggedInRole(state.login)
+  };
 };
 
 const x = connect(

@@ -5,9 +5,13 @@ import { debounce } from "lodash-es";
 import { BeevenueSpinner } from "./fragments/beevenueSpinner";
 
 import {
-  IndexPage, SearchResultsPage, ShowPage, 
-  BatchUploadPage, TagStatisticsPage, TagShowPage,
-  WildcardPage, 
+  IndexPage,
+  SearchResultsPage,
+  ShowPage,
+  BatchUploadPage,
+  TagStatisticsPage,
+  TagShowPage,
+  WildcardPage,
   InvestigateProblemsPage,
   RulesPage
 } from "./pages";
@@ -58,7 +62,9 @@ class AppRouter extends Component<AppRouterProps, any, any> {
 
     if (newProps.redirecting) {
       const r = this.props.stopRedirecting;
-      if (r) {r()};
+      if (r) {
+        r();
+      }
     }
   }
 
@@ -75,25 +81,25 @@ class AppRouter extends Component<AppRouterProps, any, any> {
 
     return (
       <Router history={history}>
-          <Switch>
-            <Route path="/" exact component={IndexPage} />
-            <Route path="/search/:extra(.+)" component={SearchResultsPage} />
-            <Route path="/show/:id" component={ShowPage} />
-            <Route path="/upload" component={BatchUploadPage} />
-            <Route path="/tags" component={TagStatisticsPage} />
-            <Route path="/tag/:name" component={TagShowPage} />
-            <Route path="/problems" component={InvestigateProblemsPage} />
-            <Route path="/rules" component={RulesPage} />
-            <Route path="/:whatever" component={WildcardPage} />
-          </Switch>
+        <Switch>
+          <Route path="/" exact component={IndexPage} />
+          <Route path="/search/:extra(.+)" component={SearchResultsPage} />
+          <Route path="/show/:id" component={ShowPage} />
+          <Route path="/upload" component={BatchUploadPage} />
+          <Route path="/tags" component={TagStatisticsPage} />
+          <Route path="/tag/:name" component={TagShowPage} />
+          <Route path="/problems" component={InvestigateProblemsPage} />
+          <Route path="/rules" component={RulesPage} />
+          <Route path="/:whatever" component={WildcardPage} />
+        </Switch>
       </Router>
     );
   }
 }
 
 const mapStateToProps = (state: any) => {
-  return { redirecting: getRedirectionTarget(state.redirect) }
-}
+  return { redirecting: getRedirectionTarget(state.redirect) };
+};
 
 const x = connect(
   mapStateToProps,

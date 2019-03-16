@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import qs from "qs";
-import {Location} from "history";
+import { Location } from "history";
 
 import { BeevenuePage } from "./beevenuePage";
 import { MediumWall, MediumWallPagination } from "../fragments/mediumWall";
@@ -15,6 +15,8 @@ import {
 } from "../redux/reducers/login";
 import { redirect } from "../redux/actions";
 import { getLastFileUploaded } from "../redux/reducers/fileUpload";
+import { paginationParamsFromQuery } from "./pagination";
+import { addToQs } from "./queryString";
 
 interface IndexPageProps {
   loggedInUser: BeevenueUser;
@@ -47,7 +49,10 @@ class IndexPage extends Component<IndexPageProps, any, any> {
       return;
     }
 
-    if ((prevProps.lastFileUploaded || -Infinity) < (this.props.lastFileUploaded || -Infinity)) {
+    if (
+      (prevProps.lastFileUploaded || -Infinity) <
+      (this.props.lastFileUploaded || -Infinity)
+    ) {
       this.loadDefaultMedia();
       return;
     }
@@ -74,20 +79,9 @@ class IndexPage extends Component<IndexPageProps, any, any> {
   }
 
   private loadDefaultMedia = () => {
-    // TODO Buncha duplicated code with searchResultsPage.
     let q = this.currentQueryString;
-
-    let pageNumber: number = parseInt(q.pageNr, 10) || 1;
-    if (pageNumber < 1) pageNumber = 1;
-
-    let pageSize: number = parseInt(q.pageSize, 10) || 10;
-    if (pageSize < 10) pageSize = 10;
-    if (pageSize > 100) pageSize = 100;
-
-    this.loadMedia({
-      pageNumber: pageNumber,
-      pageSize: pageSize
-    });
+    const paginationParams = paginationParamsFromQuery(q);
+    this.loadMedia(paginationParams);
   };
 
   private loadMedia = (params: LoadMediaParameters) => {
@@ -101,23 +95,11 @@ class IndexPage extends Component<IndexPageProps, any, any> {
   };
 
   onPageSelect = (n: number): void => {
-    this.addToQs({ pageNr: n });
+    addToQs(this.props, { pageNr: n });
   };
 
-  private addToQs(q: object) {
-    const currentLocation = this.props.location;
-    const currentQs = this.currentQueryString;
-    const newQs = { ...currentQs, ...q };
-    const newLocation = {
-      ...currentLocation,
-      search: qs.stringify(newQs, { addQueryPrefix: true })
-    };
-
-    this.props.redirect(newLocation.pathname + newLocation.search);
-  }
-
   onPageSizeSelect = (n: number): void => {
-    this.addToQs({ pageSize: n });
+    addToQs(this.props, { pageSize: n });
   };
 
   render = () => {

@@ -25,14 +25,14 @@ class MissingTags extends Component<MissingTagsProps, MissingTagsState, any> {
     if (!isEqual(this.props.tags, oldProps.tags)) {
       this.load();
     }
-  }
+  };
 
   componentDidMount = () => {
     this.load();
   };
 
   private load = () => {
-    this.setState({...this.state, missing: null });
+    this.setState({ ...this.state, missing: null });
     Api.Tags.getMissing(this.props.id).then(
       res => {
         this.setState({
@@ -44,7 +44,7 @@ class MissingTags extends Component<MissingTagsProps, MissingTagsState, any> {
         console.error(err);
       }
     );
-  }
+  };
 
   render() {
     let inner = null;

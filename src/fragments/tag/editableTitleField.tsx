@@ -17,7 +17,6 @@ class EditableTitleField extends Component<
   EditableTitleFieldState,
   any
 > {
-
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -43,17 +42,17 @@ class EditableTitleField extends Component<
     if (!this.state.currentTitle) return;
 
     if (this.state.currentTitle === this.props.initialTitle) {
-        this.setState({ ...this.state, isBeingEdited: false });
-        return;
+      this.setState({ ...this.state, isBeingEdited: false });
+      return;
     }
 
     Api.Tags.rename(this.props.initialTitle, this.state.currentTitle).then(
-        _ => {
-            this.setState({ ...this.state, isBeingEdited: false });
-            if (this.props.onTitleChanged) {
-                this.props.onTitleChanged(this.state.currentTitle || '');
-            }
+      _ => {
+        this.setState({ ...this.state, isBeingEdited: false });
+        if (this.props.onTitleChanged) {
+          this.props.onTitleChanged(this.state.currentTitle || "");
         }
+      }
     );
   };
 
@@ -61,7 +60,10 @@ class EditableTitleField extends Component<
     let content = null;
     if (this.state.isBeingEdited) {
       content = (
-        <form onSubmit={e => this.onSubmit(e)} className="beevenue-editable-title">
+        <form
+          onSubmit={e => this.onSubmit(e)}
+          className="beevenue-editable-title"
+        >
           <input
             className="input"
             onBlur={e => this.stopEditing()}

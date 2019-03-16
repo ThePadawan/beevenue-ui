@@ -8,21 +8,17 @@ import "./styles/index.scss";
 
 import { Provider } from "react-redux";
 
-
 import store from "./redux/store";
 import { AppRouter } from "./appRouter";
 
-
 class App extends Component {
-
   render() {
     return (
       <Provider store={store}>
-        <AppRouter/>
+        <AppRouter />
       </Provider>
     );
   }
 }
-
 
 export default App;

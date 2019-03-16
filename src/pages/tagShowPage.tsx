@@ -91,11 +91,9 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
   };
 
   private removeAlias = (a: string): void => {
-    Api.Tags.removeAlias(this.tagName, a).then(
-      _ => {
-        this.onAliasRemoved(a);
-      }
-    );
+    Api.Tags.removeAlias(this.tagName, a).then(_ => {
+      this.onAliasRemoved(a);
+    });
   };
 
   private get innerContent() {
@@ -105,14 +103,19 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
 
     if (!this.state.tag) return <BeevenueSpinner />;
 
-    const cardGetters = [
+    type CardGetter = (vm: ShowTagViewModel) => JSX.Element | null;
+
+    const cardGetters: CardGetter[] = [
       this.getUsageCard,
       this.getAliasesCard,
       this.getImplicationsCard
     ];
 
-    // TODO Define better type
-    const wrapper = (x: Function, idx: number) => {
+    const wrapper = (x: CardGetter, idx: number) => {
+      if (!this.state.tag) {
+        return null;
+      }
+
       return (
         <nav className="level" key={idx}>
           <div className="level-item">{x.bind(this)(this.state.tag)}</div>
@@ -123,12 +126,11 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
     return <>{cardGetters.map((g, idx) => wrapper.bind(this)(g, idx))}</>;
   }
   private getAliasesCard(tag: ShowTagViewModel): JSX.Element | null {
-    // TODO Sort alphabetically
     const getCurrentAliases = () => {
       if (tag.aliases.length == 0) return null;
       return (
         <ul>
-          {tag.aliases.map(a => (
+          {tag.aliases.sort().map(a => (
             <Fragment key={a}>
               <li>
                 {a}
@@ -163,7 +165,7 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
 
   private getImplicationsCard(tag: ShowTagViewModel): JSX.Element | null {
     if (!this.state.tag) return null;
-    return <ImplicationsCard tag={this.state.tag} tagName={this.tagName} />
+    return <ImplicationsCard tag={this.state.tag} tagName={this.tagName} />;
   }
 
   private getUsageCard(tag: ShowTagViewModel): JSX.Element | null {
@@ -181,14 +183,17 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
 
   private onTitleChanged = (newTitle: string): void => {
     this.props.redirect(`/tag/${newTitle}`);
-  }
+  };
 
   render() {
     return (
       <NeedsLoginPage>
         <div>
           <h2 className="title">
-            <EditableTitleField initialTitle={this.tagName} onTitleChanged={t => this.onTitleChanged(t)} />
+            <EditableTitleField
+              initialTitle={this.tagName}
+              onTitleChanged={t => this.onTitleChanged(t)}
+            />
             <Link to={`/search/${this.tagName}`} className="beevenue-h2-link">
               <FontAwesomeIcon icon={faSearch} />
             </Link>

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { Api } from "../../api/api";
-import { setFileUploaded } from '../../redux/actions';
+import { setFileUploaded } from "../../redux/actions";
 
 interface UploadPanelProps {
   setFileUploaded: typeof setFileUploaded;
@@ -27,11 +27,9 @@ class UploadPanel extends Component<UploadPanelProps, UploadPanelState, any> {
       return;
     }
 
-    Api.uploadMedium(this.state.file).then(
-      (res: any) => {
-        this.props.setFileUploaded();
-      }
-    );
+    Api.uploadMedium(this.state.file).then((res: any) => {
+      this.props.setFileUploaded();
+    });
   };
 
   public onChange = (files: FileList | null) => {
@@ -74,7 +72,12 @@ class UploadPanel extends Component<UploadPanelProps, UploadPanelState, any> {
                   </div>
                 </div>
                 <div className="field">
-                  <input type="submit" className="button" disabled={this.state.file === null} value="Go" />
+                  <input
+                    type="submit"
+                    className="button"
+                    disabled={this.state.file === null}
+                    value="Go"
+                  />
                 </div>
               </form>
             </div>
@@ -85,5 +88,8 @@ class UploadPanel extends Component<UploadPanelProps, UploadPanelState, any> {
   }
 }
 
-const x = connect(null, { setFileUploaded })(UploadPanel);
+const x = connect(
+  null,
+  { setFileUploaded }
+)(UploadPanel);
 export { x as UploadPanel };

@@ -25,7 +25,12 @@ class Medium extends Component<MediumProps, {}, any> {
         break;
     }
 
-    return <>{innerComponent}<SimilarMedia media={this.props.similar} /></>;
+    return (
+      <>
+        {innerComponent}
+        <SimilarMedia media={this.props.similar} />
+      </>
+    );
   }
 }
 

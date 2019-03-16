@@ -8,7 +8,7 @@ import { LoginPanel, SearchPanel, UploadPanel, LinksPanel } from "./panels";
 import {
   getLoggedInUser,
   getLoggedInRole,
-  BeevenueUser,
+  BeevenueUser
 } from "../redux/reducers/login";
 import { Location } from "history";
 
@@ -25,7 +25,7 @@ class Sidebar extends Component<SidebarProps, any, any> {
 
   render() {
     let elements: JSX.Element[];
-    if (this.props.loggedInRole === 'admin') {
+    if (this.props.loggedInRole === "admin") {
       elements = [
         <SearchPanel {...this.props} />,
         <UploadPanel />,
@@ -33,10 +33,7 @@ class Sidebar extends Component<SidebarProps, any, any> {
         <LoginPanel />
       ];
     } else {
-      elements = [
-        <SearchPanel {...this.props} />,
-        <LoginPanel />
-      ];
+      elements = [<SearchPanel {...this.props} />, <LoginPanel />];
     }
 
     return (
@@ -49,11 +46,9 @@ class Sidebar extends Component<SidebarProps, any, any> {
           </div>
         </nav>
         {elements.map((e, idx) => (
-        <nav className="level" key={idx}>
-          <div className="level-item">
-            {e}
-          </div>
-        </nav>
+          <nav className="level" key={idx}>
+            <div className="level-item">{e}</div>
+          </nav>
         ))}
       </div>
     );
@@ -61,7 +56,10 @@ class Sidebar extends Component<SidebarProps, any, any> {
 }
 
 const mapStateToProps = (state: any) => {
-  return { loggedInUser: getLoggedInUser(state.login), loggedInRole: getLoggedInRole(state.login) };
+  return {
+    loggedInUser: getLoggedInUser(state.login),
+    loggedInRole: getLoggedInRole(state.login)
+  };
 };
 
 const x = connect(

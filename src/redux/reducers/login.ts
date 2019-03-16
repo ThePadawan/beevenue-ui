@@ -1,4 +1,9 @@
-import { LOGIN, LOGOUT, LOGIN_ANONYMOUS, SET_SFW_SESSION } from "../actionTypes";
+import {
+  LOGIN,
+  LOGOUT,
+  LOGIN_ANONYMOUS,
+  SET_SFW_SESSION
+} from "../actionTypes";
 
 interface IAnonymous {}
 export const Anonymous: IAnonymous = {};
@@ -15,7 +20,12 @@ interface BeevenueStore {
   serverVersion: string;
 }
 
-const initialState = { loggedInUser: Unknown, loggedInRole: null, sfwSession: true, serverVersion: 'unknown' };
+const initialState = {
+  loggedInUser: Unknown,
+  loggedInRole: null,
+  sfwSession: true,
+  serverVersion: "unknown"
+};
 
 const login = (
   state: BeevenueStore = initialState,
@@ -31,7 +41,6 @@ const login = (
         sfwSession: action.payload.sfwSession
       };
       return result;
-
     }
     case LOGIN_ANONYMOUS: {
       return {
@@ -51,7 +60,7 @@ const login = (
       return {
         ...state,
         sfwSession: action.payload
-      }
+      };
     }
     default: {
       return state;
@@ -69,10 +78,10 @@ export const getLoggedInRole = (store: BeevenueStore) => {
 
 export const isSessionSfw = (store: BeevenueStore) => {
   return store.sfwSession;
-}
+};
 
 export const getServerVersion = (store: BeevenueStore) => {
   return store.serverVersion;
-}
+};
 
 export default login;

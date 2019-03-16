@@ -23,23 +23,28 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
   }
 
   componentDidUpdate = (prevProps: any) => {
-    if (this.props.searchTerms !== prevProps.searchTerms && this.props.searchTerms) {
+    if (
+      this.props.searchTerms !== prevProps.searchTerms &&
+      this.props.searchTerms
+    ) {
       this.setState({ ...this.state, searchTerms: this.props.searchTerms });
     }
-  }
+  };
 
   onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     // Redirect to new search results. Keep query parameter "pageSize"
     // if it is set.
-    let newQ = '';
+    let newQ = "";
     if (this.props.location) {
-      const query = qs.parse(this.props.location.search, {ignoreQueryPrefix: true});
+      const query = qs.parse(this.props.location.search, {
+        ignoreQueryPrefix: true
+      });
       const { pageSize } = query;
       newQ = qs.stringify({ pageSize });
     }
-    let newPath = `/search/${this.state.searchTerms.replace(/ /g, '/')}`;
+    let newPath = `/search/${this.state.searchTerms.replace(/ /g, "/")}`;
     if (newQ) {
       newPath = `${newPath}?${newQ}`;
     }
@@ -58,17 +63,17 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
           <p className="card-header-title">Search</p>
         </div>
         <div className="card-content">
-        <div className="content">
-          <form onSubmit={e => this.onSubmit(e)}>
-            <input
-              className="input"
-              type="text"
-              placeholder="Search"
-              value={this.state.searchTerms}
-              onChange={e => this.onChange(e.currentTarget.value)}
-            />
-          </form>
-        </div>
+          <div className="content">
+            <form onSubmit={e => this.onSubmit(e)}>
+              <input
+                className="input"
+                type="text"
+                placeholder="Search"
+                value={this.state.searchTerms}
+                onChange={e => this.onChange(e.currentTarget.value)}
+              />
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -77,10 +82,10 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
 
 const mapStateToProps = (state: any) => {
   return { searchTerms: getSearchQuery(state.search) };
-}
+};
 
 const x = connect(
   mapStateToProps,
-  { addSearchResults,  redirect }
+  { addSearchResults, redirect }
 )(SearchPanel);
 export { x as SearchPanel };

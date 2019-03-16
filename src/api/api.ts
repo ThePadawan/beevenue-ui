@@ -53,11 +53,11 @@ const _notification_wrapper = (p: AxiosPromise<any>): AxiosPromise<any> => {
       }
     );
   });
-}
+};
 
 const Api = {
   show(id: number): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`medium/${id}`))
+    return _notification_wrapper(axiosClient.get(`medium/${id}`));
   },
 
   Tags: {
@@ -82,36 +82,46 @@ const Api = {
     },
 
     addAlias(tag: string, alias: string): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.post(`tag/${tag}/aliases/${alias}`));
+      return _notification_wrapper(
+        axiosClient.post(`tag/${tag}/aliases/${alias}`)
+      );
     },
 
     removeAlias(tag: string, alias: string): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.delete(`tag/${tag}/aliases/${alias}`));
+      return _notification_wrapper(
+        axiosClient.delete(`tag/${tag}/aliases/${alias}`)
+      );
     },
 
     rename(tag: string, newName: string): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.patch(`tag/${tag}`, { newName }));
+      return _notification_wrapper(
+        axiosClient.patch(`tag/${tag}`, { newName })
+      );
     },
 
     addImplication(
       implying_this: string,
       implied_by_this: string
     ): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.patch(
-        `tag/${implying_this}/implications/${implied_by_this}`
-      ));
+      return _notification_wrapper(
+        axiosClient.patch(
+          `tag/${implying_this}/implications/${implied_by_this}`
+        )
+      );
     },
 
     removeImplication(
       implying_this: string,
       implied_by_this: string
     ): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.delete(
-        `tag/${implying_this}/implications/${implied_by_this}`
-      ));
+      return _notification_wrapper(
+        axiosClient.delete(
+          `tag/${implying_this}/implications/${implied_by_this}`
+        )
+      );
     }
   },
-  
+
   getRules(): AxiosPromise<any> {
     return _notification_wrapper(axiosClient.get(`rules`));
   },
@@ -129,10 +139,9 @@ const Api = {
   },
 
   updateMedium(params: UpdateMediumParameters): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.patch(
-      `medium/${params.id}`,
-      pick(params, ["rating", "tags"])
-    ));
+    return _notification_wrapper(
+      axiosClient.patch(`medium/${params.id}`, pick(params, ["rating", "tags"]))
+    );
   },
 
   uploadMedium(file: File): AxiosPromise<any> {
@@ -154,7 +163,9 @@ const Api = {
   },
 
   search(searchParams: SearchParameters): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get("search", { params: searchParams }));
+    return _notification_wrapper(
+      axiosClient.get("search", { params: searchParams })
+    );
   },
 
   logout(): AxiosPromise<any> {
