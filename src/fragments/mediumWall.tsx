@@ -7,6 +7,8 @@ import { backendUrl } from "../config.json";
 import { BeevenuePagination } from "./beevenuePagination";
 import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "./beevenueSpinner";
+import { addToQs } from "../pages/queryString";
+import { redirect } from "../redux/actions";
 
 export interface Thumbs {
   [index: number]: string;
@@ -29,8 +31,7 @@ export interface MediumWallPagination {
 interface MediumWallProps {
   location: Location;
   media: MediumWallPagination;
-  onPageSelect: (n: number) => void;
-  onPageSizeSelect: (n: number) => void;
+  redirect: typeof redirect;
 }
 
 interface MediumWallState {
@@ -58,12 +59,12 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
   public onPageSelect = (n: number) => {
     this.setState({ loadedImageCount: 0 });
-    this.props.onPageSelect(n);
+    addToQs(this.props, { pageNr: n });
   };
 
   public onPageSizeSelect = (n: number) => {
     this.setState({ loadedImageCount: 0 });
-    this.props.onPageSizeSelect(n);
+    addToQs(this.props, { pageSize: n });
   };
 
   private masonryClasses = (

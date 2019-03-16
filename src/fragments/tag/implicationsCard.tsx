@@ -28,32 +28,32 @@ class ImplicationsCard extends Component<
     this.state = { tag: props.tag };
   }
 
-  private getImpliedByThis(): any {
+  private get listImpliedByThis() {
     const tag = this.props.tag;
 
-    const getInner = () => {
-      if (tag.implied_by_this.length == 0) return null;
-      return (
-        <ul>
-          {tag.implied_by_this.map(a => (
-            <Fragment key={a}>
-              <li>
-                {a}
-                <a
-                  className="beevenue-alias-delete delete is-small"
-                  onClick={e => this.removeImpliedByThis(a)}
-                />
-              </li>
-            </Fragment>
-          ))}
-        </ul>
-      );
-    };
+    if (tag.implied_by_this.length == 0) return null;
+    return (
+      <ul>
+        {tag.implied_by_this.map(a => (
+          <Fragment key={a}>
+            <li>
+              {a}
+              <a
+                className="beevenue-alias-delete delete is-small"
+                onClick={e => this.removeImpliedByThis(a)}
+              />
+            </li>
+          </Fragment>
+        ))}
+      </ul>
+    );
+  }
 
+  private getImpliedByThis(): any {
     return (
       <div>
         Implied by this:
-        {getInner()}
+        {this.listImpliedByThis}
         <AddImplicationField
           tag={this.props.tagName}
           mode={"ImpliedByThis"}
@@ -127,32 +127,32 @@ class ImplicationsCard extends Component<
     this.setState({ ...this.state, tag });
   };
 
-  private getImplyingThis(): any {
+  private get listImplyingThis() {
     const tag = this.props.tag;
 
-    const getInner = () => {
-      if (tag.implying_this.length == 0) return null;
-      return (
-        <ul>
-          {tag.implying_this.map(a => (
-            <Fragment key={a}>
-              <li>
-                {a}
-                <a
-                  className="beevenue-alias-delete delete is-small"
-                  onClick={e => this.removeImplyingThis(a)}
-                />
-              </li>
-            </Fragment>
-          ))}
-        </ul>
-      );
-    };
+    if (tag.implying_this.length == 0) return null;
+    return (
+      <ul>
+        {tag.implying_this.map(a => (
+          <Fragment key={a}>
+            <li>
+              {a}
+              <a
+                className="beevenue-alias-delete delete is-small"
+                onClick={e => this.removeImplyingThis(a)}
+              />
+            </li>
+          </Fragment>
+        ))}
+      </ul>
+    );
+  }
 
+  private getImplyingThis(): any {
     return (
       <div>
         Implying this:
-        {getInner()}
+        {this.listImplyingThis}
         <AddImplicationField
           tag={this.props.tagName}
           mode={"ImplyingThis"}

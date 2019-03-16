@@ -36,19 +36,21 @@ interface UpdateMediumParameters {
   tags: Array<string>;
 }
 
+const dispatcher = (x: any) => {
+  if ((x as BeevenueNotificationTemplate).level) {
+    store.dispatch(addNotification(x));
+  }
+};
+
 const _notification_wrapper = (p: AxiosPromise<any>): AxiosPromise<any> => {
   return new Promise((resolve, reject) => {
     p.then(
       success => {
-        if ((success.data as BeevenueNotificationTemplate).level) {
-          store.dispatch(addNotification(success.data));
-        }
+        dispatcher(success.data);
         resolve(success);
       },
       error => {
-        if ((error.response.data as BeevenueNotificationTemplate).level) {
-          store.dispatch(addNotification(error.response.data));
-        }
+        dispatcher(error.response.data);
         reject(error);
       }
     );

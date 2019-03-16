@@ -23,19 +23,20 @@ class Sidebar extends Component<SidebarProps, any, any> {
     super(props);
   }
 
-  render() {
-    let elements: JSX.Element[];
+  private get elements(): JSX.Element[] {
     if (this.props.loggedInRole === "admin") {
-      elements = [
+      return [
         <SearchPanel {...this.props} />,
         <UploadPanel />,
         <LinksPanel />,
         <LoginPanel />
       ];
     } else {
-      elements = [<SearchPanel {...this.props} />, <LoginPanel />];
+      return [<SearchPanel {...this.props} />, <LoginPanel />];
     }
+  }
 
+  render() {
     return (
       <div>
         <nav className="level">
@@ -45,7 +46,7 @@ class Sidebar extends Component<SidebarProps, any, any> {
             </h2>
           </div>
         </nav>
-        {elements.map((e, idx) => (
+        {this.elements.map((e, idx) => (
           <nav className="level" key={idx}>
             <div className="level-item">{e}</div>
           </nav>

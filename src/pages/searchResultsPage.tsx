@@ -13,7 +13,6 @@ import { isSessionSfw } from "../redux/reducers/login";
 import { Thumbs, MediumWall } from "../fragments/mediumWall";
 import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
-import { addToQs } from "./queryString";
 
 interface SearchResultItem {
   id: any;
@@ -104,27 +103,12 @@ class SearchResultsPage extends Component<SearchResultsPageProps, any, any> {
     }
   };
 
-  onPageSelect = (n: number): void => {
-    addToQs(this.props, { pageNr: n });
-  };
-
-  onPageSizeSelect = (n: number): void => {
-    addToQs(this.props, { pageSize: n });
-  };
-
   render() {
     let inner = null;
     if (!this.props.results || !this.props.results.items) {
       inner = <h2 className="title is-2">No results found.</h2>;
     } else {
-      inner = (
-        <MediumWall
-          location={this.props.location}
-          media={this.props.results}
-          onPageSelect={n => this.onPageSelect(n)}
-          onPageSizeSelect={n => this.onPageSizeSelect(n)}
-        />
-      );
+      inner = <MediumWall media={this.props.results} {...this.props} />;
     }
 
     return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;

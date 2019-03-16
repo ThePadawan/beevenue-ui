@@ -30,14 +30,9 @@ class BatchUploadPage extends Component<any, BatchUploadPageState, any> {
   }
 
   private async uploadFile(f: File) {
-    await Api.uploadMedium(f).then(
-      (res: any) => {
-        this.setState({ ...this.state, doneCount: this.state.doneCount + 1 });
-      },
-      (err: any) => {
-        this.setState({ ...this.state, doneCount: this.state.doneCount + 1 });
-      }
-    );
+    await Api.uploadMedium(f).finally(() => {
+      this.setState({ ...this.state, doneCount: this.state.doneCount + 1 });
+    });
   }
 
   public onChange(files: FileList | null) {

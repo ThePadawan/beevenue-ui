@@ -16,7 +16,6 @@ import {
 import { redirect } from "../redux/actions";
 import { getLastFileUploaded } from "../redux/reducers/fileUpload";
 import { paginationParamsFromQuery } from "./pagination";
-import { addToQs } from "./queryString";
 
 interface IndexPageProps {
   loggedInUser: BeevenueUser;
@@ -94,23 +93,10 @@ class IndexPage extends Component<IndexPageProps, any, any> {
     );
   };
 
-  onPageSelect = (n: number): void => {
-    addToQs(this.props, { pageNr: n });
-  };
-
-  onPageSizeSelect = (n: number): void => {
-    addToQs(this.props, { pageSize: n });
-  };
-
   render = () => {
     return (
       <BeevenuePage {...this.props}>
-        <MediumWall
-          location={this.props.location}
-          media={this.state.media}
-          onPageSelect={n => this.onPageSelect(n)}
-          onPageSizeSelect={n => this.onPageSizeSelect(n)}
-        />
+        <MediumWall media={this.state.media} {...this.props} />
       </BeevenuePage>
     );
   };

@@ -27,35 +27,44 @@ const initialState = {
   serverVersion: "unknown"
 };
 
+const doLogin = (state: BeevenueStore, action: any) => {
+  const result = {
+    ...state,
+    loggedInUser: action.payload.id,
+    loggedInRole: action.payload.role,
+    serverVersion: action.payload.version,
+    sfwSession: action.payload.sfwSession
+  };
+  return result;
+};
+
+const doLoginAnonymous = (state: BeevenueStore) => {
+  return {
+    ...state,
+    loggedInUser: Anonymous,
+    loggedInRole: null
+  };
+};
+
+const doLogout = (state: BeevenueStore) => {
+  return {
+    ...state,
+    loggedInUser: Anonymous,
+    loggedInRole: null
+  };
+};
+
 const login = (
   state: BeevenueStore = initialState,
   action: any
 ): BeevenueStore => {
   switch (action.type) {
-    case LOGIN: {
-      const result = {
-        ...state,
-        loggedInUser: action.payload.id,
-        loggedInRole: action.payload.role,
-        serverVersion: action.payload.version,
-        sfwSession: action.payload.sfwSession
-      };
-      return result;
-    }
-    case LOGIN_ANONYMOUS: {
-      return {
-        ...state,
-        loggedInUser: Anonymous,
-        loggedInRole: null
-      };
-    }
-    case LOGOUT: {
-      return {
-        ...state,
-        loggedInUser: Anonymous,
-        loggedInRole: null
-      };
-    }
+    case LOGIN:
+      return doLogin(state, action);
+    case LOGIN_ANONYMOUS:
+      return doLoginAnonymous(state);
+    case LOGOUT:
+      return doLogout(state);
     case SET_SFW_SESSION: {
       return {
         ...state,
