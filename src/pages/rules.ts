@@ -1,17 +1,30 @@
 import { Rating } from "../api/show";
 
-export type RulePartKind =
+type IffRulePartKind = "all" | "hasRating" | "hasAnyTagsIn" | "hasAnyTagsLike";
+
+type ThenRulePartKind =
   | "all"
+  | "fail"
   | "hasRating"
   | "hasAnyTagsIn"
   | "hasAnyTagsLike";
+
+export type RulePartKind = IffRulePartKind | ThenRulePartKind;
 
 interface RulePart {
   type: RulePartKind;
 }
 
-interface AllRulePart extends RulePart {
-  type: "all";
+interface IfRulePart extends RulePart {
+  type: IffRulePartKind;
+}
+
+interface ThenRulePart extends RulePart {
+  type: ThenRulePartKind;
+}
+
+interface FailThenRulePart extends ThenRulePart {
+  type: "fail";
 }
 
 interface HasRatingRulePart extends RulePart {
@@ -30,8 +43,8 @@ interface HasAnyTagsInRulePart extends RulePart {
 }
 
 interface Rule {
-  if: RulePart;
-  then: RulePart[];
+  if: IfRulePart;
+  then: ThenRulePart[];
 }
 
 const _arrayToFragment = (terms: string[], options: {} = {}): string => {
@@ -76,7 +89,7 @@ const _ifTextHasAnyTagsLike = (p: HasAnyTagsLikeRulePart): string => {
   return `All media with a tag like ${_arrayToFragment(p.data)}`;
 };
 
-const _ifText = (rulePart: RulePart): string => {
+const _ifText = (rulePart: IfRulePart): string => {
   switch (rulePart.type) {
     case "all":
       return _ifTextAll();
@@ -104,8 +117,10 @@ const _thenTextHasAnyTagsLike = (p: HasAnyTagsLikeRulePart): string => {
   return `should have a tag like ${_arrayToFragment(p.data)}`;
 };
 
-const _thenText = (rulePart: RulePart): string => {
+const _thenText = (rulePart: ThenRulePart): string => {
   switch (rulePart.type) {
+    case "fail":
+      return "should not exist";
     case "all":
       return "should never happen";
     case "hasRating":

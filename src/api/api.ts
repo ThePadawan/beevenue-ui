@@ -62,6 +62,10 @@ const Api = {
     return _notification_wrapper(axiosClient.get(`medium/${id}`));
   },
 
+  getAnyMissing(): AxiosPromise<any> {
+    return _notification_wrapper(axiosClient.get(`tags/missing/any`));
+  },
+
   Tags: {
     show(name: string): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));

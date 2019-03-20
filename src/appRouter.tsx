@@ -19,6 +19,7 @@ import { Api } from "./api/api";
 import { login, loginAnonymous, stopRedirecting } from "./redux/actions";
 import { getRedirectionTarget } from "./redux/reducers/redirect";
 import history from "./history";
+import { RedirectToRandomRulesViolationPage } from "./pages/redirectToRandomRulesViolationPage";
 
 interface AppRouterProps {
   login: typeof login;
@@ -68,6 +69,26 @@ class AppRouter extends Component<AppRouterProps, any, any> {
     }
   }
 
+  private get routes() {
+    return (
+      <Switch>
+        <Route path="/" exact component={IndexPage} />
+        <Route path="/search/:extra(.+)" component={SearchResultsPage} />
+        <Route path="/show/:id" component={ShowPage} />
+        <Route path="/upload" component={BatchUploadPage} />
+        <Route path="/tags" component={TagStatisticsPage} />
+        <Route path="/tag/:name" component={TagShowPage} />
+        <Route path="/problems" component={InvestigateProblemsPage} />
+        <Route
+          path="/rules/violations/any"
+          component={RedirectToRandomRulesViolationPage}
+        />
+        <Route path="/rules" component={RulesPage} />
+        <Route path="/:whatever" component={WildcardPage} />
+      </Switch>
+    );
+  }
+
   render() {
     if (!this.state.HasUser) {
       return (
@@ -79,21 +100,7 @@ class AppRouter extends Component<AppRouterProps, any, any> {
       );
     }
 
-    return (
-      <Router history={history}>
-        <Switch>
-          <Route path="/" exact component={IndexPage} />
-          <Route path="/search/:extra(.+)" component={SearchResultsPage} />
-          <Route path="/show/:id" component={ShowPage} />
-          <Route path="/upload" component={BatchUploadPage} />
-          <Route path="/tags" component={TagStatisticsPage} />
-          <Route path="/tag/:name" component={TagShowPage} />
-          <Route path="/problems" component={InvestigateProblemsPage} />
-          <Route path="/rules" component={RulesPage} />
-          <Route path="/:whatever" component={WildcardPage} />
-        </Switch>
-      </Router>
-    );
+    return <Router history={history}>{this.routes}</Router>;
   }
 }
 

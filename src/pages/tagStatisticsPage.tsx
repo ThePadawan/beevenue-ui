@@ -47,10 +47,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
   };
 
   private cleanUp = (tag: string): void => {
-    Api.Tags.cleanUp(tag).then(_ => {
-      console.log("Success");
-    });
-    return;
+    Api.Tags.cleanUp(tag);
   };
 
   private getTable = () => {
