@@ -42,7 +42,7 @@ interface HasAnyTagsInRulePart extends RulePart {
   data: string[];
 }
 
-interface Rule {
+export interface Rule {
   if: IfRulePart;
   then: ThenRulePart[];
 }

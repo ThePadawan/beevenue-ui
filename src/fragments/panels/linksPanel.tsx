@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { RandomRuleViolationButton } from "../rules/randomRuleViolationLink";
 
 class LinksPanel extends Component {
   private get cardContent() {
@@ -19,7 +20,7 @@ class LinksPanel extends Component {
             <Link to="/rules">Configure rules</Link>
           </li>
           <li>
-            <Link to="/rules/violations/any">Random rule violation</Link>
+            <RandomRuleViolationButton />
           </li>
         </ul>
       </div>

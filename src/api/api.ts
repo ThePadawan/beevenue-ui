@@ -128,8 +128,22 @@ const Api = {
     }
   },
 
-  getRules(): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`rules`));
+  Rules: {
+    get(): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get(`rules`));
+    },
+
+    delete(index: number): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.delete(`rules/${index}`));
+    },
+
+    validateJson(json: any): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.post(`rules/validation`, json));
+    },
+
+    uploadJson(json: any): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.post(`rules`, json));
+    }
   },
 
   getProblems(): AxiosPromise<any> {

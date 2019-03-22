@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 
 import { Api } from "../api/api";
-import { redirect } from "../redux/actions";
+import { redirect, addNotification } from "../redux/actions";
 import { connect } from "react-redux";
+import { getRandomRuleViolation } from "../fragments/rules/randomRuleViolation";
 
 interface RedirectToRandomRulesViolationPageProps {
+  addNotification: typeof addNotification;
   redirect: typeof redirect;
 }
 
@@ -13,20 +15,13 @@ class RedirectToRandomRulesViolationPage extends Component<
   any,
   any
 > {
-  public constructor(props: any) {
+  public constructor(props: RedirectToRandomRulesViolationPageProps) {
     super(props);
     this.state = {};
   }
 
   public componentDidMount = () => {
-    Api.getAnyMissing().then(res => {
-      const mediumIds = Object.keys(res.data);
-      if (mediumIds.length === 0) {
-        this.props.redirect("/");
-      } else {
-        this.props.redirect(`/show/${mediumIds[0]}`);
-      }
-    });
+    getRandomRuleViolation(this.props);
   };
 
   render() {
@@ -36,6 +31,6 @@ class RedirectToRandomRulesViolationPage extends Component<
 
 const x = connect(
   null,
-  { redirect }
+  { addNotification, redirect }
 )(RedirectToRandomRulesViolationPage);
 export { x as RedirectToRandomRulesViolationPage };
