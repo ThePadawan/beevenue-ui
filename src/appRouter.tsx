@@ -105,7 +105,9 @@ class AppRouter extends Component<AppRouterProps, any, any> {
 }
 
 const mapStateToProps = (state: any) => {
-  return { redirecting: getRedirectionTarget(state.redirect) };
+  return {
+    redirecting: getRedirectionTarget(state.redirect)
+  };
 };
 
 const x = connect(

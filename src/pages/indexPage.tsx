@@ -13,9 +13,10 @@ import {
   Unknown,
   Anonymous
 } from "../redux/reducers/login";
-import { redirect } from "../redux/actions";
+import { redirect, setShouldRefresh } from "../redux/actions";
 import { getLastFileUploaded } from "../redux/reducers/fileUpload";
 import { paginationParamsFromQuery } from "./pagination";
+import { shouldRefresh } from "../redux/reducers/refresh";
 
 interface IndexPageProps {
   loggedInUser: BeevenueUser;
@@ -23,6 +24,8 @@ interface IndexPageProps {
   media: MediumWallPagination;
   location: Location;
   redirect: typeof redirect;
+  shouldRefresh: boolean;
+  setShouldRefresh: typeof setShouldRefresh;
 
   lastFileUploaded: number | null;
 }
@@ -67,6 +70,15 @@ class IndexPage extends Component<IndexPageProps, any, any> {
       }
       return;
     }
+
+    if (
+      prevProps.shouldRefresh !== this.props.shouldRefresh &&
+      this.props.shouldRefresh
+    ) {
+      this.props.setShouldRefresh(false);
+      this.loadDefaultMedia();
+      return;
+    }
   };
 
   private clearMedia = () => {
@@ -104,6 +116,7 @@ class IndexPage extends Component<IndexPageProps, any, any> {
 
 const mapStateToProps = (state: any) => {
   return {
+    shouldRefresh: shouldRefresh(state.refresh),
     lastFileUploaded: getLastFileUploaded(state.fileUpload),
     loggedInUser: getLoggedInUser(state.login),
     isSessionSfw: isSessionSfw(state.login)
@@ -112,6 +125,6 @@ const mapStateToProps = (state: any) => {
 
 const x = connect(
   mapStateToProps,
-  { redirect }
+  { redirect, setShouldRefresh }
 )(IndexPage);
 export { x as IndexPage };

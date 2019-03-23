@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "./beevenueSpinner";
 import { addToQs } from "../pages/queryString";
 import { redirect } from "../redux/actions";
+import { isSpeedTagging } from "../redux/reducers/speedTagging";
+import { SpeedTaggingItem } from "./speedTaggingItem";
 
 export interface Thumbs {
   [index: number]: string;
@@ -32,6 +34,7 @@ interface MediumWallProps {
   location: Location;
   media: MediumWallPagination;
   redirect: typeof redirect;
+  isSpeedTagging: typeof isSpeedTagging;
 }
 
 interface MediumWallState {
@@ -118,6 +121,25 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     const isDoneLoading =
       this.state.loadedImageCount >= this.props.media.items.length;
 
+    const imageLink = (r: MediumWallPaginationItem) => {
+      if (this.props.isSpeedTagging) {
+        return (
+          <SpeedTaggingItem
+            outerClassName={this.masonryClasses(isDoneLoading, r)}
+            {...r}
+          >
+            {thumbs(r)}
+          </SpeedTaggingItem>
+        );
+      }
+
+      return (
+        <li className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
+          <Link to={`/show/${r.id}`}>{thumbs(r)}</Link>
+        </li>
+      );
+    };
+
     return (
       <Masonry
         options={{
@@ -132,13 +154,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
       >
         <li className="beevenue-masonry-sizer" />
         {isDoneLoading ? undefined : <BeevenueSpinner />}
-        {this.props.media.items.map((r: MediumWallPaginationItem) => {
-          return (
-            <li className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
-              <Link to={`/show/${r.id}`}>{thumbs(r)}</Link>
-            </li>
-          );
-        })}
+        {this.props.media.items.map(imageLink)})}
       </Masonry>
     );
   };
@@ -159,8 +175,14 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
   }
 }
 
+const mapStateToProps = (state: any) => {
+  return {
+    isSpeedTagging: isSpeedTagging(state.speedTagging)
+  };
+};
+
 const x = connect(
-  null,
+  mapStateToProps,
   null
 )(MediumWall);
 export { x as MediumWall };

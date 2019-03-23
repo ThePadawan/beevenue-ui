@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-import { Api } from "../api/api";
 import { redirect, addNotification } from "../redux/actions";
 import { connect } from "react-redux";
 import { getRandomRuleViolation } from "../fragments/rules/randomRuleViolation";

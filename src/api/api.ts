@@ -105,6 +105,12 @@ const Api = {
       );
     },
 
+    batchAdd(tags: string[], mediumIds: number[]): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.post(`tags/batch`, { tags, mediumIds })
+      );
+    },
+
     addImplication(
       implying_this: string,
       implied_by_this: string

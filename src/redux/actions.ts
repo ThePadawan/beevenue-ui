@@ -8,7 +8,11 @@ import {
   NEW_SEARCH_QUERY,
   REDIRECT,
   SET_SFW_SESSION,
-  SET_FILE_UPLOADED
+  SET_FILE_UPLOADED,
+  SET_SPEED_TAGGING,
+  TOGGLE_SPEED_TAGGING_ITEM,
+  CLEAR_SPEED_TAGGING_ITEMS,
+  SET_SHOULD_REFRESH
 } from "./actionTypes";
 import {
   BeevenueNotificationId,
@@ -84,7 +88,25 @@ export const redirect = (location: string) => ({
   payload: location
 });
 
+export const setShouldRefresh = (shouldRefresh: boolean) => ({
+  type: SET_SHOULD_REFRESH,
+  payload: shouldRefresh
+});
+
 export const setFileUploaded = () => ({
   type: SET_FILE_UPLOADED,
   payload: +new Date()
+});
+
+export const toggleSpeedTagging = () => ({
+  type: SET_SPEED_TAGGING
+});
+
+export const toggleSpeedTaggingItem = (id: number) => ({
+  type: TOGGLE_SPEED_TAGGING_ITEM,
+  payload: id
+});
+
+export const clearSpeedTaggingItems = () => ({
+  type: CLEAR_SPEED_TAGGING_ITEMS
 });

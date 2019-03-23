@@ -11,6 +11,7 @@ import {
   BeevenueUser
 } from "../redux/reducers/login";
 import { Location } from "history";
+import { SpeedTaggerPanel } from "./panels/speedTaggerPanel";
 
 interface SidebarProps {
   location: Location;
@@ -29,7 +30,8 @@ class Sidebar extends Component<SidebarProps, any, any> {
         <SearchPanel {...this.props} />,
         <UploadPanel />,
         <LinksPanel />,
-        <LoginPanel />
+        <LoginPanel />,
+        <SpeedTaggerPanel />
       ];
     } else {
       return [<SearchPanel {...this.props} />, <LoginPanel />];

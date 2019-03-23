@@ -1,4 +1,4 @@
-.beevenue-show-page > .card:nth-child(n+2) {
+.beevenue-show-page > .card:nth-child(n + 2) {
   margin-top: 1em;
 }
 
@@ -18,4 +18,8 @@
 
 .beevenue-editable-title {
   display: inline-flex;
+}
+
+.beevenue-speed-tagger-selected {
+  box-shadow: 0 0 0 0.2rem blue;
 }

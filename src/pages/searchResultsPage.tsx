@@ -5,7 +5,12 @@ import qs from "qs";
 import { BeevenuePage } from "./beevenuePage";
 import { connect } from "react-redux";
 
-import { setSearchQuery, addSearchResults, redirect } from "../redux/actions";
+import {
+  setSearchQuery,
+  addSearchResults,
+  redirect,
+  setShouldRefresh
+} from "../redux/actions";
 import { getSearchResults } from "../redux/reducers/search";
 
 import { Api, SearchParameters } from "../api/api";
@@ -14,6 +19,7 @@ import { Thumbs, MediumWall } from "../fragments/mediumWall";
 import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
+import { shouldRefresh } from "../redux/reducers/refresh";
 
 interface SearchResultItem {
   id: any;
@@ -39,6 +45,8 @@ interface SearchResultsPageProps {
   addSearchResults: typeof addSearchResults;
   setSearchQuery: typeof setSearchQuery;
   redirect: typeof redirect;
+  shouldRefresh: boolean;
+  setShouldRefresh: typeof setShouldRefresh;
   results: SearchResults;
   isSessionSfw: boolean;
 }
@@ -118,6 +126,15 @@ class SearchResultsPage extends Component<
       this.doDefaultSearch();
       return;
     }
+
+    if (
+      prevProps.shouldRefresh !== this.props.shouldRefresh &&
+      this.props.shouldRefresh
+    ) {
+      this.props.setShouldRefresh(false);
+      this.doDefaultSearch();
+      return;
+    }
   };
 
   render() {
@@ -136,6 +153,7 @@ class SearchResultsPage extends Component<
 
 const mapStateToProps = (state: any): any => {
   return {
+    shouldRefresh: shouldRefresh(state.refresh),
     isSessionSfw: isSessionSfw(state.login),
     results: getSearchResults(state.search)
   };
@@ -143,6 +161,6 @@ const mapStateToProps = (state: any): any => {
 
 const x = connect(
   mapStateToProps,
-  { addSearchResults, setSearchQuery, redirect }
+  { addSearchResults, setSearchQuery, redirect, setShouldRefresh }
 )(SearchResultsPage);
 export { x as SearchResultsPage };
