@@ -2,7 +2,11 @@ import React, { Component, FormEvent } from "react";
 import { connect } from "react-redux";
 
 import { getSearchQuery } from "../../redux/reducers/search";
-import { addSearchResults, redirect } from "../../redux/actions";
+import {
+  addSearchResults,
+  redirect,
+  setShouldRefresh
+} from "../../redux/actions";
 import { Location } from "history";
 import qs from "qs";
 
@@ -14,6 +18,7 @@ interface SearchPanelProps {
   location: Location;
   searchTerms: string | null;
   redirect: typeof redirect;
+  setShouldRefresh: typeof setShouldRefresh;
 }
 
 class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
@@ -47,6 +52,14 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
     let newPath = `/search/${this.state.searchTerms.replace(/ /g, "/")}`;
     if (newQ) {
       newPath = `${newPath}?${newQ}`;
+    }
+
+    if (
+      this.props.location &&
+      this.props.location.pathname + this.props.location.search === newPath
+    ) {
+      this.props.setShouldRefresh(true);
+      return;
     }
 
     this.props.redirect(newPath);
@@ -86,6 +99,6 @@ const mapStateToProps = (state: any) => {
 
 const x = connect(
   mapStateToProps,
-  { addSearchResults, redirect }
+  { addSearchResults, redirect, setShouldRefresh }
 )(SearchPanel);
 export { x as SearchPanel };

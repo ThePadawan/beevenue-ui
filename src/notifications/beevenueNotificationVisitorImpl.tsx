@@ -25,7 +25,7 @@ export class BeevenueNotificationVisitorImpl
     // This would require doing something more complicated than a map(), but won't become
     // a problem any time soon.
     return (
-      <div>
+      <>
         {this.elements.map((el, idx) => {
           if (typeof el !== "string") {
             return el;
@@ -40,7 +40,7 @@ export class BeevenueNotificationVisitorImpl
           }
           return result;
         })}
-      </div>
+      </>
     );
   }
 }

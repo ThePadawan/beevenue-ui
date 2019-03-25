@@ -1,4 +1,4 @@
-import React, { Component, Ref } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { getNotifications } from "../../redux/reducers/notifications";
 import { dismissNotification } from "../../redux/actions";
@@ -35,7 +35,7 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
   }
 
   render() {
-    const notis: any[] = [];
+    const notifications: any[] = [];
     for (let [key, value] of Object.entries(this.props.notifications)) {
       const el = (
         <div className={this.classFor(value.level)} key={key}>
@@ -44,13 +44,13 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
             key={key}
             onClick={_ => this.dismiss(key)}
           />
-          <a>{value.timestamp.toLocaleTimeString()}</a> {value.content}
+          {value.timestamp.toLocaleTimeString()} {value.content}
         </div>
       );
-      notis.push(el);
+      notifications.push(el);
     }
 
-    return <div>{notis}</div>;
+    return <div className="beevenue-notifications">{notifications}</div>;
   }
 }
 

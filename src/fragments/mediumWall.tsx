@@ -154,7 +154,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
       >
         <li className="beevenue-masonry-sizer" />
         {isDoneLoading ? undefined : <BeevenueSpinner />}
-        {this.props.media.items.map(imageLink)})}
+        {this.props.media.items.map(imageLink)}
       </Masonry>
     );
   };

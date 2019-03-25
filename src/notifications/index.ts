@@ -1,3 +1,5 @@
+import randomstring from "randomstring";
+
 import { makeNotificationContent } from "./impl";
 
 export type BeevenueNotificationId = string;
@@ -45,8 +47,10 @@ export interface LinkModel {
 export const makeNotificationFromTemplate = (
   t: BeevenueNotificationTemplate
 ): BeevenueNotification => {
+  const id = randomstring.generate({ length: 6 });
+
   return {
-    id: "TODO: Random ID here",
+    id,
     level: t.level,
     content: makeNotificationContent(t.contents),
     timestamp: new Date()
