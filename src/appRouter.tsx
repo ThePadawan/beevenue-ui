@@ -38,7 +38,7 @@ class AppRouter extends Component<AppRouterProps, any, any> {
   setHasUserDebounced() {
     debounce(() => {
       this.setState({ HasUser: true });
-    }, 500)();
+    }, 100)();
   }
 
   componentDidMount() {
