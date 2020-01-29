@@ -17,7 +17,6 @@ import { pick } from "lodash-es";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { MediumDeleteButton } from "../fragments/MediumDeleteButton";
 import { MissingTags } from "../fragments/missingTags";
-import { QuickTagger } from "../fragments/quickTagger";
 
 import { isSessionSfw, getLoggedInRole } from "../redux/reducers/login";
 import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
@@ -259,14 +258,6 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
     );
   }
 
-  addTag(newTag: string) {
-    if (this.state.ViewModel === null) {
-      return;
-    }
-    const newTags = [...this.state.ViewModel.tags, newTag];
-    this.onTagsChange(newTags);
-  }
-
   render() {
     let view;
     const viewModel = this.state.ViewModel;
@@ -280,10 +271,6 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
           {this.userIsAdmin ? (
             <>
               <MissingTags {...viewModel} />
-              <QuickTagger
-                tags={viewModel.tags}
-                onAddTag={tag => this.addTag(tag)}
-              />
               <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
               <RegenerateThumbnailButton mediumId={this.mediumId} />
             </>
