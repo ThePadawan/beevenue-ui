@@ -5,6 +5,7 @@ import {
   NEW_SEARCH_RESULTS,
   ADD_NOTIFICATION,
   DISMISS_NOTIFICATION,
+  DISMISS_ALL_NOTIFICATIONS,
   NEW_SEARCH_QUERY,
   REDIRECT,
   SET_SFW_SESSION,
@@ -77,6 +78,10 @@ export const dismissNotification = (id: BeevenueNotificationId) => ({
   type: DISMISS_NOTIFICATION,
   payload: id
 });
+
+export const dismissAllNotifications = () => ({
+  type: DISMISS_ALL_NOTIFICATIONS
+})
 
 export const stopRedirecting = () => ({
   type: REDIRECT,

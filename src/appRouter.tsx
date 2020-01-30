@@ -12,7 +12,6 @@ import {
   TagStatisticsPage,
   TagShowPage,
   WildcardPage,
-  InvestigateProblemsPage,
   RulesPage
 } from "./pages";
 import { Api } from "./api/api";
@@ -78,7 +77,6 @@ class AppRouter extends Component<AppRouterProps, any, any> {
         <Route path="/upload" component={BatchUploadPage} />
         <Route path="/tags" component={TagStatisticsPage} />
         <Route path="/tag/:name" component={TagShowPage} />
-        <Route path="/problems" component={InvestigateProblemsPage} />
         <Route
           path="/rules/violations/any"
           component={RedirectToRandomRulesViolationPage}

@@ -199,8 +199,14 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
   }
 
   onTagsChange(newTags: string[]) {
+    // Technically, the user can't manually enter these characters.
+    // However, by pasting them, they can still occur in here.
+    const cleanTags = newTags.map(unclean => {
+      return unclean.replace(/[\t\r\n ]/g, "");
+    });
+
     const newState = { ...(this.state as InitializedShowPageState) };
-    newState.ViewModel.tags = newTags;
+    newState.ViewModel.tags = cleanTags;
     this.updateMedium(newState).then(res => {
       this.loadMedium(this.mediumId);
     });

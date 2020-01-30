@@ -26,4 +26,16 @@
 
 .beevenue-notifications {
   margin-bottom: 1rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.beevenue-notifications-dismiss-all {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.notification.beevenue-notification {
+  margin-bottom: .5rem;
 }

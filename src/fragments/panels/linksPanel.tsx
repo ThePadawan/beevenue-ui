@@ -14,9 +14,6 @@ class LinksPanel extends Component {
             <Link to="/tags">Tag statistics</Link>
           </li>
           <li>
-            <Link to="/problems">Investigate problems</Link>
-          </li>
-          <li>
             <Link to="/rules">Configure rules</Link>
           </li>
           <li>

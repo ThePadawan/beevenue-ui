@@ -1,4 +1,7 @@
-import { ADD_NOTIFICATION, DISMISS_NOTIFICATION } from "../actionTypes";
+import { 
+  ADD_NOTIFICATION,
+  DISMISS_NOTIFICATION,
+  DISMISS_ALL_NOTIFICATIONS } from "../actionTypes";
 
 const initialState = { notifications: [] };
 
@@ -18,6 +21,9 @@ const notifications = (state: any = initialState, action: any): any => {
       const newNotifications = { ...state.notifications };
       delete newNotifications[action.payload];
       return { ...state, notifications: newNotifications };
+    }
+    case DISMISS_ALL_NOTIFICATIONS: {
+      return { ...state, notifications: {} };
     }
     default: {
       return state;
