@@ -157,7 +157,7 @@ const Api = {
   },
 
   loadMedia(params: LoadMediaParameters): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`media/`, { params }));
+    return _notification_wrapper(axiosClient.get(`media`, { params }));
   },
 
   deleteMedium(id: number): AxiosPromise<any> {
