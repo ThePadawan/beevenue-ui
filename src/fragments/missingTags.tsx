@@ -1,14 +1,15 @@
 import React, { Component } from "react";
 import { Api } from "../api/api";
+import { Rating } from "../api/show";
 import { BeevenueSpinner } from "./beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { isEqual } from "lodash-es";
-import { loadavg } from "os";
 
 interface MissingTagsProps {
   id: number;
   tags: string[];
+  rating: Rating;
 }
 
 interface MissingTagsState {
@@ -23,6 +24,10 @@ class MissingTags extends Component<MissingTagsProps, MissingTagsState, any> {
 
   componentDidUpdate = (oldProps: MissingTagsProps) => {
     if (!isEqual(this.props.tags, oldProps.tags)) {
+      this.load();
+    }
+
+    if (!isEqual(this.props.rating, oldProps.rating)) {
       this.load();
     }
   };

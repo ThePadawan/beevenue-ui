@@ -6,6 +6,7 @@ import { NeedsLoginPage } from "./needsLoginPage";
 import { Link } from "react-router-dom";
 import { Rating } from "../api/show";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
+import { TagSimilarityWidget } from "../fragments/tag/tagSimilarityWidget";
 
 interface Tag {
   tag: string;
@@ -58,6 +59,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
             Delete orphan tags
           </button>
         </div>
+        <TagSimilarityWidget />
         <div>
           <table className="table">
             <thead>
