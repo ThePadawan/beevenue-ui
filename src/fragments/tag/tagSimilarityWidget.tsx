@@ -221,9 +221,13 @@ class TagSimilarityWidget extends Component<any, any, any> {
 
   private loadSimilarity = () => {
     Api.Tags.getSimilarity().then(res => {
-      const svg = createSvg(this.refs.foobar, res.data, this.state);
-      this.setState({ ...this.state, svg });
+      this.setState({ ...this.state, similarity: res.data });
+      this.refreshSvg();
     });
+  };
+
+  private refreshSvg = () => {
+    createSvg(this.refs.foobar, this.state.similarity, this.state);
   };
 
   private toggleSingletons(): void {
@@ -231,7 +235,7 @@ class TagSimilarityWidget extends Component<any, any, any> {
       ...this.state,
       hideSingletonNodes: !this.state.hideSingletonNodes
     });
-    this.loadSimilarity();
+    this.refreshSvg();
   }
 
   private changeSimThreshold(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -239,7 +243,7 @@ class TagSimilarityWidget extends Component<any, any, any> {
       ...this.state,
       simThreshold: e.currentTarget.value
     });
-    this.loadSimilarity();
+    this.refreshSvg();
   }
 
   render() {
