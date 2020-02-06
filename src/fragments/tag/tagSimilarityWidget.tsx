@@ -234,16 +234,15 @@ class TagSimilarityWidget extends Component<any, any, any> {
     this.setState({
       ...this.state,
       hideSingletonNodes: !this.state.hideSingletonNodes
-    });
-    this.refreshSvg();
+    }, () => this.refreshSvg());
   }
 
   private changeSimThreshold(e: React.ChangeEvent<HTMLInputElement>): void {
+    const valueAsNumber = Number.parseFloat(e.currentTarget.value);
     this.setState({
       ...this.state,
-      simThreshold: e.currentTarget.value
-    });
-    this.refreshSvg();
+      simThreshold: valueAsNumber
+    }, () => this.refreshSvg());
   }
 
   render() {
