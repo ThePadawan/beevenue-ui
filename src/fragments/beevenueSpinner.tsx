@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { RingLoader, ReactSpinners } from "react-spinners";
+// This partial import is ugly, but reduces bundle size.
+//@ts-ignore
+import RingLoader from "react-spinners/RingLoader";
 
-interface BeevenueSpinnerProps extends ReactSpinners.RingLoaderProps {}
-
-class BeevenueSpinner extends Component<BeevenueSpinnerProps, {}, {}> {
-  public constructor(props: BeevenueSpinnerProps) {
+class BeevenueSpinner extends Component<any, {}, {}> {
+  public constructor(props: any) {
     super(props);
   }
 
