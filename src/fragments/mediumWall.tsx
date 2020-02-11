@@ -106,19 +106,12 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
       return null;
     }
 
-     // TODO Make work for all breakpoints
+    // TODO Make work for all breakpoints
     const thumbs = (r: MediumWallPaginationItem) => {
       return (
-        <picture>
-          <source
-            sizes="33vw"
-            srcSet={`${backendUrl}/thumbs/${r.id}`}
-            media="(min-width: 769px)"
-          />
-          <img 
-            sizes="50vw"
-            src={`${backendUrl}/thumbs/${r.id}`} />
-        </picture>
+        <img
+          sizes="50vw"
+          src={`${backendUrl}/thumbs/${r.id}`} />
       );
     };
 
