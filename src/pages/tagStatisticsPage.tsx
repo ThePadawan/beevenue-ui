@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Rating } from "../api/show";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { TagSimilarityWidget } from "../fragments/tag/tagSimilarityWidget";
+import { TagImplicationWidget } from "../fragments/tag/tagImplicationWidget";
 
 interface Tag {
   tag: string;
@@ -60,6 +61,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
           </button>
         </div>
         <TagSimilarityWidget />
+        <TagImplicationWidget />
         <div>
           <table className="table">
             <thead>

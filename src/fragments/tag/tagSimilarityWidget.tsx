@@ -111,7 +111,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     )
     .force(
       "charge",
-      d3.forceManyBody().strength(_ => -2)
+      d3.forceManyBody().strength(_ => -0.5)
     )
     .force(
       "collision",
@@ -158,7 +158,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
 
   const drag = (simulation: any) => {
     function dragstarted(d: any) {
-      if (!d3.event.active) simulation.alphaTarget(0.1).restart();
+      if (!d3.event.active) simulation.alphaTarget(0.15).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
@@ -231,18 +231,24 @@ class TagSimilarityWidget extends Component<any, any, any> {
   };
 
   private toggleSingletons(): void {
-    this.setState({
-      ...this.state,
-      hideSingletonNodes: !this.state.hideSingletonNodes
-    }, () => this.refreshSvg());
+    this.setState(
+      {
+        ...this.state,
+        hideSingletonNodes: !this.state.hideSingletonNodes
+      },
+      () => this.refreshSvg()
+    );
   }
 
   private changeSimThreshold(e: React.ChangeEvent<HTMLInputElement>): void {
     const valueAsNumber = Number.parseFloat(e.currentTarget.value);
-    this.setState({
-      ...this.state,
-      simThreshold: valueAsNumber
-    }, () => this.refreshSvg());
+    this.setState(
+      {
+        ...this.state,
+        simThreshold: valueAsNumber
+      },
+      () => this.refreshSvg()
+    );
   }
 
   render() {
@@ -275,7 +281,9 @@ class TagSimilarityWidget extends Component<any, any, any> {
                 onChange={e => this.changeSimThreshold(e)}
                 type="range"
               />
-              <label htmlFor="sim-threshold-slider">Threshold: {this.state.simThreshold}</label>
+              <label htmlFor="sim-threshold-slider">
+                Threshold: {this.state.simThreshold}
+              </label>
             </div>
             <svg ref="foobar"></svg>
           </div>

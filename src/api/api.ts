@@ -75,6 +75,10 @@ const Api = {
       return _notification_wrapper(axiosClient.patch(`tag/${name}/clean`));
     },
 
+    getImplications(): AxiosPromise<any> {
+      return axiosClient.get("tags/implications");
+    },
+
     getSimilarity(): AxiosPromise<any> {
       return axiosClient.get("tags/similarity");
     },
