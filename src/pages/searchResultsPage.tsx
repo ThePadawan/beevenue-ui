@@ -141,7 +141,11 @@ class SearchResultsPage extends Component<
     let inner = null;
     if (this.state.doShowSpinner) {
       inner = <BeevenueSpinner />;
-    } else if (!this.state.results || !this.state.results.items) {
+    } else if (
+      !this.state.results ||
+      !this.state.results.items ||
+      this.state.results.items.length == 0
+    ) {
       inner = <h2 className="title is-2">No results found.</h2>;
     } else {
       inner = <MediumWall media={this.state.results} {...this.props} />;
@@ -159,8 +163,10 @@ const mapStateToProps = (state: any): any => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { addSearchResults, setSearchQuery, redirect, setShouldRefresh }
-)(SearchResultsPage);
+const x = connect(mapStateToProps, {
+  addSearchResults,
+  setSearchQuery,
+  redirect,
+  setShouldRefresh
+})(SearchResultsPage);
 export { x as SearchResultsPage };
