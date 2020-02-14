@@ -73,7 +73,7 @@ class BeevenuePagination extends Component<PaginationProps, any, any> {
       maybePrefix = (
         <>
           {linkTo(1)}
-          {pageNr < 3 ? null : (
+          {pageNr < 4 ? null : (
             <li>
               <span className="pagination-ellipsis">&hellip;</span>
             </li>
@@ -91,7 +91,7 @@ class BeevenuePagination extends Component<PaginationProps, any, any> {
     if (pageNr < maxPageNr) {
       maybeSuffix = (
         <>
-          {pageNr > maxPageNr - 2 ? null : (
+          {pageNr > maxPageNr - 3 ? null : (
             <li>
               <span className="pagination-ellipsis">&hellip;</span>
             </li>
