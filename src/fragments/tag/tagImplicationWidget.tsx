@@ -49,6 +49,19 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
 
   const isRoot = (d: NodeDatum): boolean => roots.indexOf(d.id) !== -1;
 
+  const radius = 250;
+
+  const rootPositions = new Map<string, any[]>();
+  roots.forEach((r: string, i: number) => {
+    const increment = (Math.PI * 2) / roots.length;
+
+    const val = i * increment;
+    const x = radius * Math.cos(val);
+    const y = radius * Math.sin(val);
+
+    rootPositions.set(r, [x, y]);
+  });
+
   const simulation = d3
     .forceSimulation<NodeDatum, LinkDatum>(nodes)
     .force(
@@ -63,15 +76,48 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     )
     .force(
       "collision",
-      d3.forceCollide<NodeDatum>().radius((n: NodeDatum) => {
-        if (isRoot(n)) {
+      d3.forceCollide<NodeDatum>().radius((d: NodeDatum) => {
+        if (isRoot(d)) {
           return 30;
         }
 
         return 15;
       })
     )
-    .force("center", d3.forceCenter(opts.width / 2, opts.height / 2));
+    .force("center", d3.forceCenter(opts.width / 2, opts.height / 2))
+    .force(
+      "x",
+      d3
+        .forceX<NodeDatum>((d: NodeDatum, i: number, data: NodeDatum[]) => {
+          if (isRoot(d)) {
+            return opts.width / 2 + rootPositions.get(d.id)![0];
+          }
+
+          return d.x || opts.width / 2;
+        })
+        .strength((d: NodeDatum, i: number, data: NodeDatum[]) => {
+          if (isRoot(d)) {
+            return 1;
+          }
+          return 0;
+        })
+    )
+    .force(
+      "y",
+      d3
+        .forceY<NodeDatum>((d: NodeDatum, i: number, data: NodeDatum[]) => {
+          if (isRoot(d)) {
+            return opts.height / 2 + rootPositions.get(d.id)![1];
+          }
+          return d.y || opts.height / 2;
+        })
+        .strength((d: NodeDatum, i: number, data: NodeDatum[]) => {
+          if (isRoot(d)) {
+            return 1;
+          }
+          return 0;
+        })
+    );
 
   const svg = d3
     .select(ref)
