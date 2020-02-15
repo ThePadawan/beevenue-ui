@@ -21,6 +21,7 @@ import { MissingTags } from "../fragments/missingTags";
 import { isSessionSfw, getLoggedInRole } from "../redux/reducers/login";
 import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
 import { Link } from "react-router-dom";
+import { PickAlternateThumbnailWidget } from "../fragments/pickAlternateThumbnailWidget";
 
 interface UnitializedShowPageState {
   ViewModel: ShowViewModel | null;
@@ -279,6 +280,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
               <MissingTags {...viewModel} />
               <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
               <RegenerateThumbnailButton mediumId={this.mediumId} />
+              <PickAlternateThumbnailWidget {...viewModel} />
             </>
           ) : null}
         </>
@@ -302,8 +304,9 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { addNotification, addNotLoggedInNotification, redirect }
-)(ShowPage);
+const x = connect(mapStateToProps, {
+  addNotification,
+  addNotLoggedInNotification,
+  redirect
+})(ShowPage);
 export { x as ShowPage };

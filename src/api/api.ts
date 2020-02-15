@@ -66,6 +66,21 @@ const Api = {
     return _notification_wrapper(axiosClient.get(`tags/missing/any`));
   },
 
+  Medium: {
+    generateThumbnailPicks(mediumId: number, n: number): AxiosPromise<any> {
+      return axiosClient.get(`medium/${mediumId}/thumbnail/picks/${n}`);
+    },
+    selectThumbnailPick(
+      mediumId: number,
+      i: number,
+      n: number
+    ): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.patch(`medium/${mediumId}/thumbnail/pick/${i}/${n}`)
+      );
+    }
+  },
+
   Tags: {
     show(name: string): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));
