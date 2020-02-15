@@ -68,7 +68,21 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
   public onPageSizeSelect = (n: number) => {
     this.setState({ loadedImageCount: 0 });
-    addToQs(this.props, { pageSize: n });
+    // Example calculation:
+    // * We are currently on pageNumber == 2, pageSize == 20.
+    //   so we are showing images with 1-indices 21-40.
+    // * When switching to pageSize == 10, we *still* want to show images
+    //   starting at 1-index 21. That would put us on page *3*.
+    // * Thus, we figure out on which pageNr our first visible image index
+    //   would land (using the new pageSize), and switch pageNumber to that
+    //   value as well.
+
+    const previousFirstVisibleImageIndex =
+      (this.props.media.pageNumber - 1) * this.props.media.pageSize + 1;
+
+    const newPageNumber = Math.ceil(previousFirstVisibleImageIndex / n);
+
+    addToQs(this.props, { pageNr: newPageNumber, pageSize: n });
   };
 
   private masonryClasses = (
@@ -108,11 +122,7 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
     // TODO Make work for all breakpoints
     const thumbs = (r: MediumWallPaginationItem) => {
-      return (
-        <img
-          sizes="50vw"
-          src={`${backendUrl}/thumbs/${r.id}`} />
-      );
+      return <img sizes="50vw" src={`${backendUrl}/thumbs/${r.id}`} />;
     };
 
     const isDoneLoading =
@@ -178,8 +188,5 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  null
-)(MediumWall);
+const x = connect(mapStateToProps, null)(MediumWall);
 export { x as MediumWall };

@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { getNotifications } from "../../redux/reducers/notifications";
-import { dismissNotification, dismissAllNotifications } from "../../redux/actions";
+import {
+  dismissNotification,
+  dismissAllNotifications
+} from "../../redux/actions";
 
 import {
   BeevenueNotificationId,
@@ -25,7 +28,8 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
     this.props.dismissNotification(id);
   }
 
-  public dismissAll(): void {
+  public dismissAll(e: any): void {
+    e.preventDefault();
     this.props.dismissAll();
   }
 
@@ -48,9 +52,7 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
         <div className="beevenue-notifications-dismiss-all">
           {maybeDismissAll}
         </div>
-        <div className="beevenue-notifications">
-          {notifications}
-        </div>
+        <div className="beevenue-notifications">{notifications}</div>
       </div>
     );
   }
@@ -58,10 +60,16 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
   private getNotificationElements() {
     const notifications: JSX.Element[] = [];
     for (let [key, value] of Object.entries(this.props.notifications)) {
-      const el = (<div className={this.classFor(value.level)} key={key}>
-        <button className="delete" key={key} onClick={_ => this.dismiss(key)} />
-        {value.timestamp.toLocaleTimeString()} {value.content}
-      </div>);
+      const el = (
+        <div className={this.classFor(value.level)} key={key}>
+          <button
+            className="delete"
+            key={key}
+            onClick={_ => this.dismiss(key)}
+          />
+          {value.timestamp.toLocaleTimeString()} {value.content}
+        </div>
+      );
       notifications.push(el);
     }
     return notifications;
@@ -69,8 +77,15 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
 
   private getDismissAllLink(notificationCount: number): JSX.Element | null {
     if (notificationCount > 0) {
-      return <a href="#" className="beevenue-notifications-dismiss-all-link" onClick={_ => this.dismissAll()}>Dismiss all
-      </a>;
+      return (
+        <a
+          href="#"
+          className="beevenue-notifications-dismiss-all-link"
+          onClick={e => this.dismissAll(e)}
+        >
+          Dismiss all
+        </a>
+      );
     }
 
     return null;
@@ -81,5 +96,8 @@ const mapStateToProps = (state: any) => {
   return { notifications: getNotifications(state.notifications) };
 };
 
-const x = connect(mapStateToProps, { dismissNotification, dismissAll: dismissAllNotifications })(NotificationsPanel);
+const x = connect(mapStateToProps, {
+  dismissNotification,
+  dismissAll: dismissAllNotifications
+})(NotificationsPanel);
 export { x as NotificationsPanel };

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { Link } from "react-router-dom";
+import { redirect, setSearchQuery } from "../redux/actions";
 
 import { LoginPanel, SearchPanel, UploadPanel, LinksPanel } from "./panels";
 
@@ -17,6 +17,8 @@ interface SidebarProps {
   location: Location;
   loggedInUser: BeevenueUser;
   loggedInRole: string | null;
+  redirect: typeof redirect;
+  setSearchQuery: typeof setSearchQuery;
 }
 
 class Sidebar extends Component<SidebarProps, any, any> {
@@ -38,13 +40,21 @@ class Sidebar extends Component<SidebarProps, any, any> {
     }
   }
 
+  private onHomeButtonClicked = (e: any) => {
+    e.preventDefault();
+    this.props.setSearchQuery("");
+    this.props.redirect("/");
+  };
+
   render() {
     return (
       <div>
         <nav className="level">
           <div className="level-item">
             <h2 className="title">
-              <Link to="/">Home</Link>
+              <a href="#" onClick={e => this.onHomeButtonClicked(e)}>
+                Home
+              </a>
             </h2>
           </div>
         </nav>
@@ -65,8 +75,5 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  null
-)(Sidebar);
+const x = connect(mapStateToProps, { redirect, setSearchQuery })(Sidebar);
 export { x as Sidebar };
