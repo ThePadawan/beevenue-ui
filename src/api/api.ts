@@ -68,7 +68,11 @@ const Api = {
 
   Medium: {
     generateThumbnailPicks(mediumId: number, n: number): AxiosPromise<any> {
-      return axiosClient.get(`medium/${mediumId}/thumbnail/picks/${n}`);
+      return axiosClient.get(`medium/${mediumId}/thumbnail/picks/${n}`, {
+        // This could potentially take a really long time. Turn off timeouts
+        // completely for this request.
+        timeout: 0
+      });
     },
     selectThumbnailPick(
       mediumId: number,
