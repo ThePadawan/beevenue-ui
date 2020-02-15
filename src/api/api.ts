@@ -80,7 +80,11 @@ const Api = {
       n: number
     ): AxiosPromise<any> {
       return _notification_wrapper(
-        axiosClient.patch(`medium/${mediumId}/thumbnail/pick/${i}/${n}`)
+        axiosClient.patch(`medium/${mediumId}/thumbnail/pick/${i}/${n}`, {
+          // This could potentially take a really long time. Turn off timeouts
+          // completely for this request.
+          timeout: 0
+        })
       );
     }
   },
