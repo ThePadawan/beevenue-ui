@@ -8,10 +8,14 @@ import { Rating } from "../api/show";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { TagSimilarityWidget } from "../fragments/tag/tagSimilarityWidget";
 import { TagImplicationWidget } from "../fragments/tag/tagImplicationWidget";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 
 interface Tag {
   tag: string;
-  count: number;
+  impliedByThisCount: number;
+  implyingThisCount: number;
+  mediaCount: number;
   rating: Rating;
   id: number;
 }
@@ -39,7 +43,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
     Api.Tags.getStatistics().then(
       res => {
         let tags = res.data;
-        tags = sortBy(tags, t => t.count).reverse();
+        tags = sortBy(tags, t => t.mediaCount).reverse();
         this.setState({ ...this.state, tags: tags });
       },
       err => {
@@ -52,7 +56,7 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
     Api.Tags.cleanUp(tag);
   };
 
-  private getTable = () => {
+  private renderTable = () => {
     return (
       <>
         <div>
@@ -67,37 +71,50 @@ class TagStatisticsPage extends Component<any, TagStatisticsPageState, any> {
             <thead>
               <tr>
                 <th>Tag</th>
+                <th>?</th>
                 <th>Media</th>
                 <th />
               </tr>
             </thead>
-            <tbody>
-              {this.state.tags.map(t => (
-                <tr key={t.tag}>
-                  <td>
-                    <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
-                  </td>
-                  <td>{t.count}</td>
-                  <td>
-                    <button
-                      className="button"
-                      onClick={e => this.cleanUp(t.tag)}
-                    >
-                      Clean up
-                    </button>{" "}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            <tbody>{this.state.tags.map(this.renderTag)}</tbody>
           </table>
         </div>
       </>
     );
   };
 
+  private renderTag = (t: Tag): JSX.Element => {
+    return (
+      <tr key={t.tag}>
+        <td>
+          <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
+        </td>
+        <td>{this.maybeRenderTooltip(t)}</td>
+        <td>{t.mediaCount}</td>
+        <td>
+          <button className="button" onClick={e => this.cleanUp(t.tag)}>
+            Clean up
+          </button>{" "}
+        </td>
+      </tr>
+    );
+  };
+
+  private maybeRenderTooltip = (t: Tag): React.ReactNode => {
+    if (t.mediaCount === 0 && t.implyingThisCount > 0) {
+      const title =
+        "This tag is not used on any media, but implied by other tags." +
+        " It will stay in this list.";
+
+      return <FontAwesomeIcon icon={faQuestionCircle} title={title} />;
+    }
+
+    return null;
+  };
+
   render() {
     const content =
-      this.state.tags.length > 0 ? this.getTable() : <BeevenueSpinner />;
+      this.state.tags.length > 0 ? this.renderTable() : <BeevenueSpinner />;
 
     return <NeedsLoginPage>{content}</NeedsLoginPage>;
   }
