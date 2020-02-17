@@ -55,18 +55,28 @@ class SpeedTaggerPanel extends Component<
       return;
     }
 
-    console.log("Now tagging", items, tagNames);
     Api.Tags.batchAdd(tagNames, items).finally(() => {
       this.props.clearSpeedTaggingItems();
       this.props.setShouldRefresh(true);
     });
   };
 
+  private get cardTitle() {
+    if (
+      this.props.speedTaggingItems &&
+      this.props.speedTaggingItems.length > 0
+    ) {
+      return `Speed tagger (${this.props.speedTaggingItems.length} selected)`;
+    }
+
+    return "Speed tagger";
+  }
+
   render() {
     return (
       <div className="card beevenue-sidebar-card">
         <div className="card-header">
-          <p className="card-header-title">Speed tagger</p>
+          <p className="card-header-title">{this.cardTitle}</p>
         </div>
         <div className="card-content">
           <div className="content">
@@ -106,13 +116,14 @@ class SpeedTaggerPanel extends Component<
 
 const mapStateToProps = (state: any) => {
   return {
-    speedTaggingItems: getSpeedTaggingItems(state.speedTagging),
+    speedTaggingItems: getSpeedTaggingItems(state.speedTagging).slice(),
     isSpeedTagging: isSpeedTagging(state.speedTagging)
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { setShouldRefresh, toggleSpeedTagging, clearSpeedTaggingItems }
-)(SpeedTaggerPanel);
+const x = connect(mapStateToProps, {
+  setShouldRefresh,
+  toggleSpeedTagging,
+  clearSpeedTaggingItems
+})(SpeedTaggerPanel);
 export { x as SpeedTaggerPanel };

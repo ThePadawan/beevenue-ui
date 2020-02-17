@@ -33,7 +33,6 @@ class SpeedTaggingItem extends Component<
   render() {
     const className = () => {
       const base = this.props.outerClassName;
-      console.log();
       if (this.props.speedTaggingItems.indexOf(this.props.id) > -1) {
         return `${base} beevenue-speed-tagger-selected`;
       }
@@ -59,8 +58,7 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { toggleSpeedTaggingItem }
-)(SpeedTaggingItem);
+const x = connect(mapStateToProps, { toggleSpeedTaggingItem })(
+  SpeedTaggingItem
+);
 export { x as SpeedTaggingItem };

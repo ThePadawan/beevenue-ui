@@ -67,7 +67,6 @@ class ImplicationsCard extends Component<
     Api.Tags.removeImplication(this.props.tagName, a).then(
       res => {
         this.updateArrays("Remove", "ImpliedByThis", a);
-        console.log(res);
       },
       err => {
         console.log(err);
