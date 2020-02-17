@@ -121,6 +121,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
 
   const svg = d3
     .select(ref)
+    .attr("cursor", "grab")
     .attr("viewBox", `0 0 ${opts.width} ${opts.height}`);
 
   const strokeWidth = (link: LinkDatum) => {
@@ -135,8 +136,11 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     .selectAll("g")
     .remove();
 
-  const link = svg
+  const g = svg.append("g");
+
+  const link = g
     .append("g")
+    .attr("cursor", "auto")
     .attr("stroke", "#999")
     .attr("stroke-opacity", 0.6)
     .selectAll("line")
@@ -156,43 +160,31 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     return (d: NodeDatum) => scale(`${d.group}`);
   };
 
-  const drag = (simulation: any) => {
-    function dragstarted(d: any) {
-      if (!d3.event.active) simulation.alphaTarget(0.15).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(d: any) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-
-    function dragended(d: any) {
-      if (!d3.event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-
-    return d3
-      .drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended);
+  const zoomed = () => {
+    g.attr("transform", d3.event.transform);
   };
 
-  const f: any = drag(simulation);
+  svg.call(
+    d3
+      .zoom()
+      .extent([
+        [0, 0],
+        [opts.width, opts.height]
+      ])
+      .scaleExtent([1, 8])
+      .on("zoom", zoomed)
+  );
 
-  const node = svg
+  const node = g
     .append("g")
+    .attr("cursor", "auto")
     .attr("stroke", "#fff")
     .attr("stroke-width", 1.5)
     .selectAll("circle")
     .data(nodes)
     .join("circle")
     .attr("r", sizer)
-    .attr("fill", color())
-    .call(f);
+    .attr("fill", color());
 
   node.append("title").text((d: NodeDatum) => d.id);
 
