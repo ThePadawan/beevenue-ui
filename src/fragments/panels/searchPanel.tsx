@@ -72,10 +72,7 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
   render() {
     return (
       <div className="card beevenue-sidebar-card">
-        <div className="card-header">
-          <p className="card-header-title">Search</p>
-        </div>
-        <div className="card-content">
+        <div className="card-content beevenue-search-card-content">
           <div className="content">
             <form onSubmit={e => this.onSubmit(e)}>
               <input
@@ -97,8 +94,9 @@ const mapStateToProps = (state: any) => {
   return { searchTerms: getSearchQuery(state.search) };
 };
 
-const x = connect(
-  mapStateToProps,
-  { addSearchResults, redirect, setShouldRefresh }
-)(SearchPanel);
+const x = connect(mapStateToProps, {
+  addSearchResults,
+  redirect,
+  setShouldRefresh
+})(SearchPanel);
 export { x as SearchPanel };
