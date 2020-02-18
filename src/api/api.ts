@@ -6,6 +6,8 @@ import { pick } from "lodash-es";
 import store from "../redux/store";
 import { addNotification } from "../redux/actions";
 import { BeevenueNotificationTemplate } from "../notifications/index";
+import { SimilarityData } from "./similarity";
+import { ImplicationData } from "./implications";
 
 const axiosClient = axios.create({
   baseURL: `${backendUrl}/`,
@@ -98,11 +100,11 @@ const Api = {
       return _notification_wrapper(axiosClient.patch(`tag/${name}/clean`));
     },
 
-    getImplications(): AxiosPromise<any> {
+    getImplications(): AxiosPromise<ImplicationData> {
       return axiosClient.get("tags/implications");
     },
 
-    getSimilarity(): AxiosPromise<any> {
+    getSimilarity(): AxiosPromise<SimilarityData> {
       return axiosClient.get("tags/similarity");
     },
 

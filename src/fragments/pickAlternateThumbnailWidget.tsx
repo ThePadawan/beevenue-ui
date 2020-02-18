@@ -60,16 +60,19 @@ class PickAlternateThumbnailWidget extends Component<
       return null;
     }
 
-    // TODO Styling
-    return this.state.picks.map((p: any, i: number) => {
-      return (
-        <img
-          key={`pick${i}`}
-          onClick={_ => this.choosePick(i)}
-          src={`data:image/png;base64, ${p}`}
-        />
-      );
-    });
+    return (
+      <div className="beevenue-picks">
+        {this.state.picks.map((p: any, i: number) => {
+          return (
+            <img
+              key={`pick${i}`}
+              onClick={_ => this.choosePick(i)}
+              src={`data:image/png;base64, ${p}`}
+            />
+          );
+        })}
+      </div>
+    );
   };
 
   private renderContent = () => {
@@ -84,6 +87,7 @@ class PickAlternateThumbnailWidget extends Component<
           <div className="select">
             <select
               defaultValue="5"
+              value={this.state.pickCount}
               onChange={e => this.onChange(e.currentTarget.value)}
             >
               <option>3</option>

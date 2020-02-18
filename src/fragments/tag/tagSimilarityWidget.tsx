@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Api } from "../../api/api";
 import * as d3 from "d3";
+import { SimilarityData } from "../../api/similarity";
+import { zoomAndDrag } from "./d3util";
 
 interface NodeDatum extends d3.SimulationNodeDatum {
   id: string;
@@ -29,32 +31,20 @@ interface CreateSvgOptions2 {
   height: number;
 }
 
-const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
-  const defaultOptions: CreateSvgOptions2 = {
-    hideSingletonNodes: true,
-    simThreshold: 0.4,
-    width: 800,
-    height: 800
-  };
-
-  const opts: CreateSvgOptions2 = { ...defaultOptions, ...options };
-
+const preprocessNodes = (data: SimilarityData) => {
   let counter = 2;
   const groupDict = new Map<string, number>();
 
   // Get groupId based on prefix (a:, c:, p:, ...)
-  function grouper(name: string): number {
+  const grouper = (name: string): number => {
     const found = name.match(/(.+)\:/);
     if (!found) return 1;
-
     const m = found[0];
-
     if (!groupDict.has(m)) {
       groupDict.set(m, counter++);
     }
-
     return groupDict.get(m)!;
-  }
+  };
 
   let nodes: NodeDatum[] = Object.keys(data.nodes).map(k => ({
     id: k,
@@ -63,6 +53,14 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     size: data.nodes[k].size
   }));
 
+  return nodes;
+};
+
+const preprocessLinks = (
+  nodes: NodeDatum[],
+  data: SimilarityData,
+  opts: CreateSvgOptions2
+): LinkDatum[] => {
   let links: LinkDatum[] = [];
 
   for (let [key, value] of Object.entries(data.links)) {
@@ -92,13 +90,37 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     }
   }
 
-  if (opts.hideSingletonNodes) {
-    const lamb = (n: NodeDatum) => {
-      return n.hasAny;
-    };
+  return links;
+};
 
-    nodes = nodes.filter(lamb);
+const preprocess = (data: SimilarityData, opts: CreateSvgOptions2) => {
+  let nodes = preprocessNodes(data);
+  const links = preprocessLinks(nodes, data, opts);
+
+  if (opts.hideSingletonNodes) {
+    nodes = nodes.filter((n: NodeDatum) => {
+      return n.hasAny;
+    });
   }
+
+  return { nodes, links };
+};
+
+const createSvg = (
+  ref: any,
+  data: SimilarityData,
+  options?: CreateSvgOptions
+) => {
+  const defaultOptions: CreateSvgOptions2 = {
+    hideSingletonNodes: true,
+    simThreshold: 0.4,
+    width: 800,
+    height: 800
+  };
+
+  const opts: CreateSvgOptions2 = { ...defaultOptions, ...options };
+
+  const { nodes, links } = preprocess(data, opts);
 
   const simulation = d3
     .forceSimulation<NodeDatum, LinkDatum>(nodes)
@@ -107,11 +129,11 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
       d3
         .forceLink<NodeDatum, LinkDatum>(links)
         .id(d => d.id)
-        .strength(l => l.similarity)
+        .strength(l => 2 * l.similarity)
     )
     .force(
       "charge",
-      d3.forceManyBody().strength(_ => -0.5)
+      d3.forceManyBody().strength(_ => -3)
     )
     .force(
       "collision",
@@ -140,7 +162,6 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
 
   const link = g
     .append("g")
-    .attr("cursor", "auto")
     .attr("stroke", "#999")
     .attr("stroke-opacity", 0.6)
     .selectAll("line")
@@ -160,20 +181,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     return (d: NodeDatum) => scale(`${d.group}`);
   };
 
-  const zoomed = () => {
-    g.attr("transform", d3.event.transform);
-  };
-
-  svg.call(
-    d3
-      .zoom()
-      .extent([
-        [0, 0],
-        [opts.width, opts.height]
-      ])
-      .scaleExtent([1, 8])
-      .on("zoom", zoomed)
-  );
+  zoomAndDrag(svg, g, [opts.width, opts.height]);
 
   const node = g
     .append("g")

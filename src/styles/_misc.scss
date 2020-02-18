@@ -3,7 +3,8 @@
 }
 
 .beevenue-sidebar-card {
-  width: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 .beevenue-h2-link {
@@ -37,5 +38,10 @@
 }
 
 .notification.beevenue-notification {
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
+}
+
+.level-item.beevenue-level-item-fullwidth {
+  flex-grow: 1;
+  flex-shrink: 1;
 }

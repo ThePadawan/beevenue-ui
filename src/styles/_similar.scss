@@ -1,13 +1,11 @@
 .beevenue-similar-media {
   max-height: 15rem;
+  display: flex;
+  justify-content: space-between;
   overflow: hidden;
 }
 
 .beevenue-similar-medium {
-  width: 18%;
-  float: left;
-}
-
-.beevenue-similar-medium:nth-child(n+2) {
-  padding-left: 1em;
+  width: 19%;
+  // float: left;
 }

@@ -38,7 +38,7 @@ class RulesPage extends Component<any, RulesPageState, any> {
         {rules.map((r, idx) => {
           return (
             <nav className="level" key={idx}>
-              <div className="level-item">
+              <div className="level-item beevenue-level-item-fullwidth">
                 <div className="card beevenue-sidebar-card">
                   <header className="card-header">
                     <p className="card-header-title">Rule {idx + 1}</p>

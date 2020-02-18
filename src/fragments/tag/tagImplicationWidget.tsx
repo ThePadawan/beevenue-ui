@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Api } from "../../api/api";
 import * as d3 from "d3";
+import { zoomAndDrag } from "./d3util";
+import { ImplicationData } from "../../api/implications";
 
 interface NodeDatum extends d3.SimulationNodeDatum {
   id: string;
@@ -18,14 +20,7 @@ interface CreateSvgOptions2 {
   height: number;
 }
 
-const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
-  const defaultOptions: CreateSvgOptions2 = {
-    width: 800,
-    height: 800
-  };
-
-  const opts: CreateSvgOptions2 = { ...defaultOptions, ...options };
-
+const preprocess = (data: ImplicationData) => {
   let nodes: NodeDatum[] = Object.keys(data.nodes).map(k => ({
     id: k
   }));
@@ -35,11 +30,9 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
   let roots = Object.keys(data.nodes);
 
   for (let [key, value] of Object.entries(data.links)) {
-    const v: any = value;
-
     roots.splice(roots.indexOf(key), 1);
 
-    v.forEach((right: any) => {
+    value.forEach(right => {
       links.push({
         source: key,
         target: right
@@ -47,11 +40,9 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     });
   }
 
-  const isRoot = (d: NodeDatum): boolean => roots.indexOf(d.id) !== -1;
-
   const radius = 250;
 
-  const rootPositions = new Map<string, any[]>();
+  const rootPositions = new Map<string, number[]>();
   roots.forEach((r: string, i: number) => {
     const increment = (Math.PI * 2) / roots.length;
 
@@ -62,11 +53,33 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     rootPositions.set(r, [x, y]);
   });
 
+  return { nodes, links, rootPositions };
+};
+
+const createSvg = (
+  ref: any,
+  data: ImplicationData,
+  options?: CreateSvgOptions
+) => {
+  const defaultOptions: CreateSvgOptions2 = {
+    width: 800,
+    height: 800
+  };
+
+  const opts: CreateSvgOptions2 = { ...defaultOptions, ...options };
+
+  const { nodes, links, rootPositions } = preprocess(data);
+
+  const isRoot = (d: NodeDatum): boolean => rootPositions.has(d.id);
+
   const simulation = d3
     .forceSimulation<NodeDatum, LinkDatum>(nodes)
     .force(
       "link",
-      d3.forceLink<NodeDatum, LinkDatum>(links).id(d => d.id)
+      d3
+        .forceLink<NodeDatum, LinkDatum>(links)
+        .id(d => d.id)
+        .strength(2)
     )
     .force(
       "charge",
@@ -81,7 +94,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
           return 30;
         }
 
-        return 15;
+        return 10;
       })
     )
     .force("center", d3.forceCenter(opts.width / 2, opts.height / 2))
@@ -93,7 +106,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
             return opts.width / 2 + rootPositions.get(d.id)![0];
           }
 
-          return d.x || opts.width / 2;
+          return 0;
         })
         .strength((d: NodeDatum, i: number, data: NodeDatum[]) => {
           if (isRoot(d)) {
@@ -109,7 +122,8 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
           if (isRoot(d)) {
             return opts.height / 2 + rootPositions.get(d.id)![1];
           }
-          return d.y || opts.height / 2;
+
+          return 0;
         })
         .strength((d: NodeDatum, i: number, data: NodeDatum[]) => {
           if (isRoot(d)) {
@@ -121,10 +135,11 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
 
   const svg = d3
     .select(ref)
+    .attr("cursor", "grab")
     .attr("viewBox", `0 0 ${opts.width} ${opts.height}`);
 
   const strokeWidth = (link: LinkDatum) => {
-    return 1;
+    return 2;
   };
 
   // If SVG was previously added, remove it again so we can replace it
@@ -132,7 +147,9 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     .selectAll("g")
     .remove();
 
-  const link = svg
+  const g = svg.append("g");
+
+  const link = g
     .append("g")
     .attr("stroke", "#999")
     .attr("stroke-opacity", 0.6)
@@ -145,7 +162,7 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     if (isRoot(n)) {
       return 12;
     }
-    return 8;
+    return 7;
   };
 
   const color = () => {
@@ -159,8 +176,11 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
     };
   };
 
-  const node = svg
+  zoomAndDrag(svg, g, [opts.width, opts.height]);
+
+  const node = g
     .append("g")
+    .attr("cursor", "auto")
     .attr("stroke", "#fff")
     .attr("stroke-width", 1.5)
     .selectAll("circle")
@@ -174,7 +194,6 @@ const createSvg = (ref: any, data: any, options?: CreateSvgOptions) => {
       return n.x;
     })
     .attr("fill", color());
-
   node.append("title").text((d: NodeDatum) => d.id);
 
   simulation.on("tick", () => {
