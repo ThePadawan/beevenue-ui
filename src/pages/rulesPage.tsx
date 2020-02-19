@@ -4,11 +4,11 @@ import { Api } from "../api/api";
 import { NeedsLoginPage } from "./needsLoginPage";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 
-import { displayText, Rule } from "./rules";
 import { RuleFileUploadCard } from "../fragments/rules/ruleFileUploadCard";
 import { RuleFileDownloadCard } from "../fragments/rules/ruleFileDownloadCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Rule, RuleText } from "./ruleText";
 
 interface RulesPageState {
   rules: any[] | null;
@@ -28,38 +28,40 @@ class RulesPage extends Component<any, RulesPageState, any> {
     this.loadRules();
   };
 
-  private deleteRule = (ruleIndex: number) => {
+  private deleteRule = (e: any, ruleIndex: number) => {
+    e.preventDefault();
     Api.Rules.delete(ruleIndex).then(_ => this.loadRules());
   };
 
   private getRules = (rules: Rule[]) => {
     return (
       <>
-        {rules.map((r, idx) => {
-          return (
-            <nav className="level" key={idx}>
-              <div className="level-item beevenue-level-item-fullwidth">
-                <div className="card beevenue-sidebar-card">
-                  <header className="card-header">
-                    <p className="card-header-title">Rule {idx + 1}</p>
-                  </header>
-                  <div className="card-content">
-                    <div className="content">{displayText(r)}</div>
-                  </div>
-                  <footer className="card-footer">
-                    <a
-                      className="card-footer-item"
-                      onClick={e => this.deleteRule(idx)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                      Delete
-                    </a>
-                  </footer>
+        <nav className="level">
+          <div className="level-item beevenue-level-item-fullwidth">
+            <div className="card beevenue-sidebar-card">
+              <header className="card-header">
+                <p className="card-header-title">Rules</p>
+              </header>
+              <div className="card-content">
+                <div className="content">
+                  <ul>
+                    {rules.map((r, idx) => {
+                      return (
+                        <li key={`rule${idx}`}>
+                          <RuleText {...r} />
+                          &nbsp;
+                          <a href="#" onClick={e => this.deleteRule(e, idx)}>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
               </div>
-            </nav>
-          );
-        })}
+            </div>
+          </div>
+        </nav>
       </>
     );
   };

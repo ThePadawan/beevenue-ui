@@ -88,28 +88,11 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
   private masonryClasses = (
     isDoneLoading: boolean,
     m: MediumWallPaginationItem
-  ) => {
-    const thresholds = [1.4, 1.8, 2.2];
-
+  ): string => {
     const result = ["beevenue-masonry-item"];
 
     if (!isDoneLoading) {
       result.push("beevenue-masonry-hidden");
-    }
-
-    if (m.aspectRatio === null) {
-      return result.join(" ");
-    }
-
-    const aspectRatio = parseFloat(m.aspectRatio);
-
-    for (let idx = thresholds.length - 1; idx >= 0; --idx) {
-      const threshold = thresholds[idx];
-
-      if (aspectRatio > threshold) {
-        result.push(`beevenue-masonry-item-${idx + 2}`);
-        return result.join(" ");
-      }
     }
 
     return result.join(" ");
@@ -141,9 +124,9 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
       }
 
       return (
-        <li className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
+        <div className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
           <Link to={`/show/${r.id}`}>{thumbs(r)}</Link>
-        </li>
+        </div>
       );
     };
 
@@ -154,12 +137,12 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
           gutter: 20,
           transitionDuration: 0
         }}
-        elementType={"ul"}
+        elementType={"div"}
         disableImagesLoaded={false}
         updateOnEachImageLoad={true}
         onImagesLoaded={i => this.onImageLoaded()}
       >
-        <li className="beevenue-masonry-sizer" />
+        <div className="beevenue-masonry-sizer" />
         {isDoneLoading ? undefined : <BeevenueSpinner />}
         {this.props.media.items.map(imageLink)}
       </Masonry>

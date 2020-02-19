@@ -41,13 +41,13 @@ class SpeedTaggingItem extends Component<
     };
 
     return (
-      <li
+      <div
         className={className()}
         key={this.props.id}
         onClick={e => this.toggle()}
       >
         {this.props.children}
-      </li>
+      </div>
     );
   }
 }
