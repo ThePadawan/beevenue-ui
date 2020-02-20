@@ -92,6 +92,10 @@ const Api = {
   },
 
   Tags: {
+    patch(name: string, body: object): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.patch(`tag/${name}`, body));
+    },
+
     show(name: string): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));
     },
@@ -125,12 +129,6 @@ const Api = {
     removeAlias(tag: string, alias: string): AxiosPromise<any> {
       return _notification_wrapper(
         axiosClient.delete(`tag/${tag}/aliases/${alias}`)
-      );
-    },
-
-    rename(tag: string, newName: string): AxiosPromise<any> {
-      return _notification_wrapper(
-        axiosClient.patch(`tag/${tag}`, { newName })
       );
     },
 

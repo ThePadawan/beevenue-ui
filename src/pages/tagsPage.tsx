@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+import { TagRatingControl } from "../fragments/tag/tagRatingControl";
 
 interface Tag {
   tag: string;
@@ -84,6 +85,7 @@ class TagsPage extends Component<any, TagsPageState, any> {
               <tr>
                 <th>Tag</th>
                 <th />
+                <th>Rating</th>
                 <th>Media</th>
               </tr>
             </thead>
@@ -101,6 +103,9 @@ class TagsPage extends Component<any, TagsPageState, any> {
           <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
         </td>
         <td>{this.maybeRenderTooltip(t)}</td>
+        <td>
+          <TagRatingControl tag={t} />
+        </td>
         <td className="has-text-centered">{t.mediaCount}</td>
       </tr>
     );

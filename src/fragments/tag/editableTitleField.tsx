@@ -46,14 +46,14 @@ class EditableTitleField extends Component<
       return;
     }
 
-    Api.Tags.rename(this.props.initialTitle, this.state.currentTitle).then(
-      _ => {
-        this.setState({ ...this.state, isBeingEdited: false });
-        if (this.props.onTitleChanged) {
-          this.props.onTitleChanged(this.state.currentTitle || "");
-        }
+    Api.Tags.patch(this.props.initialTitle, {
+      tag: this.state.currentTitle
+    }).then(_ => {
+      this.setState({ ...this.state, isBeingEdited: false });
+      if (this.props.onTitleChanged) {
+        this.props.onTitleChanged(this.state.currentTitle || "");
       }
-    );
+    });
   };
 
   render() {
