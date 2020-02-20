@@ -16,14 +16,15 @@ class TagRatingControl extends Component<any, any, any> {
   };
 
   ratingElement = (rating: string) => {
-    const id = `tag-${this.state.tag.id}-rating-${rating}`;
+    const name = `tag-${this.state.tag.tag}`;
+    const id = `${name}-rating-${rating}`;
     return (
       <div className="beevenue-tag-rating" key={id}>
         <input
           className="is-checkradio"
           type="radio"
           checked={this.state.tag.rating === rating}
-          name="currentRating"
+          name={name}
           onChange={e => this.onRatingChange(e.target.value)}
           value={rating}
           id={id}
