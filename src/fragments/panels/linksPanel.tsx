@@ -8,10 +8,10 @@ class LinksPanel extends Component {
       <div className="card-content">
         <ul>
           <li>
-            <Link to="/upload">Batch upload</Link>
+            <Link to="/tags">Tags</Link>
           </li>
           <li>
-            <Link to="/tags">Tag statistics</Link>
+            <Link to="/tagStats">Tag statistics</Link>
           </li>
           <li>
             <Link to="/rules">Configure rules</Link>

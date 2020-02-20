@@ -96,10 +96,6 @@ const Api = {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));
     },
 
-    cleanUp(name: string): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.patch(`tag/${name}/clean`));
-    },
-
     getImplications(): AxiosPromise<ImplicationData> {
       return axiosClient.get("tags/implications");
     },

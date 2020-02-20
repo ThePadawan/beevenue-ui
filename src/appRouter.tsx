@@ -8,8 +8,8 @@ import {
   IndexPage,
   SearchResultsPage,
   ShowPage,
-  BatchUploadPage,
   TagStatisticsPage,
+  TagsPage,
   TagShowPage,
   WildcardPage,
   RulesPage
@@ -74,8 +74,8 @@ class AppRouter extends Component<AppRouterProps, any, any> {
         <Route path="/" exact component={IndexPage} />
         <Route path="/search/:extra(.+)" component={SearchResultsPage} />
         <Route path="/show/:id" component={ShowPage} />
-        <Route path="/upload" component={BatchUploadPage} />
-        <Route path="/tags" component={TagStatisticsPage} />
+        <Route path="/tags" component={TagsPage} />
+        <Route path="/tagStats" component={TagStatisticsPage} />
         <Route path="/tag/:name" component={TagShowPage} />
         <Route
           path="/rules/violations/any"
@@ -108,8 +108,7 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { login, loginAnonymous, stopRedirecting }
-)(AppRouter);
+const x = connect(mapStateToProps, { login, loginAnonymous, stopRedirecting })(
+  AppRouter
+);
 export { x as AppRouter };

@@ -106,7 +106,6 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
     type CardGetter = (vm: ShowTagViewModel) => JSX.Element | null;
 
     const cardGetters: CardGetter[] = [
-      this.getUsageCard,
       this.getAliasesCard,
       this.getImplicationsCard
     ];
@@ -168,28 +167,23 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
     return <ImplicationsCard tag={this.state.tag} tagName={this.tagName} />;
   }
 
-  private getUsageCard(tag: ShowTagViewModel): JSX.Element | null {
-    return (
-      <div className="card beevenue-sidebar-card">
-        <header className="card-header">
-          <p className="card-header-title">Usage</p>
-        </header>
-        <div className="card-content">
-          <div className="content">Used {tag.count} times</div>
-        </div>
-      </div>
-    );
-  }
-
   private onTitleChanged = (newTitle: string): void => {
     this.props.redirect(`/tag/${newTitle}`);
+  };
+
+  private subtitle = () => {
+    if (this.state.tagNotFound || !this.state.tag) {
+      return null;
+    }
+
+    return <h3 className="subtitle is-5">Used {this.state.tag.count} times</h3>;
   };
 
   render() {
     return (
       <NeedsLoginPage>
         <div>
-          <h2 className="title">
+          <h3 className="title is-2">
             <EditableTitleField
               initialTitle={this.tagName}
               onTitleChanged={t => this.onTitleChanged(t)}
@@ -197,7 +191,8 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
             <Link to={`/search/${this.tagName}`} className="beevenue-h2-link">
               <FontAwesomeIcon icon={faSearch} />
             </Link>
-          </h2>
+          </h3>
+          {this.subtitle()}
           {this.innerContent}
         </div>
       </NeedsLoginPage>
@@ -205,8 +200,5 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
   }
 }
 
-const x = connect(
-  null,
-  { redirect }
-)(TagShowPage);
+const x = connect(null, { redirect })(TagShowPage);
 export { x as TagShowPage };
