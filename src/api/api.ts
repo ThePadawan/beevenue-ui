@@ -116,10 +116,6 @@ const Api = {
       return _notification_wrapper(axiosClient.get(`tags/missing/${mediumId}`));
     },
 
-    deleteOrphans(): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.delete(`tags/orphans`));
-    },
-
     addAlias(tag: string, alias: string): AxiosPromise<any> {
       return _notification_wrapper(
         axiosClient.post(`tag/${tag}/aliases/${alias}`)

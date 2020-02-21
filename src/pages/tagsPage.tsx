@@ -1,19 +1,30 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 import { Api } from "../api/api";
 import { sortBy } from "lodash-es";
-import { NeedsLoginPage } from "./needsLoginPage";
+import { Location } from "history";
 import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { TagRatingControl } from "../fragments/tag/tagRatingControl";
+import { BeevenuePage } from "./beevenuePage";
+import { getLoggedInRole, isSessionSfw } from "../redux/reducers/login";
+import { Rating } from "../api/show";
 
 interface Tag {
+  rating: Rating;
   tag: string;
   impliedByThisCount: number;
   implyingThisCount: number;
   mediaCount: number;
+}
+
+interface TagsPageProps {
+  isSessionSfw: boolean;
+  location: Location;
+  loggedInRole: string | null;
 }
 
 interface TagsPageState {
@@ -21,7 +32,7 @@ interface TagsPageState {
   filter: string;
 }
 
-class TagsPage extends Component<any, TagsPageState, any> {
+class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
   public constructor(props: any) {
     super(props);
     this.state = { tags: [], filter: "" };
@@ -31,9 +42,13 @@ class TagsPage extends Component<any, TagsPageState, any> {
     this.loadTags();
   };
 
-  public deleteOrphanTags = () => {
-    this.setState({ ...this.state, tags: [] });
-    Api.Tags.deleteOrphans().then(_ => this.loadTags());
+  public componentDidUpdate = (prevProps: TagsPageProps, _: any) => {
+    if (
+      this.props.loggedInRole !== "admin" &&
+      prevProps.isSessionSfw !== this.props.isSessionSfw
+    ) {
+      this.loadTags();
+    }
   };
 
   private loadTags = () => {
@@ -65,11 +80,6 @@ class TagsPage extends Component<any, TagsPageState, any> {
   private renderContent = () => {
     return (
       <>
-        <div>
-          <button className="button" onClick={e => this.deleteOrphanTags()}>
-            Delete orphan tags
-          </button>
-        </div>
         <div className="content beevenue-tags-filter">
           <input
             className="input"
@@ -99,16 +109,31 @@ class TagsPage extends Component<any, TagsPageState, any> {
     );
   };
 
+  private isAdmin = () => {
+    return this.props.loggedInRole === "admin";
+  };
+
+  private tagLink = (t: Tag) => {
+    let url = `/search/${t.tag}`;
+    if (this.isAdmin()) {
+      url = `/tag/${t.tag}`;
+    }
+
+    return <Link to={url}>{t.tag}</Link>;
+  };
+
   private renderTag = (t: Tag): JSX.Element => {
+    const ratingCell = this.isAdmin() ? (
+      <TagRatingControl tag={t} prefix="large" />
+    ) : (
+      <p>{t.rating}</p>
+    );
+
     return (
       <tr key={t.tag}>
-        <td>
-          <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
-        </td>
+        <td>{this.tagLink(t)}</td>
         <td>{this.maybeRenderTooltip(t)}</td>
-        <td>
-          <TagRatingControl tag={t} prefix="large" />
-        </td>
+        <td>{ratingCell}</td>
         <td className="has-text-centered">{t.mediaCount}</td>
       </tr>
     );
@@ -120,13 +145,17 @@ class TagsPage extends Component<any, TagsPageState, any> {
         <div className="card">
           <header className="card-header">
             <p className="card-header-title">
-              <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
+              {this.tagLink(t)}
               {this.maybeRenderTooltip(t)}
             </p>
           </header>
           <div className="card-content">
             <p className="subtitle">Used {t.mediaCount} times</p>
-            <TagRatingControl tag={t} prefix="small" />
+            {this.isAdmin() ? (
+              <TagRatingControl tag={t} prefix="small" />
+            ) : (
+              <p>{t.rating}</p>
+            )}
           </div>
         </div>
       </nav>
@@ -149,8 +178,17 @@ class TagsPage extends Component<any, TagsPageState, any> {
     const content =
       this.state.tags.length > 0 ? this.renderContent() : <BeevenueSpinner />;
 
-    return <NeedsLoginPage>{content}</NeedsLoginPage>;
+    return <BeevenuePage {...this.props}>{content}</BeevenuePage>;
   }
 }
 
-export { TagsPage };
+const mapStateToProps = (state: any): TagsPageProps => {
+  return {
+    ...state,
+    loggedInRole: getLoggedInRole(state.login),
+    isSessionSfw: isSessionSfw(state.login)
+  };
+};
+
+const x = connect(mapStateToProps, null)(TagsPage);
+export { x as TagsPage };

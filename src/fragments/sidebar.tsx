@@ -27,16 +27,19 @@ class Sidebar extends Component<SidebarProps, any, any> {
   }
 
   private get elements(): JSX.Element[] {
+    const linksPanel = (
+      <LinksPanel isAdmin={this.props.loggedInRole === "admin"} />
+    );
     if (this.props.loggedInRole === "admin") {
       return [
         <SearchPanel {...this.props} />,
         <UploadPanel />,
-        <LinksPanel />,
+        linksPanel,
         <LoginPanel />,
         <SpeedTaggerPanel />
       ];
     } else {
-      return [<SearchPanel {...this.props} />, <LoginPanel />];
+      return [<SearchPanel {...this.props} />, linksPanel, <LoginPanel />];
     }
   }
 
