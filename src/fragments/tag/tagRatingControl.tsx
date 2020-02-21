@@ -16,7 +16,7 @@ class TagRatingControl extends Component<any, any, any> {
   };
 
   ratingElement = (rating: string) => {
-    const name = `tag-${this.state.tag.tag}`;
+    const name = `${this.props.prefix}-tag-${this.state.tag.tag}`;
     const id = `${name}-rating-${rating}`;
     return (
       <div className="beevenue-tag-rating" key={id}>

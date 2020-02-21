@@ -80,7 +80,7 @@ class TagsPage extends Component<any, TagsPageState, any> {
           />
         </div>
         <div>
-          <table className="table is-striped is-narrow is-hoverable">
+          <table className="table is-hidden-mobile is-striped is-narrow is-hoverable">
             <thead>
               <tr>
                 <th>Tag</th>
@@ -91,6 +91,9 @@ class TagsPage extends Component<any, TagsPageState, any> {
             </thead>
             <tbody>{this.filteredTags().map(this.renderTag)}</tbody>
           </table>
+          <div className="is-hidden-tablet">
+            {this.filteredTags().map(this.renderTagMobile)}
+          </div>
         </div>
       </>
     );
@@ -104,10 +107,29 @@ class TagsPage extends Component<any, TagsPageState, any> {
         </td>
         <td>{this.maybeRenderTooltip(t)}</td>
         <td>
-          <TagRatingControl tag={t} />
+          <TagRatingControl tag={t} prefix="large" />
         </td>
         <td className="has-text-centered">{t.mediaCount}</td>
       </tr>
+    );
+  };
+
+  private renderTagMobile = (t: Tag): JSX.Element => {
+    return (
+      <nav className="level" key={t.tag}>
+        <div className="card">
+          <header className="card-header">
+            <p className="card-header-title">
+              <Link to={`/tag/${t.tag}`}>{t.tag}</Link>
+              {this.maybeRenderTooltip(t)}
+            </p>
+          </header>
+          <div className="card-content">
+            <p className="subtitle">Used {t.mediaCount} times</p>
+            <TagRatingControl tag={t} prefix="small" />
+          </div>
+        </div>
+      </nav>
     );
   };
 
