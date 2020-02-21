@@ -5,7 +5,8 @@ import { getSearchQuery } from "../../redux/reducers/search";
 import {
   addSearchResults,
   redirect,
-  setShouldRefresh
+  setShouldRefresh,
+  setSearchQuery
 } from "../../redux/actions";
 import { Location } from "history";
 import qs from "qs";
@@ -16,6 +17,7 @@ interface SearchPanelState {
 
 interface SearchPanelProps {
   location: Location;
+  setSearchQuery: typeof setSearchQuery;
   searchTerms: string | null;
   redirect: typeof redirect;
   setShouldRefresh: typeof setShouldRefresh;
@@ -66,6 +68,7 @@ class SearchPanel extends Component<SearchPanelProps, SearchPanelState, any> {
   }
 
   onChange(newSearchTerms: string) {
+    this.props.setSearchQuery(newSearchTerms);
     this.setState({ ...this.state, searchTerms: newSearchTerms });
   }
 
@@ -97,6 +100,7 @@ const mapStateToProps = (state: any) => {
 const x = connect(mapStateToProps, {
   addSearchResults,
   redirect,
-  setShouldRefresh
+  setShouldRefresh,
+  setSearchQuery
 })(SearchPanel);
 export { x as SearchPanel };

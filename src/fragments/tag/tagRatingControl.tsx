@@ -8,8 +8,6 @@ class TagRatingControl extends Component<any, any, any> {
   }
 
   private onRatingChange = (newRating: string) => {
-    console.log(this.state.tag.tag, newRating);
-    // RS2RS Partial patch on tag
     Api.Tags.patch(this.state.tag.tag, { rating: newRating }).then(success => {
       this.setState({ ...this.state, tag: success.data });
     });
