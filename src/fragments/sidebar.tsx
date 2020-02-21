@@ -8,7 +8,8 @@ import { LoginPanel, SearchPanel, UploadPanel, LinksPanel } from "./panels";
 import {
   getLoggedInUser,
   getLoggedInRole,
-  BeevenueUser
+  BeevenueUser,
+  Anonymous
 } from "../redux/reducers/login";
 import { Location } from "history";
 import { SpeedTaggerPanel } from "./panels/speedTaggerPanel";
@@ -38,6 +39,8 @@ class Sidebar extends Component<SidebarProps, any, any> {
         <LoginPanel />,
         <SpeedTaggerPanel />
       ];
+    } else if (this.props.loggedInUser === Anonymous) {
+      return [<SearchPanel {...this.props} />, <LoginPanel />];
     } else {
       return [<SearchPanel {...this.props} />, linksPanel, <LoginPanel />];
     }
