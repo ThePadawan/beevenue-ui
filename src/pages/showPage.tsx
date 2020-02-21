@@ -153,11 +153,18 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
         getTagDisplayValue,
         ...other
       } = props;
+
+      const displayValue = getTagDisplayValue(tag);
+
+      const linkTarget = disabled
+        ? `/search/${displayValue}`
+        : `/tag/${displayValue}`;
+
       return (
         <div className="control" key={key}>
           <div {...other}>
-            <Link to={`/tag/${getTagDisplayValue(tag)}`}>
-              <span className="tag">{getTagDisplayValue(tag)}</span>
+            <Link to={linkTarget}>
+              <span className="tag">{displayValue}</span>
             </Link>
             {!disabled && (
               <a className="tag is-delete" onClick={e => onRemove(key)} />
