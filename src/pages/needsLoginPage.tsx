@@ -1,4 +1,3 @@
-import React from "react";
 import { connect } from "react-redux";
 
 import { addNotLoggedInNotification, redirect } from "../redux/actions";
@@ -37,8 +36,7 @@ const mapStateToProps = (state: any): NeedsLoginPageProps => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { addNotLoggedInNotification, redirect }
-)(NeedsLoginPage);
+const x = connect(mapStateToProps, { addNotLoggedInNotification, redirect })(
+  NeedsLoginPage
+);
 export { x as NeedsLoginPage };

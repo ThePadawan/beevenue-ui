@@ -40,7 +40,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
 
     Api.login(this.state).then(
       res => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           // The session cookie is set now.
           this.props.login(res.data);
         }
@@ -61,7 +61,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
 
     Api.logout().then(
       res => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           // The session cookie is unset now.
           this.props.logout();
           this.props.redirect("/");
@@ -170,7 +170,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
     if (this.state.loginInProgress) {
       return <BeevenueSpinner />;
     }
-    if (this.props.loggedInUser == Anonymous) {
+    if (this.props.loggedInUser === Anonymous) {
       return this.renderLogin();
     } else {
       return this.renderLogout();

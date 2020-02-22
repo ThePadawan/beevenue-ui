@@ -100,7 +100,7 @@ class SearchResultsPage extends Component<
 
   private doDefaultSearch() {
     const tags = this.searchTerms;
-    if (tags == "") {
+    if (tags === "") {
       console.warn("Searching with empty tags!");
       return;
     }
@@ -146,7 +146,7 @@ class SearchResultsPage extends Component<
     } else if (
       !this.state.results ||
       !this.state.results.items ||
-      this.state.results.items.length == 0
+      this.state.results.items.length === 0
     ) {
       inner = <h2 className="title is-2">No results found.</h2>;
     } else {

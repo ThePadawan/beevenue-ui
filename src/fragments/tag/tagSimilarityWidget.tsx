@@ -37,7 +37,7 @@ const preprocessNodes = (data: SimilarityData) => {
 
   // Get groupId based on prefix (a:, c:, p:, ...)
   const grouper = (name: string): number => {
-    const found = name.match(/(.+)\:/);
+    const found = name.match(/(.+):/);
     if (!found) return 1;
     const m = found[0];
     if (!groupDict.has(m)) {
@@ -68,15 +68,15 @@ const preprocessLinks = (
     for (let [key2, value2] of Object.entries(v)) {
       const v3: any = value2;
       if (v3.similarity < opts.simThreshold) continue;
-      if (links.findIndex(l => l.source == key2 && l.target == key) !== -1)
+      if (links.findIndex(l => l.source === key2 && l.target === key) !== -1)
         continue;
 
       // Tag nodes if they are involved in any edge (so we can hide them later if we want)
-      let node = nodes.find(n => n.id == key);
+      let node = nodes.find(n => n.id === key);
       if (node) {
         node.hasAny = true;
       }
-      node = nodes.find(n => n.id == key2);
+      node = nodes.find(n => n.id === key2);
       if (node) {
         node.hasAny = true;
       }

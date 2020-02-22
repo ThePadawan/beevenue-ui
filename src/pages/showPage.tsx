@@ -82,7 +82,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
         this.setState({ ViewModel: res.data as ShowViewModel });
       },
       err => {
-        if (err.response.status == 401) {
+        if (err.response.status === 401) {
           this.props.addNotLoggedInNotification();
         }
 

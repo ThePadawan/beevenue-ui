@@ -126,7 +126,7 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
   }
   private getAliasesCard(tag: ShowTagViewModel): JSX.Element | null {
     const getCurrentAliases = () => {
-      if (tag.aliases.length == 0) return null;
+      if (tag.aliases.length === 0) return null;
       return (
         <ul>
           {tag.aliases.sort().map(a => (

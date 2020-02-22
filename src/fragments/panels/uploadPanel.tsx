@@ -36,7 +36,7 @@ class UploadPanel extends Component<any, UploadPanelState, any> {
 
   private incrementDoneCount = () => {
     const newState = { ...this.state, doneCount: this.state.doneCount + 1 };
-    if (this.state.files && newState.doneCount == this.state.files.length) {
+    if (this.state.files && newState.doneCount === this.state.files.length) {
       this.setState(newState);
 
       setTimeout(() => {
@@ -55,7 +55,7 @@ class UploadPanel extends Component<any, UploadPanelState, any> {
       return result;
     }
 
-    if (this.state.doneCount == this.state.files.length) {
+    if (this.state.doneCount === this.state.files.length) {
       return result + " is-success";
     }
 

@@ -45,10 +45,10 @@ const convertNotificationContents = (
   const contents = models.map(model => {
     if (typeof model === "string") {
       return new TextContent(model);
-    } else if (model.type == "link") {
+    } else if (model.type === "link") {
       const l = model as LinkModel;
       return new LinkContent(l.data.location, l.data.text);
-    } else if (model.type == "text") {
+    } else if (model.type === "text") {
       return new TextContent((model as TextModel).data);
     }
     throw Error(`Unknown tag ${model}`);

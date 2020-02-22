@@ -31,7 +31,7 @@ class ImplicationsCard extends Component<
   private get listImpliedByThis() {
     const tag = this.props.tag;
 
-    if (tag.implied_by_this.length == 0) return null;
+    if (tag.implied_by_this.length === 0) return null;
     return (
       <ul>
         {tag.implied_by_this.map(a => (
@@ -103,12 +103,12 @@ class ImplicationsCard extends Component<
 
     // Signal React to behave
     const target =
-      mode == "ImpliedByThis"
+      mode === "ImpliedByThis"
         ? this.props.tag.implied_by_this
         : this.props.tag.implying_this;
 
     const newArray = target.slice();
-    if (addOrRemove == "Add") {
+    if (addOrRemove === "Add") {
       newArray.push(tagName);
     } else {
       const maybeIdx = newArray.indexOf(tagName);
@@ -117,7 +117,7 @@ class ImplicationsCard extends Component<
       }
     }
 
-    if (mode == "ImpliedByThis") {
+    if (mode === "ImpliedByThis") {
       tag.implied_by_this = newArray;
     } else {
       tag.implying_this = newArray;
@@ -129,7 +129,7 @@ class ImplicationsCard extends Component<
   private get listImplyingThis() {
     const tag = this.props.tag;
 
-    if (tag.implying_this.length == 0) return null;
+    if (tag.implying_this.length === 0) return null;
     return (
       <ul>
         {tag.implying_this.map(a => (

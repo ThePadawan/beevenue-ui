@@ -113,14 +113,12 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
     const imageLink = (r: MediumWallPaginationItem) => {
       if (this.props.isSpeedTagging) {
-        return (
-          <SpeedTaggingItem
-            outerClassName={this.masonryClasses(isDoneLoading, r)}
-            {...r}
-          >
-            {thumbs(r)}
-          </SpeedTaggingItem>
-        );
+        const inner = {
+          ...r,
+          outerClassName: this.masonryClasses(isDoneLoading, r)
+        };
+
+        return <SpeedTaggingItem {...inner}>{thumbs(r)}</SpeedTaggingItem>;
       }
 
       return (

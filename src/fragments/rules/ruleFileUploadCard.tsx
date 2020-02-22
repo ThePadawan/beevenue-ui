@@ -73,7 +73,7 @@ class RuleFileUploadCard extends Component<
 
     if (file.size > 500 * 1024) {
       return this.suspiciousFile("it is bigger than 500 KB");
-    } else if (file.type != "application/json") {
+    } else if (file.type !== "application/json") {
       return this.suspiciousFile(
         `it has the Mime-Type '${file.type}' and not 'application/json'.`
       );

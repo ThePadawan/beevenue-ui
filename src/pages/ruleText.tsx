@@ -65,7 +65,7 @@ function _arrayToFragment<T1, T2>(
   options: {} = {},
   selector: Selector<T1, T2> = defaultSelector
 ) {
-  if (!terms || terms.length == 0) return [];
+  if (!terms || terms.length === 0) return [];
 
   const localOptions = {
     separator: ", ",
