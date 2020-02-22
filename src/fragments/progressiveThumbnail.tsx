@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { SpeedTaggingItem } from "./speedTaggingItem";
+import { backendUrl } from "../config.json";
 
 interface Medium {
   id: number;
@@ -28,8 +29,27 @@ class ProgressiveThumbnail extends Component<
     this.state = { src: this.props.src!, doBlur: true };
   }
 
-  public replaceWith = (src: any) => {
-    this.setState({ ...this.state, src, doBlur: false });
+  private isMountedHelper: boolean = false;
+
+  public componentDidMount = () => {
+    this.isMountedHelper = true;
+
+    new Promise((resolve, reject) => {
+      const img = new Image();
+
+      img.onload = () => {
+        resolve(img.src);
+      };
+
+      img.src = `${backendUrl}/thumbs/${this.props.medium.id}`;
+    }).then((src: any) => {
+      if (this.isMountedHelper)
+        this.setState({ ...this.state, src, doBlur: false });
+    });
+  };
+
+  public componentWillUnmount = () => {
+    this.isMountedHelper = false;
   };
 
   render() {

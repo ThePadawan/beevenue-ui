@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import Masonry from "react-masonry-component";
+import Masonry from "react-masonry-css";
 import { Location } from "history";
 
-import { backendUrl } from "../config.json";
 import { BeevenuePagination } from "./beevenuePagination";
 import { addToQs } from "../pages/queryString";
 import { redirect } from "../redux/actions";
@@ -44,15 +43,11 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     this.state = {};
   }
 
-  private tinyThumbRefs = new Map<number, any>();
-
   public onPageSelect = (n: number) => {
     addToQs(this.props, { pageNr: n });
-    this.tinyThumbRefs.clear();
   };
 
   public onPageSizeSelect = (n: number) => {
-    this.tinyThumbRefs.clear();
     // Example calculation:
     // * We are currently on pageNumber == 2, pageSize == 20.
     //   so we are showing images with 1-indices 21-40.
@@ -77,10 +72,6 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
 
     const imageLinks = this.props.media.items.map(
       (r: MediumWallPaginationItem) => {
-        if (!this.tinyThumbRefs.has(r.id)) {
-          this.tinyThumbRefs.set(r.id, React.createRef());
-        }
-
         const maybeSrc = r.tinyThumbnail
           ? `data:image/png;base64, ${r.tinyThumbnail}`
           : undefined;
@@ -91,44 +82,22 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
               src={maybeSrc}
               medium={r}
               isSpeedTagging={this.props.isSpeedTagging}
-              ref={this.tinyThumbRefs.get(r.id)}
             />
           </div>
         );
       }
     );
 
-    this.props.media.items.map((r: MediumWallPaginationItem) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-
-        img.onload = () => {
-          resolve(img);
-        };
-
-        img.src = `${backendUrl}/thumbs/${r.id}`;
-      }).then((img: any) => {
-        if (
-          !this.tinyThumbRefs.has(r.id) ||
-          !this.tinyThumbRefs.get(r.id).current
-        )
-          return;
-
-        this.tinyThumbRefs.get(r.id).current.replaceWith(img.src);
-      });
-    });
-
     return (
       <Masonry
-        options={{
-          columnWidth: ".beevenue-masonry-sizer",
-          gutter: 20,
-          transitionDuration: 0
+        breakpointCols={{
+          default: 4,
+          1600: 2,
+          500: 1
         }}
-        elementType={"div"}
-        disableImagesLoaded={false}
+        className="beevenue-masonry"
+        columnClassName="beevenue-masonry-column"
       >
-        <div className="beevenue-masonry-sizer" />
         {imageLinks}
       </Masonry>
     );

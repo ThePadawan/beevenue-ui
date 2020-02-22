@@ -1,43 +1,24 @@
-.beevenue-masonry-sizer {
-  width: 47%;
+$gutter: 1.25rem;
+
+.beevenue-masonry {
+  display: flex;
+  margin-left: -$gutter;
+  width: auto;
 }
 
-.beevenue-masonry-hidden {
-  display: none;
+.beevenue-masonry-column {
+  padding-left: $gutter;
+  background-clip: padding-box;
 }
 
 .beevenue-masonry-item {
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-  margin-bottom: 1em;
-  width: 47%;
+  margin-bottom: $gutter;
 }
 
 .beevenue-masonry-item img {
   display: block;
   width: 100%;
-  max-width: 100%;
-}
-
-@media screen and (max-width: 768px) {
-  .beevenue-masonry-sizer {
-    width: 100%;
-  }
-  .beevenue-masonry-item {
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-    margin-bottom: 1em;
-    width: 100%;
-  }
-}
-
-@media screen and (min-width: 1600px) {
-  .beevenue-masonry-sizer {
-    width: 24%;
-  }
-  .beevenue-masonry-item {
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-    margin-bottom: 1em;
-    width: 24%;
-  }
 }
 
 .card {
