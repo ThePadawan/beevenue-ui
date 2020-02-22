@@ -8,36 +8,25 @@ interface LinksPanelProps {
 
 class LinksPanel extends Component<LinksPanelProps, any, any> {
   private get cardContent() {
+    let items = [
+      <Link to="/tags">Tags</Link>,
+      <Link to="/tagStats">Tag statistics</Link>
+    ];
+
     if (this.props.isAdmin) {
-      return (
-        <div className="card-content">
-          <ul>
-            <li>
-              <Link to="/tags">Tags</Link>
-            </li>
-            <li>
-              <Link to="/tagStats">Tag statistics</Link>
-            </li>
-            <li>
-              <Link to="/rules">Configure rules</Link>
-            </li>
-            <li>
-              <RandomRuleViolationButton />
-            </li>
-          </ul>
-        </div>
-      );
-    } else {
-      return (
-        <div className="card-content">
-          <ul>
-            <li>
-              <Link to="/tags">Tags</Link>
-            </li>
-          </ul>
-        </div>
-      );
+      items.push(<Link to="/rules">Configure rules</Link>);
+      items.push(<RandomRuleViolationButton />);
     }
+
+    return (
+      <div className="card-content">
+        <ul>
+          {items.map((item, index) => {
+            return <li key={index}>{item}</li>;
+          })}
+        </ul>
+      </div>
+    );
   }
 
   render() {

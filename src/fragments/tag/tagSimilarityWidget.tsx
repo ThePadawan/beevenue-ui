@@ -209,14 +209,28 @@ const createSvg = (
   return svg.node();
 };
 
-class TagSimilarityWidget extends Component<any, any, any> {
-  public constructor(props: any) {
+interface TagSimilarityWidgetProps {
+  isSessionSfw: boolean;
+}
+
+class TagSimilarityWidget extends Component<
+  TagSimilarityWidgetProps,
+  any,
+  any
+> {
+  public constructor(props: TagSimilarityWidgetProps) {
     super(props);
     this.state = { hideSingletonNodes: true, simThreshold: 0.4 };
   }
 
   public componentDidMount = () => {
     this.loadSimilarity();
+  };
+
+  public componentDidUpdate = (prevProps: TagSimilarityWidgetProps, _: any) => {
+    if (prevProps.isSessionSfw !== this.props.isSessionSfw) {
+      this.loadSimilarity();
+    }
   };
 
   private loadSimilarity = () => {

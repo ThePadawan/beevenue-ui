@@ -9,7 +9,7 @@ import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { TagRatingControl } from "../fragments/tag/tagRatingControl";
-import { BeevenuePage } from "./beevenuePage";
+import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 import { getLoggedInRole, isSessionSfw } from "../redux/reducers/login";
 import { Rating } from "../api/show";
 
@@ -21,9 +21,8 @@ interface Tag {
   mediaCount: number;
 }
 
-interface TagsPageProps {
+interface TagsPageProps extends BeevenuePageProps {
   isSessionSfw: boolean;
-  location: Location;
   loggedInRole: string | null;
 }
 

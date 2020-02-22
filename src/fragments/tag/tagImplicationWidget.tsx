@@ -209,14 +209,31 @@ const createSvg = (
   return svg.node();
 };
 
-class TagImplicationWidget extends Component<any, any, any> {
-  public constructor(props: any) {
+interface TagImplicationWidgetProps {
+  isSessionSfw: boolean;
+}
+
+class TagImplicationWidget extends Component<
+  TagImplicationWidgetProps,
+  any,
+  any
+> {
+  public constructor(props: TagImplicationWidgetProps) {
     super(props);
     this.state = {};
   }
 
   public componentDidMount = () => {
     this.loadImplications();
+  };
+
+  public componentDidUpdate = (
+    prevProps: TagImplicationWidgetProps,
+    _: any
+  ) => {
+    if (prevProps.isSessionSfw !== this.props.isSessionSfw) {
+      this.loadImplications();
+    }
   };
 
   private loadImplications = () => {

@@ -1,23 +1,41 @@
 import React, { Component } from "react";
-import { NeedsLoginPage } from "./needsLoginPage";
 import { TagSimilarityWidget } from "../fragments/tag/tagSimilarityWidget";
 import { TagImplicationWidget } from "../fragments/tag/tagImplicationWidget";
+import { isSessionSfw } from "../redux/reducers/login";
+import { connect } from "react-redux";
+import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 
-class TagStatisticsPage extends Component<any, any, any> {
+interface TagStatisticsProps extends BeevenuePageProps {
+  isSessionSfw: boolean;
+}
+
+class TagStatisticsPage extends Component<TagStatisticsProps, any, any> {
   public constructor(props: any) {
     super(props);
   }
 
   render() {
     return (
-      <NeedsLoginPage>
+      <BeevenuePage {...this.props}>
         <div>
-          <TagSimilarityWidget />
-          <TagImplicationWidget />
+          <nav className="level" key="similarity">
+            <TagSimilarityWidget {...this.props} />
+          </nav>
+          <nav className="level" key="implication">
+            <TagImplicationWidget {...this.props} />
+          </nav>
         </div>
-      </NeedsLoginPage>
+      </BeevenuePage>
     );
   }
 }
 
-export { TagStatisticsPage };
+const mapStateToProps = (state: any): TagStatisticsProps => {
+  return {
+    ...state,
+    isSessionSfw: isSessionSfw(state.login)
+  };
+};
+
+const x = connect(mapStateToProps, null)(TagStatisticsPage);
+export { x as TagStatisticsPage };
