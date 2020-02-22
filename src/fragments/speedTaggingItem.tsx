@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Thumbs } from "./mediumWall";
 import { toggleSpeedTaggingItem } from "../redux/actions";
 import { getSpeedTaggingItems } from "../redux/reducers/speedTagging";
 
 interface SpeedTaggingItemProps {
   id: number;
-  thumbs: Thumbs;
 
-  outerClassName: string;
   toggleSpeedTaggingItem: typeof toggleSpeedTaggingItem;
 
   speedTaggingItems: number[];
@@ -32,12 +29,11 @@ class SpeedTaggingItem extends Component<
 
   render() {
     const className = () => {
-      const base = this.props.outerClassName;
       if (this.props.speedTaggingItems.indexOf(this.props.id) > -1) {
-        return `${base} beevenue-speed-tagger-selected`;
+        return "beevenue-speed-tagger-selected";
       }
 
-      return base;
+      return undefined;
     };
 
     return (

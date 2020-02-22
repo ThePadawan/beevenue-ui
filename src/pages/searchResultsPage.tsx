@@ -25,6 +25,7 @@ import { isSpeedTagging } from "../redux/reducers/speedTagging";
 interface SearchResultItem {
   id: any;
   aspectRatio: string | null;
+  tinyThumbnail: string | null;
   hash: string;
   thumbs: Thumbs;
 }

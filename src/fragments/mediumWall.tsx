@@ -5,18 +5,17 @@ import { Location } from "history";
 
 import { backendUrl } from "../config.json";
 import { BeevenuePagination } from "./beevenuePagination";
-import { Link } from "react-router-dom";
-import { BeevenueSpinner } from "./beevenueSpinner";
 import { addToQs } from "../pages/queryString";
 import { redirect } from "../redux/actions";
 import { isSpeedTagging } from "../redux/reducers/speedTagging";
-import { SpeedTaggingItem } from "./speedTaggingItem";
+import { ProgressiveThumbnail } from "./progressiveThumbnail";
 
 export interface Thumbs {
   [index: number]: string;
 }
 
 interface MediumWallPaginationItem {
+  tinyThumbnail: string | null;
   id: number;
   aspectRatio: string | null;
   hash: string;
@@ -37,37 +36,23 @@ interface MediumWallProps {
   isSpeedTagging: boolean;
 }
 
-interface MediumWallState {
-  loadedImageCount: number;
-}
+interface MediumWallState {}
 
 class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
   public constructor(props: MediumWallProps) {
     super(props);
-    this.state = { loadedImageCount: 0 };
+    this.state = {};
   }
 
-  private onImageLoaded = () => {
-    // Don't be an idiot and remove this, it will lead to an infinite loop.
-    if (
-      this.props.media.items &&
-      this.state.loadedImageCount === this.props.media.items.length
-    ) {
-      return;
-    }
-
-    // Note: This describes the degree of parallelism with which <img> elements are added
-    // to the DOM, so directly influences reactivity of the UI vs thumbnail loading performance!
-    this.setState({ loadedImageCount: this.state.loadedImageCount + 10 });
-  };
+  private tinyThumbRefs = new Map<number, any>();
 
   public onPageSelect = (n: number) => {
-    this.setState({ loadedImageCount: 0 });
     addToQs(this.props, { pageNr: n });
+    this.tinyThumbRefs.clear();
   };
 
   public onPageSizeSelect = (n: number) => {
-    this.setState({ loadedImageCount: 0 });
+    this.tinyThumbRefs.clear();
     // Example calculation:
     // * We are currently on pageNumber == 2, pageSize == 20.
     //   so we are showing images with 1-indices 21-40.
@@ -85,48 +70,53 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
     addToQs(this.props, { pageNr: newPageNumber, pageSize: n });
   };
 
-  private masonryClasses = (
-    isDoneLoading: boolean,
-    m: MediumWallPaginationItem
-  ): string => {
-    const result = ["beevenue-masonry-item"];
-
-    if (!isDoneLoading) {
-      result.push("beevenue-masonry-hidden");
-    }
-
-    return result.join(" ");
-  };
-
   public results = () => {
     if (!this.props.media || !this.props.media.items) {
       return null;
     }
 
-    // TODO Make work for all breakpoints
-    const thumbs = (r: MediumWallPaginationItem) => {
-      return <img sizes="50vw" src={`${backendUrl}/thumbs/${r.id}`} />;
-    };
+    const imageLinks = this.props.media.items.map(
+      (r: MediumWallPaginationItem) => {
+        if (!this.tinyThumbRefs.has(r.id)) {
+          this.tinyThumbRefs.set(r.id, React.createRef());
+        }
 
-    const isDoneLoading =
-      this.state.loadedImageCount >= this.props.media.items.length;
+        const maybeSrc = r.tinyThumbnail
+          ? `data:image/png;base64, ${r.tinyThumbnail}`
+          : undefined;
 
-    const imageLink = (r: MediumWallPaginationItem) => {
-      if (this.props.isSpeedTagging) {
-        const inner = {
-          ...r,
-          outerClassName: this.masonryClasses(isDoneLoading, r)
+        return (
+          <div className="beevenue-masonry-item" key={r.id}>
+            <ProgressiveThumbnail
+              src={maybeSrc}
+              medium={r}
+              isSpeedTagging={this.props.isSpeedTagging}
+              ref={this.tinyThumbRefs.get(r.id)}
+            />
+          </div>
+        );
+      }
+    );
+
+    this.props.media.items.map((r: MediumWallPaginationItem) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = () => {
+          resolve(img);
         };
 
-        return <SpeedTaggingItem {...inner}>{thumbs(r)}</SpeedTaggingItem>;
-      }
+        img.src = `${backendUrl}/thumbs/${r.id}`;
+      }).then((img: any) => {
+        if (
+          !this.tinyThumbRefs.has(r.id) ||
+          !this.tinyThumbRefs.get(r.id).current
+        )
+          return;
 
-      return (
-        <div className={this.masonryClasses(isDoneLoading, r)} key={r.id}>
-          <Link to={`/show/${r.id}`}>{thumbs(r)}</Link>
-        </div>
-      );
-    };
+        this.tinyThumbRefs.get(r.id).current.replaceWith(img.src);
+      });
+    });
 
     return (
       <Masonry
@@ -137,12 +127,9 @@ class MediumWall extends Component<MediumWallProps, MediumWallState, any> {
         }}
         elementType={"div"}
         disableImagesLoaded={false}
-        updateOnEachImageLoad={true}
-        onImagesLoaded={i => this.onImageLoaded()}
       >
         <div className="beevenue-masonry-sizer" />
-        {isDoneLoading ? undefined : <BeevenueSpinner />}
-        {this.props.media.items.map(imageLink)}
+        {imageLinks}
       </Masonry>
     );
   };
