@@ -2,7 +2,7 @@ import axios, { AxiosPromise } from "axios";
 
 import { backendUrl, backendTimeoutMs } from "../config.json";
 import { Rating } from "./show.js";
-import { pick } from "lodash-es";
+import pick from "lodash-es/pick";
 import store from "../redux/store";
 import { addNotification } from "../redux/actions";
 import { BeevenueNotificationTemplate } from "../notifications/index";

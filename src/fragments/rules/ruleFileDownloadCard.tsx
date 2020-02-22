@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { backendUrl } from "../../config.json";
-import { faFileDownload } from "@fortawesome/free-solid-svg-icons";
+import { faFileDownload } from "@fortawesome/free-solid-svg-icons/faFileDownload";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface RuleFileDownloadCardProps {}

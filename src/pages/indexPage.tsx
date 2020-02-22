@@ -17,10 +17,12 @@ import { redirect, setShouldRefresh } from "../redux/actions";
 import { getLastFileUploaded } from "../redux/reducers/fileUpload";
 import { paginationParamsFromQuery } from "./pagination";
 import { shouldRefresh } from "../redux/reducers/refresh";
+import { isSpeedTagging } from "../redux/reducers/speedTagging";
 
 interface IndexPageProps {
   loggedInUser: BeevenueUser;
   isSessionSfw: boolean;
+  isSpeedTagging: boolean;
   media: MediumWallPagination;
   location: Location;
   redirect: typeof redirect;
@@ -119,12 +121,10 @@ const mapStateToProps = (state: any) => {
     shouldRefresh: shouldRefresh(state.refresh),
     lastFileUploaded: getLastFileUploaded(state.fileUpload),
     loggedInUser: getLoggedInUser(state.login),
+    isSpeedTagging: isSpeedTagging(state.speedTagging),
     isSessionSfw: isSessionSfw(state.login)
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { redirect, setShouldRefresh }
-)(IndexPage);
+const x = connect(mapStateToProps, { redirect, setShouldRefresh })(IndexPage);
 export { x as IndexPage };

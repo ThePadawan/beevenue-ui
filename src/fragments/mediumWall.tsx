@@ -34,7 +34,7 @@ interface MediumWallProps {
   location: Location;
   media: MediumWallPagination;
   redirect: typeof redirect;
-  isSpeedTagging: typeof isSpeedTagging;
+  isSpeedTagging: boolean;
 }
 
 interface MediumWallState {

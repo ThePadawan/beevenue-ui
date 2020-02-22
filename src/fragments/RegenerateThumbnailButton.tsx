@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { faSync } from "@fortawesome/free-solid-svg-icons";
+import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Api } from "../api/api";
 import { addNotification } from "../redux/actions";
@@ -39,8 +39,5 @@ class RegenerateThumbnailButton extends Component<
   }
 }
 
-const x = connect(
-  null,
-  { addNotification }
-)(RegenerateThumbnailButton);
+const x = connect(null, { addNotification })(RegenerateThumbnailButton);
 export { x as RegenerateThumbnailButton };

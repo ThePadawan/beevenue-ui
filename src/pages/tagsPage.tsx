@@ -2,12 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import { Api } from "../api/api";
-import { sortBy } from "lodash-es";
-import { Location } from "history";
+import sortBy from "lodash-es/sortBy";
 import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
 import { TagRatingControl } from "../fragments/tag/tagRatingControl";
 import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
 import { getLoggedInRole, isSessionSfw } from "../redux/reducers/login";

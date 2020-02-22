@@ -20,6 +20,7 @@ import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { shouldRefresh } from "../redux/reducers/refresh";
+import { isSpeedTagging } from "../redux/reducers/speedTagging";
 
 interface SearchResultItem {
   id: any;
@@ -49,6 +50,7 @@ interface SearchResultsPageProps {
   setShouldRefresh: typeof setShouldRefresh;
   results: SearchResults;
   isSessionSfw: boolean;
+  isSpeedTagging: boolean;
 }
 
 interface SearchResultsPageState {
@@ -159,6 +161,7 @@ const mapStateToProps = (state: any): any => {
   return {
     shouldRefresh: shouldRefresh(state.refresh),
     isSessionSfw: isSessionSfw(state.login),
+    isSpeedTagging: isSpeedTagging(state.speedTagging),
     results: getSearchResults(state.search)
   };
 };

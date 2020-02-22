@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Router, Route, Switch } from "react-router-dom";
-import { debounce } from "lodash-es";
+import debounce from "lodash-es/debounce";
 import { BeevenueSpinner } from "./fragments/beevenueSpinner";
 
 import {

@@ -1,9 +1,8 @@
 import React, { Component, FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
 
 import { Api } from "../../api/api";
-import { tickStep } from "d3";
 
 interface UploadPanelState {
   files: FileList | null;

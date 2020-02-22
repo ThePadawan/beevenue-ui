@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { match, Redirect } from "react-router";
+import { match } from "react-router";
 
 import TagsInput from "react-tagsinput";
 
@@ -13,7 +13,7 @@ import {
   addNotLoggedInNotification,
   redirect
 } from "../redux/actions";
-import { pick } from "lodash-es";
+import pick from "lodash-es/pick";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { MediumDeleteButton } from "../fragments/MediumDeleteButton";
 import { MissingTags } from "../fragments/missingTags";

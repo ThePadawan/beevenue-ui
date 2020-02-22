@@ -3,8 +3,9 @@ import { Api } from "../api/api";
 import { Rating } from "../api/show";
 import { BeevenueSpinner } from "./beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { isEqual } from "lodash-es";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
+import isEqual from "lodash-es/isEqual";
 
 interface MissingTagsProps {
   id: number;

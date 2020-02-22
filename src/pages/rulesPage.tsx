@@ -7,7 +7,7 @@ import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { RuleFileUploadCard } from "../fragments/rules/ruleFileUploadCard";
 import { RuleFileDownloadCard } from "../fragments/rules/ruleFileDownloadCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { Rule, RuleText } from "./ruleText";
 
 interface RulesPageState {

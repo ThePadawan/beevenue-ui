@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Api } from "../../api/api";
-import { faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type Validity = "invalid" | "valid" | "validating" | "unknown";

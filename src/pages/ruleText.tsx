@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Rating } from "../api/show";
-import { SSL_OP_NO_TLSv1_1 } from "constants";
-import { random } from "lodash-es";
 
 type IffRulePartKind = "all" | "hasRating" | "hasAnyTagsIn" | "hasAnyTagsLike";
 

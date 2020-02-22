@@ -5,7 +5,7 @@ import { NeedsLoginPage } from "./needsLoginPage";
 import { Link, match } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { AddAliasField } from "../fragments/tag/addAliasField";
 import { ImplicationsCard } from "../fragments/tag/implicationsCard";
 import { EditableTitleField } from "../fragments/tag/editableTitleField";

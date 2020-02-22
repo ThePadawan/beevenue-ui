@@ -11,7 +11,7 @@ import {
   getSpeedTaggingItems
 } from "../../redux/reducers/speedTagging";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { Api } from "../../api/api";
 
 interface SpeedTaggerPanelProps {
