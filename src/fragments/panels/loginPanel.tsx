@@ -94,7 +94,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
         <input
           className="input"
           type="text"
-          name="username"
+          name="beevenue-username"
           placeholder="Username"
           onChange={e => this.handleUsernameChange(e)}
         />
@@ -109,7 +109,7 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
           className="input"
           autoComplete="current-password"
           type="password"
-          name="password"
+          name="beevenue-password"
           placeholder="Password"
           onChange={e => this.handlePasswordChange(e)}
         />
@@ -185,8 +185,5 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const x = connect(
-  mapStateToProps,
-  { login, logout, redirect }
-)(LoginPanel);
+const x = connect(mapStateToProps, { login, logout, redirect })(LoginPanel);
 export { x as LoginPanel };
