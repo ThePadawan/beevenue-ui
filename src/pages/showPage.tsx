@@ -138,7 +138,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
       return (
         <>
           {tagComponents}
-          {inputComponent}
+          {this.userIsAdmin ? inputComponent : null}
         </>
       );
     };
@@ -216,6 +216,8 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
     const newState = { ...(this.state as InitializedShowPageState) };
     newState.ViewModel.tags = cleanTags;
     this.updateMedium(newState).then(res => {
+      // TODO Inelegant - REST response to updateMedium could already
+      // contain this information so we save one round trip.
       this.loadMedium(this.mediumId);
     });
   }

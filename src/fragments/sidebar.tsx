@@ -31,18 +31,21 @@ class Sidebar extends Component<SidebarProps, any, any> {
     const linksPanel = (
       <LinksPanel isAdmin={this.props.loggedInRole === "admin"} />
     );
+    const searchPanel = <SearchPanel {...this.props} />;
+    const loginPanel = <LoginPanel />;
+
     if (this.props.loggedInRole === "admin") {
       return [
-        <SearchPanel {...this.props} />,
+        searchPanel,
         <UploadPanel />,
         linksPanel,
-        <LoginPanel />,
+        loginPanel,
         <SpeedTaggerPanel />
       ];
     } else if (this.props.loggedInUser === Anonymous) {
-      return [<SearchPanel {...this.props} />, <LoginPanel />];
+      return [loginPanel];
     } else {
-      return [<SearchPanel {...this.props} />, linksPanel, <LoginPanel />];
+      return [searchPanel, linksPanel, loginPanel];
     }
   }
 

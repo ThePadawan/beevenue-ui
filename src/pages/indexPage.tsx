@@ -108,11 +108,12 @@ class IndexPage extends Component<IndexPageProps, any, any> {
   };
 
   render = () => {
-    return (
-      <BeevenuePage {...this.props}>
+    const inner =
+      this.props.loggedInUser === Anonymous ? null : (
         <MediumWall media={this.state.media} {...this.props} />
-      </BeevenuePage>
-    );
+      );
+
+    return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;
   };
 }
 
