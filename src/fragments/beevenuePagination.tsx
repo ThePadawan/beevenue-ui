@@ -106,52 +106,50 @@ class BeevenuePagination extends Component<PaginationProps, any, any> {
       maybeNext = linkTo(pageNr + 1);
     }
 
-    const pagination = (extraClassName: string): JSX.Element => {
-      return (
-        <nav
-          className={`pagination beevenue-pagination ${extraClassName}`}
-          role="navigation"
-          aria-label="pagination"
-        >
-          <span>
-            <ul className="pagination-list">
-              {maybePrefix}
-              {maybePrevious}
-              <li>
-                <a
-                  className="pagination-link is-current"
-                  aria-label={`Goto page ${pageNr}`}
-                  aria-current="page"
-                >
-                  {pageNr}
-                </a>
-              </li>
-              {maybeNext}
-              {maybeSuffix}
-            </ul>
-          </span>
-          <span>
-            <div className="select">
-              <select
-                value={this.state.pageSize}
-                onChange={e => this.onChange(e)}
+    const pagination = (
+      <nav
+        className="pagination beevenue-pagination"
+        role="navigation"
+        aria-label="pagination"
+      >
+        <span>
+          <ul className="pagination-list">
+            {maybePrefix}
+            {maybePrevious}
+            <li>
+              <a
+                className="pagination-link is-current"
+                aria-label={`Go to page ${pageNr}`}
+                aria-current="page"
               >
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-            </div>
-          </span>
-        </nav>
-      );
-    };
+                {pageNr}
+              </a>
+            </li>
+            {maybeNext}
+            {maybeSuffix}
+          </ul>
+        </span>
+        <span>
+          <div className="select">
+            <select
+              value={this.state.pageSize}
+              onChange={e => this.onChange(e)}
+            >
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </div>
+        </span>
+      </nav>
+    );
 
     return (
       <>
-        {pagination("beevenue-pagination-top")}
+        {pagination}
         {this.props.children}
-        {pagination("beevenue-pagination-bottom")}
+        {pagination}
       </>
     );
   }

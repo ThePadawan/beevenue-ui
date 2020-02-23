@@ -54,8 +54,8 @@ class Sidebar extends Component<SidebarProps, any, any> {
 
   render() {
     return (
-      <div>
-        <nav className="level">
+      <div className="beevenue-sidebar">
+        <nav className="level beevenue-home">
           <div className="level-item">
             <h2 className="title">
               <a href="#" onClick={e => this.onHomeButtonClicked(e)}>
