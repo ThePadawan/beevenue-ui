@@ -1,5 +1,5 @@
 import { MimeType } from "../media";
-import { Thumbs } from "../fragments/mediumWall";
+import { Thumbs } from "../fragments/mediumWallTypes";
 
 export type Rating = "u" | "s" | "q" | "e";
 

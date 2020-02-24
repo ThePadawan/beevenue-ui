@@ -28,8 +28,8 @@ class RedirectToRandomRulesViolationPage extends Component<
   }
 }
 
-const x = connect(
-  null,
-  { addNotification, redirect }
-)(RedirectToRandomRulesViolationPage);
+const x = connect(null, { addNotification, redirect })(
+  RedirectToRandomRulesViolationPage
+);
 export { x as RedirectToRandomRulesViolationPage };
+export default x;

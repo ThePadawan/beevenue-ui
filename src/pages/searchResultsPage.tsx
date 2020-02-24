@@ -15,12 +15,14 @@ import { getSearchResults } from "../redux/reducers/search";
 
 import { Api, SearchParameters } from "../api/api";
 import { isSessionSfw } from "../redux/reducers/login";
-import { Thumbs, MediumWall } from "../fragments/mediumWall";
+import { Thumbs } from "../fragments/mediumWallTypes";
 import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { shouldRefresh } from "../redux/reducers/refresh";
 import { isSpeedTagging } from "../redux/reducers/speedTagging";
+
+const MediumWall = React.lazy(() => import("../fragments/mediumWall"));
 
 interface SearchResultItem {
   id: any;
@@ -174,3 +176,4 @@ const x = connect(mapStateToProps, {
   setShouldRefresh
 })(SearchResultsPage);
 export { x as SearchResultsPage };
+export default x;

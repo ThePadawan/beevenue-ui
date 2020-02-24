@@ -319,3 +319,4 @@ const x = connect(mapStateToProps, {
   redirect
 })(ShowPage);
 export { x as ShowPage };
+export default x;

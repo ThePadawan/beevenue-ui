@@ -37,8 +37,6 @@ class WildcardPage extends Component<WildcardPageProps, any, any> {
   }
 }
 
-const x = connect(
-  null,
-  { redirect }
-)(WildcardPage);
+const x = connect(null, { redirect })(WildcardPage);
 export { x as WildcardPage };
+export default x;

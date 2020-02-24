@@ -46,8 +46,5 @@ const mapStateToProps = (state: any) => {
   return { sfw: isSessionSfw(state.login) };
 };
 
-const x = connect(
-  mapStateToProps,
-  { setSfwSession }
-)(SfwButton);
+const x = connect(mapStateToProps, { setSfwSession })(SfwButton);
 export { x as SfwButton };

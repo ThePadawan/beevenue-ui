@@ -8,25 +8,10 @@ import { addToQs } from "../pages/queryString";
 import { redirect } from "../redux/actions";
 import { isSpeedTagging } from "../redux/reducers/speedTagging";
 import { ProgressiveThumbnail } from "./progressiveThumbnail";
-
-export interface Thumbs {
-  [index: number]: string;
-}
-
-interface MediumWallPaginationItem {
-  tinyThumbnail: string | null;
-  id: number;
-  aspectRatio: string | null;
-  hash: string;
-  thumbs: Thumbs;
-}
-
-export interface MediumWallPagination {
-  items: MediumWallPaginationItem[];
-  pageCount: number;
-  pageNumber: number;
-  pageSize: number;
-}
+import {
+  MediumWallPagination,
+  MediumWallPaginationItem
+} from "./mediumWallTypes";
 
 interface MediumWallProps {
   location: Location;
@@ -127,3 +112,4 @@ const mapStateToProps = (state: any) => {
 
 const x = connect(mapStateToProps, null)(MediumWall);
 export { x as MediumWall };
+export default x;

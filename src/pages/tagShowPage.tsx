@@ -202,3 +202,4 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
 
 const x = connect(null, { redirect })(TagShowPage);
 export { x as TagShowPage };
+export default x;

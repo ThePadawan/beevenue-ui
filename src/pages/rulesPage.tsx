@@ -94,3 +94,4 @@ class RulesPage extends Component<any, RulesPageState, any> {
 }
 
 export { RulesPage };
+export default RulesPage;

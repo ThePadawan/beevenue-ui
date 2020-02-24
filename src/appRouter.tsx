@@ -1,24 +1,23 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import { connect } from "react-redux";
 import { Router, Route, Switch } from "react-router-dom";
 import debounce from "lodash-es/debounce";
 import { BeevenueSpinner } from "./fragments/beevenueSpinner";
 
-import {
-  IndexPage,
-  SearchResultsPage,
-  ShowPage,
-  TagStatisticsPage,
-  TagsPage,
-  TagShowPage,
-  WildcardPage,
-  RulesPage
-} from "./pages";
+import { IndexPage, ShowPage } from "./pages";
+
 import { Api } from "./api/api";
 import { login, loginAnonymous, stopRedirecting } from "./redux/actions";
 import { getRedirectionTarget } from "./redux/reducers/redirect";
 import history from "./history";
 import { RedirectToRandomRulesViolationPage } from "./pages/redirectToRandomRulesViolationPage";
+
+const WildcardPage = React.lazy(() => import("./pages/wildcardPage"));
+const TagStatisticsPage = React.lazy(() => import("./pages/tagStatisticsPage"));
+const TagsPage = React.lazy(() => import("./pages/tagsPage"));
+const TagShowPage = React.lazy(() => import("./pages/tagShowPage"));
+const RulesPage = React.lazy(() => import("./pages/rulesPage"));
+const SearchResultsPage = React.lazy(() => import("./pages/searchResultsPage"));
 
 interface AppRouterProps {
   login: typeof login;
@@ -68,37 +67,39 @@ class AppRouter extends Component<AppRouterProps, any, any> {
     }
   }
 
-  private get routes() {
-    return (
-      <Switch>
-        <Route path="/" exact component={IndexPage} />
-        <Route path="/search/:extra(.+)" component={SearchResultsPage} />
-        <Route path="/show/:id" component={ShowPage} />
-        <Route path="/tags" component={TagsPage} />
-        <Route path="/tagStats" component={TagStatisticsPage} />
-        <Route path="/tag/:name" component={TagShowPage} />
-        <Route
-          path="/rules/violations/any"
-          component={RedirectToRandomRulesViolationPage}
-        />
-        <Route path="/rules" component={RulesPage} />
-        <Route path="/:whatever" component={WildcardPage} />
-      </Switch>
-    );
-  }
-
   render() {
-    if (!this.state.HasUser) {
-      return (
-        <div className="full-page-spinner">
-          <div className="full-page-spinner-inner">
-            <BeevenueSpinner />
-          </div>
+    const fallback = (
+      <div className="full-page-spinner">
+        <div className="full-page-spinner-inner">
+          <BeevenueSpinner />
         </div>
-      );
+      </div>
+    );
+
+    if (!this.state.HasUser) {
+      return fallback;
     }
 
-    return <Router history={history}>{this.routes}</Router>;
+    return (
+      <Router history={history}>
+        <Suspense fallback={fallback}>
+          <Switch>
+            <Route path="/" exact component={IndexPage} />
+            <Route path="/search/:extra(.+)" component={SearchResultsPage} />
+            <Route path="/show/:id" component={ShowPage} />
+            <Route path="/tags" component={TagsPage} />
+            <Route path="/tagStats" component={TagStatisticsPage} />
+            <Route path="/tag/:name" component={TagShowPage} />
+            <Route
+              path="/rules/violations/any"
+              component={RedirectToRandomRulesViolationPage}
+            />
+            <Route path="/rules" component={RulesPage} />
+            <Route path="/:whatever" component={WildcardPage} />
+          </Switch>
+        </Suspense>
+      </Router>
+    );
   }
 }
 

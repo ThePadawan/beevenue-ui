@@ -190,3 +190,4 @@ const mapStateToProps = (state: any): TagsPageProps => {
 
 const x = connect(mapStateToProps, null)(TagsPage);
 export { x as TagsPage };
+export default x;

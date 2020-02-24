@@ -3,7 +3,7 @@ import qs from "qs";
 import { Location } from "history";
 
 import { BeevenuePage } from "./beevenuePage";
-import { MediumWall, MediumWallPagination } from "../fragments/mediumWall";
+import { MediumWallPagination } from "../fragments/mediumWallTypes";
 import { Api, LoadMediaParameters } from "../api/api";
 import { connect } from "react-redux";
 import {
@@ -18,6 +18,8 @@ import { getLastFileUploaded } from "../redux/reducers/fileUpload";
 import { paginationParamsFromQuery } from "./pagination";
 import { shouldRefresh } from "../redux/reducers/refresh";
 import { isSpeedTagging } from "../redux/reducers/speedTagging";
+
+const MediumWall = React.lazy(() => import("../fragments/mediumWall"));
 
 interface IndexPageProps {
   loggedInUser: BeevenueUser;
