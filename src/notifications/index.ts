@@ -1,5 +1,3 @@
-import randomstring from "randomstring";
-
 import { makeNotificationContent } from "./impl";
 
 export type BeevenueNotificationId = string;
@@ -47,7 +45,11 @@ export interface LinkModel {
 export const makeNotificationFromTemplate = (
   t: BeevenueNotificationTemplate
 ): BeevenueNotification => {
-  const id = randomstring.generate({ length: 6 });
+  const getRandomInt = (max: number) => {
+    return Math.floor(Math.random() * Math.floor(max));
+  };
+
+  const id = `notification-${getRandomInt(1024 * 1024)}`;
 
   return {
     id,
