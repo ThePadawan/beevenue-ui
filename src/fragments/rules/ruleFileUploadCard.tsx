@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../../api/api";
 import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
@@ -10,30 +10,12 @@ interface RuleFileUploadCardProps {
   onUploaded: () => void;
 }
 
-interface RuleFileUploadCardState {
-  file: File | null;
-  status: string;
+const RuleFileUploadCard = (props: RuleFileUploadCardProps) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState("Select a file to upload");
+  const [validity, setValidity] = useState<Validity>("unknown");
 
-  validity: Validity;
-}
-
-class RuleFileUploadCard extends Component<
-  RuleFileUploadCardProps,
-  RuleFileUploadCardState,
-  any
-> {
-  static defaultProps: RuleFileUploadCardProps = { onUploaded: () => {} };
-
-  public constructor(props: any) {
-    super(props);
-    this.state = {
-      file: null,
-      status: "Select a file to upload",
-      validity: "unknown"
-    };
-  }
-
-  private readFile = (f: File): Promise<any> => {
+  const readFile = (f: File): Promise<any> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -58,112 +40,93 @@ class RuleFileUploadCard extends Component<
     });
   };
 
-  private suspiciousFile = (reason: string) => {
-    this.setState({
-      ...this.state,
-      status: `That doesn't look like a rules file: ${reason}`
-    });
+  const suspiciousFile = (reason: string) => {
+    setStatus(`That doesn't look like a rules file: ${reason}`);
   };
 
-  private onChange = (f: FileList | null) => {
+  const onChange = (f: FileList | null) => {
     if (!f) return;
     if (f.length > 1) return;
 
     const file = f[0];
 
     if (file.size > 500 * 1024) {
-      return this.suspiciousFile("it is bigger than 500 KB");
+      return suspiciousFile("it is bigger than 500 KB");
     } else if (file.type !== "application/json") {
-      return this.suspiciousFile(
+      return suspiciousFile(
         `it has the Mime-Type '${file.type}' and not 'application/json'.`
       );
     }
 
-    this.setState({ ...this.state, validity: "validating" });
+    setValidity("validating");
 
-    this.readFile(file)
+    readFile(file)
       .then(Api.Rules.validateJson)
       .then(
         success => {
           if (success.data.ok === false) {
-            this.setState({
-              ...this.state,
-              status: `This is not valid: ${success.data.data}`,
-              validity: "invalid"
-            });
+            setStatus(`This is not valid: ${success.data.data}`);
+            setValidity("invalid");
           } else {
-            this.setState({
-              ...this.state,
-              file,
-              status: `This is valid and contains ${success.data.data} rules`,
-              validity: "valid"
-            });
+            setFile(file);
+            setStatus(`This is valid and contains ${success.data.data} rules`);
+            setValidity("valid");
           }
         },
         err => {
-          this.setState({
-            ...this.state,
-            status: `This is not valid: ${err}`,
-            validity: "invalid"
-          });
+          setStatus(`This is not valid: ${err}`);
+          setValidity("invalid");
         }
       );
   };
 
-  private onAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    if (!this.state.file) return;
-    this.readFile(this.state.file)
+    if (!file) return;
+    readFile(file)
       .then(Api.Rules.uploadJson)
       .then(success => {
-        this.setState({
-          ...this.state,
-          file: null,
-          validity: "unknown",
-          status: "This uploaded successfully"
-        });
-        // TODO: How to reset selected file of input element?
-        this.props.onUploaded();
+        setFile(null);
+        setStatus("This uploaded successfully");
+        setValidity("unknown");
+        props.onUploaded();
       });
   };
 
-  private buttonClassName(extra?: string): string {
+  const buttonClassName = (extra?: string): string => {
     let result = "button";
     if (extra) {
       result += ` ${extra}`;
     }
-    if (this.state.validity === "validating") {
+    if (validity === "validating") {
       result += " is-loading";
     }
 
     return result;
-  }
+  };
 
-  private get acceptButtonClassName() {
-    if (this.state.validity === "valid") {
-      return this.buttonClassName("is-success");
+  const getAcceptButtonClassName = () => {
+    if (validity === "valid") {
+      return buttonClassName("is-success");
     }
 
-    if (this.state.validity === "invalid") {
-      return this.buttonClassName("is-danger");
+    if (validity === "invalid") {
+      return buttonClassName("is-danger");
     }
 
-    return this.buttonClassName();
-  }
+    return buttonClassName();
+  };
 
-  private get isAcceptButtonDisabled(): boolean | undefined {
-    if (
-      this.state.validity === "invalid" ||
-      this.state.validity === "unknown"
-    ) {
+  const getIsAcceptButtonDisabled = (): boolean | undefined => {
+    if (validity === "invalid" || validity === "unknown") {
       return true;
     }
 
     return undefined;
-  }
+  };
 
-  private get uploadBox() {
+  const getUploadBox = () => {
     return (
       <>
         <div className="file is-boxed">
@@ -173,7 +136,7 @@ class RuleFileUploadCard extends Component<
               multiple={false}
               type="file"
               name="medium"
-              onChange={e => this.onChange(e.target.files)}
+              onChange={e => onChange(e.target.files)}
             />
             <span className="file-cta">
               <FontAwesomeIcon icon={faUpload} />
@@ -182,13 +145,13 @@ class RuleFileUploadCard extends Component<
           </label>
         </div>
 
-        <div>{this.state.status}</div>
+        <div>{status}</div>
 
         <form>
           <button
-            className={this.acceptButtonClassName}
-            onClick={e => this.onAccept(e)}
-            disabled={this.isAcceptButtonDisabled}
+            className={getAcceptButtonClassName()}
+            onClick={e => onAccept(e)}
+            disabled={getIsAcceptButtonDisabled()}
           >
             <span className="icon">
               <FontAwesomeIcon icon={faCheck} />
@@ -197,26 +160,24 @@ class RuleFileUploadCard extends Component<
         </form>
       </>
     );
-  }
+  };
 
-  render() {
-    return (
-      <>
-        <nav className="level">
-          <div className="level-item">
-            <div className="card beevenue-sidebar-card">
-              <header className="card-header">
-                <p className="card-header-title">Upload rules file</p>
-              </header>
-              <div className="card-content">
-                <div className="content">{this.uploadBox}</div>
-              </div>
+  return (
+    <>
+      <nav className="level">
+        <div className="level-item">
+          <div className="card beevenue-sidebar-card">
+            <header className="card-header">
+              <p className="card-header-title">Upload rules file</p>
+            </header>
+            <div className="card-content">
+              <div className="content">{getUploadBox()}</div>
             </div>
           </div>
-        </nav>
-      </>
-    );
-  }
-}
+        </div>
+      </nav>
+    </>
+  );
+};
 
 export { RuleFileUploadCard };

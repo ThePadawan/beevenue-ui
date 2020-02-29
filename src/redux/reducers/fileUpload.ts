@@ -1,8 +1,12 @@
 import { SET_FILE_UPLOADED } from "../actionTypes";
+import { FileUploadStore } from "../store";
 
-const initialState = { lastFileUploaded: -Infinity };
+const initialState: FileUploadStore = { lastFileUploaded: -Infinity };
 
-const fileUpload = (state: any = initialState, action: any): any => {
+const fileUpload = (
+  state: FileUploadStore = initialState,
+  action: any
+): any => {
   switch (action.type) {
     case SET_FILE_UPLOADED: {
       return {
@@ -14,10 +18,6 @@ const fileUpload = (state: any = initialState, action: any): any => {
       return state;
     }
   }
-};
-
-export const getLastFileUploaded = (store: any) => {
-  return store.lastFileUploaded;
 };
 
 export default fileUpload;

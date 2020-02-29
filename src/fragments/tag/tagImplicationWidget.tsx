@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import React, { useEffect, useRef } from "react";
 import { Api } from "../../api/api";
 import * as d3 from "d3";
 import { zoomAndDrag } from "./d3util";
 import { ImplicationData } from "../../api/implications";
+import { useIsSessionSfw } from "../../redux/selectors";
 
 interface NodeDatum extends d3.SimulationNodeDatum {
   id: string;
@@ -57,7 +58,7 @@ const preprocess = (data: ImplicationData) => {
 };
 
 const createSvg = (
-  ref: any,
+  ref: SVGSVGElement,
   data: ImplicationData,
   options?: CreateSvgOptions
 ) => {
@@ -209,58 +210,33 @@ const createSvg = (
   return svg.node();
 };
 
-interface TagImplicationWidgetProps {
-  isSessionSfw: boolean;
-}
+const TagImplicationWidget = () => {
+  const isSessionSfw = useIsSessionSfw();
+  const svgRef = useRef<SVGSVGElement>(null);
 
-class TagImplicationWidget extends Component<
-  TagImplicationWidgetProps,
-  any,
-  any
-> {
-  public constructor(props: TagImplicationWidgetProps) {
-    super(props);
-    this.state = {};
-  }
+  useEffect(() => {
+    loadImplications();
+  }, [isSessionSfw, svgRef]);
 
-  public componentDidMount = () => {
-    this.loadImplications();
-  };
-
-  public componentDidUpdate = (
-    prevProps: TagImplicationWidgetProps,
-    _: any
-  ) => {
-    if (prevProps.isSessionSfw !== this.props.isSessionSfw) {
-      this.loadImplications();
-    }
-  };
-
-  private loadImplications = () => {
+  const loadImplications = () => {
     Api.Tags.getImplications().then(res => {
-      this.setState({ ...this.state, implications: res.data });
-      this.refreshSvg();
+      const implicationData = res.data as ImplicationData;
+      createSvg(svgRef.current!, implicationData);
     });
   };
 
-  private refreshSvg = () => {
-    createSvg(this.refs.foobar, this.state.implications, this.state);
-  };
-
-  render() {
-    return (
-      <div className="card beevenue-sidebar-card">
-        <header className="card-header">
-          <p className="card-header-title">Implications</p>
-        </header>
-        <div className="card-content">
-          <div className="content" ref="bar">
-            <svg ref="foobar"></svg>
-          </div>
+  return (
+    <div className="card beevenue-sidebar-card">
+      <header className="card-header">
+        <p className="card-header-title">Implications</p>
+      </header>
+      <div className="card-content">
+        <div className="content">
+          <svg id="beevenue-implication-svg" ref={svgRef}></svg>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export { TagImplicationWidget };

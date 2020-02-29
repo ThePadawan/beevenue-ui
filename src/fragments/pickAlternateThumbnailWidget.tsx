@@ -1,72 +1,53 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../api/api";
 import { BeevenueSpinner } from "./beevenueSpinner";
 import { ShowViewModel } from "../api/show";
 
-interface PickAlternateThumbnailWidgetState {
-  isLoading: boolean;
-  pickCount: number;
-  picks: string[] | null;
-}
+const PickAlternateThumbnailWidget = (props: ShowViewModel) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [pickCount, setPickCount] = useState(5);
+  const [picks, setPicks] = useState<string[] | null>(null);
 
-class PickAlternateThumbnailWidget extends Component<
-  ShowViewModel,
-  PickAlternateThumbnailWidgetState,
-  any
-> {
-  public constructor(props: ShowViewModel) {
-    super(props);
-    this.state = { isLoading: false, pickCount: 5, picks: null };
-  }
-
-  private onChange = (e: any) => {
-    this.setState({ ...this.state, pickCount: e });
+  const onChange = (e: any) => {
+    setPickCount(Number(e));
   };
 
-  private onClick = () => {
-    this.startLoading();
-    Api.Medium.generateThumbnailPicks(this.props.id, this.state.pickCount).then(
-      success => {
-        this.setState({
-          ...this.state,
-          isLoading: false,
-          picks: success.data.thumbs
-        });
-      }
-    );
-  };
-
-  private startLoading = () => {
-    this.setState({ ...this.state, isLoading: true });
-  };
-
-  private choosePick = (i: number) => {
-    if (!this.state.picks) {
-      return;
-    }
-
-    this.startLoading();
-    Api.Medium.selectThumbnailPick(
-      this.props.id,
-      i,
-      this.state.picks.length
-    ).then(success => {
-      this.setState({ ...this.state, isLoading: false, picks: null });
+  const onClick = () => {
+    startLoading();
+    Api.Medium.generateThumbnailPicks(props.id, pickCount).then(success => {
+      setIsLoading(false);
+      setPicks(success.data.thumbs);
     });
   };
 
-  private renderPicks = () => {
-    if (!this.state.picks) {
+  const startLoading = () => {
+    setIsLoading(true);
+  };
+
+  const choosePick = (i: number) => {
+    if (!picks) {
+      return;
+    }
+
+    startLoading();
+    Api.Medium.selectThumbnailPick(props.id, i, picks.length).then(success => {
+      setIsLoading(false);
+      setPicks(null);
+    });
+  };
+
+  const renderPicks = () => {
+    if (!picks) {
       return null;
     }
 
     return (
       <div className="beevenue-picks">
-        {this.state.picks.map((p: any, i: number) => {
+        {picks.map((p: any, i: number) => {
           return (
             <img
               key={`pick${i}`}
-              onClick={_ => this.choosePick(i)}
+              onClick={_ => choosePick(i)}
               src={`data:image/png;base64, ${p}`}
             />
           );
@@ -75,8 +56,8 @@ class PickAlternateThumbnailWidget extends Component<
     );
   };
 
-  private renderContent = () => {
-    if (this.state.isLoading) {
+  const renderContent = () => {
+    if (isLoading) {
       return <BeevenueSpinner />;
     }
 
@@ -87,8 +68,8 @@ class PickAlternateThumbnailWidget extends Component<
           <div className="select">
             <select
               defaultValue="5"
-              value={this.state.pickCount}
-              onChange={e => this.onChange(e.currentTarget.value)}
+              value={pickCount}
+              onChange={e => onChange(e.currentTarget.value)}
             >
               <option>3</option>
               <option>5</option>
@@ -96,31 +77,29 @@ class PickAlternateThumbnailWidget extends Component<
             </select>
           </div>
           &nbsp;new thumbnails:&nbsp;
-          <button className="button is-primary" onClick={e => this.onClick()}>
+          <button className="button is-primary" onClick={e => onClick()}>
             Go
           </button>
         </div>
-        <div>{this.renderPicks()}</div>
+        <div>{renderPicks()}</div>
       </>
     );
   };
 
-  render() {
-    if (!/^video/.test(this.props.mime_type)) {
-      return null;
-    }
-
-    return (
-      <div className="card beevenue-sidebar-card">
-        <header className="card-header">
-          <p className="card-header-title">Pick alternate thumbnail</p>
-        </header>
-        <div className="card-content">
-          <div className="content">{this.renderContent()}</div>
-        </div>
-      </div>
-    );
+  if (!/^video/.test(props.mime_type)) {
+    return null;
   }
-}
+
+  return (
+    <div className="card beevenue-sidebar-card">
+      <header className="card-header">
+        <p className="card-header-title">Pick alternate thumbnail</p>
+      </header>
+      <div className="card-content">
+        <div className="content">{renderContent()}</div>
+      </div>
+    </div>
+  );
+};
 
 export { PickAlternateThumbnailWidget };

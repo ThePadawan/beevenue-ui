@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../../api/api";
 
 interface EditableTitleFieldProps {
@@ -6,85 +6,62 @@ interface EditableTitleFieldProps {
   onTitleChanged?: (newTitle: string) => void;
 }
 
-interface EditableTitleFieldState {
-  currentTitle: string | null;
+const EditableTitleField = (props: EditableTitleFieldProps) => {
+  const [currentTitle, setCurrentTitle] = useState(props.initialTitle);
+  const [isBeingEdited, setIsBeingEdited] = useState(false);
 
-  isBeingEdited: boolean;
-}
-
-class EditableTitleField extends Component<
-  EditableTitleFieldProps,
-  EditableTitleFieldState,
-  any
-> {
-  public constructor(props: any) {
-    super(props);
-    this.state = {
-      currentTitle: this.props.initialTitle,
-      isBeingEdited: false
-    };
-  }
-
-  public onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    this.stopEditing();
+    stopEditing();
   };
 
-  onChange(text: string) {
-    this.setState({ ...this.state, currentTitle: text });
-  }
-
-  private beginEditing = () => {
-    this.setState({ ...this.state, isBeingEdited: true });
+  const onChange = (text: string) => {
+    setCurrentTitle(text);
   };
 
-  private stopEditing = () => {
-    if (!this.state.currentTitle) return;
+  const beginEditing = () => {
+    setIsBeingEdited(true);
+  };
 
-    if (this.state.currentTitle === this.props.initialTitle) {
-      this.setState({ ...this.state, isBeingEdited: false });
+  const stopEditing = () => {
+    if (!currentTitle) return;
+
+    if (currentTitle === props.initialTitle) {
+      setIsBeingEdited(false);
       return;
     }
 
-    Api.Tags.patch(this.props.initialTitle, {
-      tag: this.state.currentTitle
+    Api.Tags.patch(props.initialTitle, {
+      tag: currentTitle
     }).then(_ => {
-      this.setState({ ...this.state, isBeingEdited: false });
-      if (this.props.onTitleChanged) {
-        this.props.onTitleChanged(this.state.currentTitle || "");
+      setIsBeingEdited(false);
+
+      if (props.onTitleChanged) {
+        props.onTitleChanged(currentTitle || "");
       }
     });
   };
 
-  render() {
-    let content = null;
-    if (this.state.isBeingEdited) {
-      content = (
-        <form
-          onSubmit={e => this.onSubmit(e)}
-          className="beevenue-editable-title"
-        >
-          <input
-            className="input"
-            onBlur={e => this.stopEditing()}
-            type="text"
-            autoFocus
-            placeholder="Tag title"
-            onChange={e => this.onChange(e.currentTarget.value)}
-            value={this.state.currentTitle || ""}
-          />
-        </form>
-      );
-    } else {
-      content = (
-        <span onClick={e => this.beginEditing()}>
-          "{this.state.currentTitle}" tag
-        </span>
-      );
-    }
-
-    return <>{content}</>;
+  let content = null;
+  if (isBeingEdited) {
+    content = (
+      <form onSubmit={e => onSubmit(e)} className="beevenue-editable-title">
+        <input
+          className="input"
+          onBlur={e => stopEditing()}
+          type="text"
+          autoFocus
+          placeholder="Tag title"
+          onChange={e => onChange(e.currentTarget.value)}
+          value={currentTitle || ""}
+        />
+      </form>
+    );
+  } else {
+    content = <span onClick={e => beginEditing()}>"{currentTitle}" tag</span>;
   }
-}
+
+  return <>{content}</>;
+};
 
 export { EditableTitleField };

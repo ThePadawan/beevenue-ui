@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Rating } from "../api/show";
 
@@ -90,12 +90,8 @@ function _arrayToFragment<T1, T2>(
   return results;
 }
 
-class RuleText extends Component<Rule, any, any> {
-  public constructor(props: any) {
-    super(props);
-  }
-
-  private linkSelector = (x: string, idx: number) => {
+const RuleText = (props: Rule) => {
+  const linkSelector = (x: string, idx: number) => {
     return (
       <Link key={idx} to={`/tag/${x}`}>
         {x}
@@ -103,32 +99,32 @@ class RuleText extends Component<Rule, any, any> {
     );
   };
 
-  private renderIffTagsIn = (rulePart: HasAnyTagsInRulePart) => {
+  const renderIffTagsIn = (rulePart: HasAnyTagsInRulePart) => {
     return (
       <>
         All media with the tag&nbsp;
-        {_arrayToFragment(rulePart.data, {}, this.linkSelector)}
+        {_arrayToFragment(rulePart.data, {}, linkSelector)}
       </>
     );
   };
 
-  private renderThenTagsIn = (rulePart: HasAnyTagsInRulePart) => {
+  const renderThenTagsIn = (rulePart: HasAnyTagsInRulePart) => {
     return (
       <>
         should have one of the tags&nbsp;
-        {_arrayToFragment(rulePart.data, {}, this.linkSelector)}
+        {_arrayToFragment(rulePart.data, {}, linkSelector)}
       </>
     );
   };
 
-  private renderIf = (iff: IfRulePart) => {
+  const renderIf = (iff: IfRulePart) => {
     switch (iff.type) {
       case "all":
         return "All media";
       case "hasRating":
         return `All media with rating ${(iff as HasRatingRulePart).data}`;
       case "hasAnyTagsIn":
-        return this.renderIffTagsIn(iff as HasAnyTagsInRulePart);
+        return renderIffTagsIn(iff as HasAnyTagsInRulePart);
       case "hasAnyTagsLike":
         return `All media with a tag like ${_arrayToFragment(
           (iff as HasAnyTagsLikeRulePart).data
@@ -136,7 +132,7 @@ class RuleText extends Component<Rule, any, any> {
     }
   };
 
-  private renderThen = (then: ThenRulePart) => {
+  const renderThen = (then: ThenRulePart) => {
     const _thenTextHasRating = (p: HasRatingRulePart): string => {
       if (p.data) {
         return `should have a rating of ${p.data}`;
@@ -152,7 +148,7 @@ class RuleText extends Component<Rule, any, any> {
       case "hasRating":
         return _thenTextHasRating(then as HasRatingRulePart);
       case "hasAnyTagsIn":
-        return this.renderThenTagsIn(then as HasAnyTagsInRulePart);
+        return renderThenTagsIn(then as HasAnyTagsInRulePart);
       case "hasAnyTagsLike":
         return `should have a tag like ${_arrayToFragment(
           (then as HasAnyTagsLikeRulePart).data
@@ -160,20 +156,18 @@ class RuleText extends Component<Rule, any, any> {
     }
   };
 
-  private renderThens = (thens: ThenRulePart[]) => {
-    const thensTexts = thens.map(this.renderThen);
+  const renderThens = (thens: ThenRulePart[]) => {
+    const thensTexts = thens.map(renderThen);
     return _arrayToFragment(thensTexts, { finalSeparator: " and " });
   };
 
-  render() {
-    return (
-      <>
-        {this.renderIf(this.props.if)}
-        &nbsp;
-        {this.renderThens(this.props.then)}.
-      </>
-    );
-  }
-}
+  return (
+    <>
+      {renderIf(props.if)}
+      &nbsp;
+      {renderThens(props.then)}.
+    </>
+  );
+};
 
 export { RuleText };

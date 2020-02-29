@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import "bulma/css/bulma.min.css";
 import "bulma-switch/dist/css/bulma-switch.min.css";
 import "bulma-slider/dist/css/bulma-slider.min.css";
@@ -12,14 +12,12 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import { AppRouter } from "./appRouter";
 
-class App extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <AppRouter />
-      </Provider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Provider store={store}>
+      <AppRouter />
+    </Provider>
+  );
+};
 
 export default App;

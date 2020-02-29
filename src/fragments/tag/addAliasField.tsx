@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../../api/api";
 
 interface AddAliasFieldProps {
@@ -6,67 +6,50 @@ interface AddAliasFieldProps {
   onAliasAdded: (alias: string) => void;
 }
 
-interface AddAliasFieldState {
-  currentAlias: string | null;
+const AddAliasField = (props: AddAliasFieldProps) => {
+  const [currentAlias, setCurrentAlias] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  isSubmitting: boolean;
-}
-
-class AddAliasField extends Component<
-  AddAliasFieldProps,
-  AddAliasFieldState,
-  any
-> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { currentAlias: null, isSubmitting: false };
-  }
-
-  public onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.state.currentAlias) return;
+    if (!currentAlias) return;
 
-    this.setState({ ...this.state, isSubmitting: true });
+    setIsSubmitting(true);
 
-    Api.Tags.addAlias(this.props.tag, this.state.currentAlias).then(
+    Api.Tags.addAlias(props.tag, currentAlias).then(
       _ => {
-        this.props.onAliasAdded(this.state.currentAlias!);
-        this.setState({ currentAlias: null, isSubmitting: false });
+        props.onAliasAdded(currentAlias!);
+        setCurrentAlias(null);
+        setIsSubmitting(false);
       },
       _ => {
-        this.setState({ ...this.state, isSubmitting: false });
+        setIsSubmitting(false);
       }
     );
   };
 
-  onChange(text: string) {
-    this.setState({ ...this.state, currentAlias: text });
-  }
-
-  render() {
-    return (
-      <>
-        <div
-          className={
-            "beevenue-add-alias-field control" +
-            (this.state.isSubmitting ? " is-loading" : "")
-          }
-        >
-          <form onSubmit={e => this.onSubmit(e)}>
-            <input
-              className="input"
-              type="text"
-              placeholder="New alias"
-              value={this.state.currentAlias || ""}
-              onChange={e => this.onChange(e.currentTarget.value)}
-              disabled={this.state.isSubmitting}
-            />
-          </form>
-        </div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div
+        className={
+          "beevenue-add-alias-field control" +
+          (isSubmitting ? " is-loading" : "")
+        }
+      >
+        <form onSubmit={e => onSubmit(e)}>
+          <input
+            className="input"
+            type="text"
+            placeholder="New alias"
+            value={currentAlias || ""}
+            onChange={e => setCurrentAlias(e.currentTarget.value)}
+            disabled={isSubmitting}
+          />
+        </form>
+      </div>
+    </>
+  );
+};
 
 export { AddAliasField };

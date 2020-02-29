@@ -7,7 +7,7 @@ import redirect from "./redirect";
 import speedTagging from "./speedTagging";
 import refresh from "./refresh";
 
-export default combineReducers({
+const rootStore = {
   fileUpload,
   login,
   search,
@@ -15,4 +15,6 @@ export default combineReducers({
   redirect,
   speedTagging,
   refresh
-});
+};
+
+export const rootReducer = combineReducers(rootStore);

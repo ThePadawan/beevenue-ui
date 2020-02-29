@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../../api/api";
 
 export type Mode = "ImplyingThis" | "ImpliedByThis";
@@ -9,91 +9,61 @@ interface AddImplicationFieldProps {
   onImplicationAdded: (implication: string) => void;
 }
 
-interface AddImplicationFieldState {
-  currentName: string | null;
+const AddImplicationField = (props: AddImplicationFieldProps) => {
+  const [currentName, setCurrentName] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  isSubmitting: boolean;
-}
-
-class AddImplicationField extends Component<
-  AddImplicationFieldProps,
-  AddImplicationFieldState,
-  any
-> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { currentName: null, isSubmitting: false };
-  }
-
-  public onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!this.state.currentName) return;
+    if (!currentName) return;
 
-    this.setState({ ...this.state, isSubmitting: true });
-    const name = this.state.currentName;
+    setIsSubmitting(true);
+    const name = currentName;
 
-    switch (this.props.mode) {
+    let func: (() => Promise<any>) | null = null;
+
+    switch (props.mode) {
       case "ImpliedByThis":
-        Api.Tags.addImplication(this.props.tag, name).then(
-          res => {
-            this.props.onImplicationAdded(name);
-            this.setState({
-              ...this.state,
-              currentName: null,
-              isSubmitting: false
-            });
-          },
-          err => {
-            this.setState({ ...this.state, isSubmitting: false });
-          }
-        );
+        func = () => Api.Tags.addImplication(props.tag, name);
         break;
 
       case "ImplyingThis":
-        Api.Tags.addImplication(name, this.props.tag).then(
-          res => {
-            this.props.onImplicationAdded(name);
-            this.setState({
-              ...this.state,
-              currentName: null,
-              isSubmitting: false
-            });
-          },
-          err => {
-            this.setState({ ...this.state, isSubmitting: false });
-          }
-        );
+        func = () => Api.Tags.addImplication(name, props.tag);
         break;
     }
+
+    func?.call(func).then(
+      res => {
+        props.onImplicationAdded(name);
+        setCurrentName(null);
+        setIsSubmitting(false);
+      },
+      err => {
+        setIsSubmitting(false);
+      }
+    );
   };
 
-  onChange(text: string) {
-    this.setState({ ...this.state, currentName: text });
-  }
-
-  render() {
-    return (
-      <>
-        <div
-          className={
-            "beevenue-add-implication-field" +
-            (this.state.isSubmitting ? " is-loading" : "")
-          }
-        >
-          <form onSubmit={e => this.onSubmit(e)}>
-            <input
-              className="input"
-              type="text"
-              placeholder="New implication"
-              value={this.state.currentName || ""}
-              onChange={e => this.onChange(e.currentTarget.value)}
-              disabled={this.state.isSubmitting}
-            />
-          </form>
-        </div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div
+        className={
+          "beevenue-add-implication-field" + (isSubmitting ? " is-loading" : "")
+        }
+      >
+        <form onSubmit={e => onSubmit(e)}>
+          <input
+            className="input"
+            type="text"
+            placeholder="New implication"
+            value={currentName || ""}
+            onChange={e => setCurrentName(e.currentTarget.value)}
+            disabled={isSubmitting}
+          />
+        </form>
+      </div>
+    </>
+  );
+};
 
 export { AddImplicationField };

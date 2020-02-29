@@ -1,26 +1,17 @@
-import React, { Component } from "react";
-import { match } from "react-router";
+import React, { useState, useEffect } from "react";
+import { useRouteMatch, useLocation } from "react-router";
 import qs from "qs";
 
 import { BeevenuePage } from "./beevenuePage";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import {
-  setSearchQuery,
-  addSearchResults,
-  redirect,
-  setShouldRefresh
-} from "../redux/actions";
-import { getSearchResults } from "../redux/reducers/search";
+import { setSearchQuery, setShouldRefresh } from "../redux/actions";
 
 import { Api, SearchParameters } from "../api/api";
-import { isSessionSfw } from "../redux/reducers/login";
 import { Thumbs } from "../fragments/mediumWallTypes";
-import { Location } from "history";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
-import { shouldRefresh } from "../redux/reducers/refresh";
-import { isSpeedTagging } from "../redux/reducers/speedTagging";
+import { useBeevenueSelector } from "../redux/selectors";
 
 const MediumWall = React.lazy(() => import("../fragments/mediumWall"));
 
@@ -43,137 +34,71 @@ interface SearchResultsPageParams {
   extra: string;
 }
 
-interface SearchResultsPageProps {
-  match: match<SearchResultsPageParams>;
-  location: Location;
-  addSearchResults: typeof addSearchResults;
-  setSearchQuery: typeof setSearchQuery;
-  redirect: typeof redirect;
-  shouldRefresh: boolean;
-  setShouldRefresh: typeof setShouldRefresh;
-  results: SearchResults;
-  isSessionSfw: boolean;
-  isSpeedTagging: boolean;
-}
+const SearchResultsPage = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const shouldRefresh = useBeevenueSelector(
+    store => store.refresh.shouldRefresh
+  );
 
-interface SearchResultsPageState {
-  results: SearchResults | null;
-  doShowSpinner: boolean;
-}
+  const match = useRouteMatch<SearchResultsPageParams>();
 
-class SearchResultsPage extends Component<
-  SearchResultsPageProps,
-  SearchResultsPageState,
-  any
-> {
-  public constructor(props: SearchResultsPageProps) {
-    super(props);
-    this.state = { results: null, doShowSpinner: false };
-  }
+  const [results, setResults] = useState<SearchResults | null>(null);
+  const [doShowSpinner, setDoShowSpinner] = useState(false);
 
-  componentDidMount = () => {
-    this.doDefaultSearch();
-  };
+  useEffect(() => {
+    if (shouldRefresh) {
+      dispatch(setShouldRefresh(false));
+    }
 
-  private doSearch(params: SearchParameters) {
-    this.setState({ ...this.state, results: null, doShowSpinner: true });
-    Api.search(params).then(
-      res => {
-        this.props.addSearchResults(res.data);
-        this.setState({
-          ...this.state,
-          results: res.data,
-          doShowSpinner: false
-        });
-      },
-      _ => {}
-    );
-  }
+    const getSearchTerms = (): string => {
+      const joinedTags = match.params.extra;
+      if (!joinedTags) return "";
+      const tags = joinedTags.split("/").join(" ");
+      return tags;
+    };
 
-  private get searchTerms(): string {
-    const joinedTags = this.props.match.params.extra;
-    if (!joinedTags) return "";
-    const tags = joinedTags.split("/").join(" ");
-    return tags;
-  }
+    const getCurrentQueryString = (): any => {
+      return qs.parse(location.search, { ignoreQueryPrefix: true });
+    };
 
-  private get currentQueryString(): any {
-    return qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
-  }
+    const doSearch = (params: SearchParameters) => {
+      setResults(null);
+      setDoShowSpinner(true);
+      Api.search(params).then(
+        res => {
+          setResults(res.data);
+          setDoShowSpinner(false);
+        },
+        _ => {}
+      );
+    };
 
-  private doDefaultSearch() {
-    const tags = this.searchTerms;
+    const tags = getSearchTerms();
     if (tags === "") {
       console.warn("Searching with empty tags!");
       return;
     }
 
-    this.props.setSearchQuery(tags);
+    dispatch(setSearchQuery(tags));
 
-    let q = this.currentQueryString;
+    let q = getCurrentQueryString();
     const paginationParams = paginationParamsFromQuery(q);
     const queryParams = { ...paginationParams, q: tags };
-    this.doSearch(queryParams);
+    doSearch(queryParams);
+  }, [shouldRefresh, location, match, dispatch]);
+
+  let inner = null;
+  if (doShowSpinner) {
+    inner = <BeevenueSpinner />;
+  } else if (!results || !results.items || results.items.length === 0) {
+    inner = <h2 className="title is-2">No results found.</h2>;
+  } else {
+    inner = <MediumWall media={results} />;
   }
 
-  componentDidUpdate = (prevProps: SearchResultsPageProps, _: any) => {
-    if (this.props.match.params.extra !== prevProps.match.params.extra) {
-      this.doDefaultSearch();
-      return;
-    }
-
-    if (this.props.location.search !== prevProps.location.search) {
-      this.doDefaultSearch();
-      return;
-    }
-
-    if (this.props.isSessionSfw !== prevProps.isSessionSfw) {
-      this.doDefaultSearch();
-      return;
-    }
-
-    if (
-      prevProps.shouldRefresh !== this.props.shouldRefresh &&
-      this.props.shouldRefresh
-    ) {
-      this.props.setShouldRefresh(false);
-      this.doDefaultSearch();
-      return;
-    }
-  };
-
-  render() {
-    let inner = null;
-    if (this.state.doShowSpinner) {
-      inner = <BeevenueSpinner />;
-    } else if (
-      !this.state.results ||
-      !this.state.results.items ||
-      this.state.results.items.length === 0
-    ) {
-      inner = <h2 className="title is-2">No results found.</h2>;
-    } else {
-      inner = <MediumWall media={this.state.results} {...this.props} />;
-    }
-
-    return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;
-  }
-}
-
-const mapStateToProps = (state: any): any => {
-  return {
-    shouldRefresh: shouldRefresh(state.refresh),
-    isSessionSfw: isSessionSfw(state.login),
-    isSpeedTagging: isSpeedTagging(state.speedTagging),
-    results: getSearchResults(state.search)
-  };
+  return <BeevenuePage>{inner}</BeevenuePage>;
 };
 
-const x = connect(mapStateToProps, {
-  addSearchResults,
-  setSearchQuery,
-  redirect,
-  setShouldRefresh
-})(SearchResultsPage);
-export { x as SearchResultsPage };
-export default x;
+export { SearchResultsPage };
+export default SearchResultsPage;

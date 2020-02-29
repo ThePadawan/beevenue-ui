@@ -1,7 +1,8 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { SpeedTaggingItem } from "./speedTaggingItem";
 import { backendUrl } from "../config.json";
+import { useBeevenueSelector } from "../redux/selectors";
 
 interface Medium {
   id: number;
@@ -10,30 +11,19 @@ interface Medium {
 interface ProgressiveThumbnailProps {
   src?: string;
   medium: Medium;
-
-  isSpeedTagging: boolean;
 }
 
-interface ProgressiveThumbnailState {
-  src: string;
-  doBlur: boolean;
-}
+const ProgressiveThumbnail = (props: ProgressiveThumbnailProps) => {
+  const isSpeedTagging = useBeevenueSelector(
+    store => store.speedTagging.isSpeedTagging
+  );
 
-class ProgressiveThumbnail extends Component<
-  ProgressiveThumbnailProps,
-  ProgressiveThumbnailState,
-  any
-> {
-  public constructor(props: ProgressiveThumbnailProps) {
-    super(props);
-    this.state = { src: this.props.src!, doBlur: true };
-  }
+  const [doBlur, setDoBlur] = useState(true);
+  const [src, setSrc] = useState(props.src!);
 
-  private isMountedHelper: boolean = false;
+  const isMounted = useRef(true);
 
-  public componentDidMount = () => {
-    this.isMountedHelper = true;
-
+  useEffect(() => {
     new Promise((resolve, reject) => {
       const img = new Image();
 
@@ -41,39 +31,38 @@ class ProgressiveThumbnail extends Component<
         resolve(img.src);
       };
 
-      img.src = `${backendUrl}/thumbs/${this.props.medium.id}`;
-    }).then((src: any) => {
-      if (this.isMountedHelper)
-        this.setState({ ...this.state, src, doBlur: false });
+      img.src = `${backendUrl}/thumbs/${props.medium.id}`;
+    }).then((resSrc: any) => {
+      if (!isMounted.current) return;
+      setSrc(resSrc);
+      setDoBlur(false);
+      isMounted.current = false;
     });
-  };
 
-  public componentWillUnmount = () => {
-    this.isMountedHelper = false;
-  };
+    return () => {
+      isMounted.current = false;
+    };
+  }, [props.medium.id]);
 
-  render() {
-    const className = this.state.doBlur ? "tiny-thumb" : undefined;
+  const className = doBlur ? "tiny-thumb" : undefined;
 
-    if (this.props.isSpeedTagging) {
-      const innerProps = {
-        ...this.props.medium,
-        outerClassName: "TODO-might-not-be-necessary"
-      };
-
-      return (
-        <SpeedTaggingItem {...innerProps}>
-          <img width="50vw" className={className} src={this.state.src} />
-        </SpeedTaggingItem>
-      );
-    }
+  if (isSpeedTagging) {
+    const innerProps = {
+      ...props.medium
+    };
 
     return (
-      <Link to={`/show/${this.props.medium.id}`}>
-        <img width="50vw" className={className} src={this.state.src} />
-      </Link>
+      <SpeedTaggingItem {...innerProps}>
+        <img width="50vw" className={className} src={src} />
+      </SpeedTaggingItem>
     );
   }
-}
+
+  return (
+    <Link to={`/show/${props.medium.id}`}>
+      <img width="50vw" className={className} src={src} />
+    </Link>
+  );
+};
 
 export { ProgressiveThumbnail };

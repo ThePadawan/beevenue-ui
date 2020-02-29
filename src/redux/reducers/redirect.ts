@@ -1,23 +1,20 @@
 import { REDIRECT } from "../actionTypes";
+import { RedirectStore } from "../store";
 
-const initialState = { target: null };
+const initialState: RedirectStore = { redirection: null };
 
-const redirect = (state: any = initialState, action: any): any => {
+const redirect = (state: RedirectStore = initialState, action: any): any => {
   switch (action.type) {
     case REDIRECT: {
       return {
         ...state,
-        target: action.payload
+        redirection: action.payload
       };
     }
     default: {
       return state;
     }
   }
-};
-
-export const getRedirectionTarget = (store: any) => {
-  return store.target;
 };
 
 export default redirect;

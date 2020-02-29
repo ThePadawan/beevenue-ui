@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Api } from "../api/api";
-import { NeedsLoginPage } from "./needsLoginPage";
+import { useLoginRequired } from "./loginRequired";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 
 import { RuleFileUploadCard } from "../fragments/rules/ruleFileUploadCard";
@@ -9,31 +9,29 @@ import { RuleFileDownloadCard } from "../fragments/rules/ruleFileDownloadCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { Rule, RuleText } from "./ruleText";
+import { BeevenuePage } from "./beevenuePage";
 
-interface RulesPageState {
-  rules: any[] | null;
-}
+const RulesPage = () => {
+  const [rules, setRules] = useState<any[] | null>(null);
 
-class RulesPage extends Component<any, RulesPageState, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { rules: null };
-  }
+  useLoginRequired();
 
-  public componentDidMount = () => {
-    this.loadRules();
+  const loadRules = () => {
+    Api.Rules.get().then(res => {
+      setRules(res.data);
+    });
   };
 
-  private onRuleFileUploaded = () => {
-    this.loadRules();
-  };
+  useEffect(() => {
+    loadRules();
+  }, []);
 
-  private deleteRule = (e: any, ruleIndex: number) => {
+  const deleteRule = (e: any, ruleIndex: number) => {
     e.preventDefault();
-    Api.Rules.delete(ruleIndex).then(_ => this.loadRules());
+    Api.Rules.delete(ruleIndex).then(_ => loadRules());
   };
 
-  private getRules = (rules: Rule[]) => {
+  const getRules = (rules: Rule[]) => {
     return (
       <>
         <nav className="level">
@@ -50,7 +48,7 @@ class RulesPage extends Component<any, RulesPageState, any> {
                         <li key={`rule${idx}`}>
                           <RuleText {...r} />
                           &nbsp;
-                          <a href="#" onClick={e => this.deleteRule(e, idx)}>
+                          <a href="#" onClick={e => deleteRule(e, idx)}>
                             <FontAwesomeIcon icon={faTrash} />
                           </a>
                         </li>
@@ -66,32 +64,24 @@ class RulesPage extends Component<any, RulesPageState, any> {
     );
   };
 
-  private loadRules() {
-    Api.Rules.get().then(res => {
-      this.setState({ rules: res.data });
-    });
+  let content: JSX.Element;
+  if (rules === null) {
+    content = <BeevenueSpinner />;
+  } else {
+    content = getRules(rules);
   }
 
-  render() {
-    let content: JSX.Element;
-    if (this.state.rules === null) {
-      content = <BeevenueSpinner />;
-    } else {
-      content = this.getRules(this.state.rules);
-    }
-
-    return (
-      <NeedsLoginPage>
-        <h2 className="title is-2">Rules</h2>
-        <h3 className="title is-3">File</h3>
-        <RuleFileUploadCard onUploaded={() => this.onRuleFileUploaded()} />
-        <RuleFileDownloadCard />
-        <h3 className="title is-3">Current rules</h3>
-        {content}
-      </NeedsLoginPage>
-    );
-  }
-}
+  return (
+    <BeevenuePage>
+      <h2 className="title is-2">Rules</h2>
+      <h3 className="title is-3">File</h3>
+      <RuleFileUploadCard onUploaded={() => loadRules()} />
+      <RuleFileDownloadCard />
+      <h3 className="title is-3">Current rules</h3>
+      {content}
+    </BeevenuePage>
+  );
+};
 
 export { RulesPage };
 export default RulesPage;

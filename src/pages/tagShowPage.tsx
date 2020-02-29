@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 
 import { Api } from "../api/api";
-import { NeedsLoginPage } from "./needsLoginPage";
-import { Link, match } from "react-router-dom";
+import { useLoginRequired } from "./loginRequired";
+import { Link, useRouteMatch } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
@@ -10,7 +10,8 @@ import { AddAliasField } from "../fragments/tag/addAliasField";
 import { ImplicationsCard } from "../fragments/tag/implicationsCard";
 import { EditableTitleField } from "../fragments/tag/editableTitleField";
 import { redirect } from "../redux/actions";
-import { connect } from "react-redux";
+import { BeevenuePage } from "./beevenuePage";
+import { useDispatch } from "react-redux";
 
 interface ShowTagViewModel {
   aliases: string[];
@@ -20,49 +21,33 @@ interface ShowTagViewModel {
   implying_this: string[];
 }
 
-interface TagShowPageState {
-  tag: ShowTagViewModel | null;
-
-  tagNotFound: boolean;
-}
-
 interface TagShowPageParams {
   name: string;
 }
 
-interface TagShowPageProps {
-  redirect: typeof redirect;
-  match: match<TagShowPageParams>;
-}
+const TagShowPage = () => {
+  const dispatch = useDispatch();
+  const match = useRouteMatch<TagShowPageParams>();
 
-class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
-  public constructor(props: TagShowPageProps) {
-    super(props);
-    this.state = { tag: null, tagNotFound: false };
-  }
+  const [tag, setTag] = useState<ShowTagViewModel | null>(null);
+  const [tagNotFound, setTagNotFound] = useState(false);
 
-  private get tagName(): string {
-    return this.props.match.params.name;
-  }
+  const tagName = match.params.name;
 
-  public componentDidMount = () => {
-    this.loadTag();
-  };
+  useLoginRequired();
 
-  private loadTag = () => {
-    Api.Tags.show(this.tagName).then(
+  useEffect(() => {
+    Api.Tags.show(tagName).then(
       res => {
-        let tag = res.data;
-        this.setState({ ...this.state, tag });
+        setTag(res.data);
       },
       err => {
-        this.setState({ ...this.state, tagNotFound: true });
+        setTagNotFound(true);
       }
     );
-  };
+  }, [tagName]);
 
-  private onAliasAdded = (a: string): void => {
-    const tag = this.state.tag;
+  const onAliasAdded = (a: string): void => {
     if (!tag) return;
 
     // Signal React to behave
@@ -70,11 +55,10 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
     newAliases.push(a);
     tag.aliases = newAliases;
 
-    this.setState({ ...this.state, tag });
+    setTag(tag);
   };
 
-  private onAliasRemoved = (a: string): void => {
-    const tag = this.state.tag;
+  const onAliasRemoved = (a: string): void => {
     if (!tag) return;
 
     // Signal React to behave
@@ -86,45 +70,41 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
     }
 
     tag.aliases = newAliases;
-
-    this.setState({ ...this.state, tag });
+    setTag(tag);
   };
 
-  private removeAlias = (a: string): void => {
-    Api.Tags.removeAlias(this.tagName, a).then(_ => {
-      this.onAliasRemoved(a);
+  const removeAlias = (a: string): void => {
+    Api.Tags.removeAlias(tagName, a).then(_ => {
+      onAliasRemoved(a);
     });
   };
 
-  private get innerContent() {
-    if (this.state.tagNotFound) {
+  const getInnerContent = () => {
+    if (tagNotFound) {
       return <div>No such tag</div>;
     }
 
-    if (!this.state.tag) return <BeevenueSpinner />;
+    if (!tag) return <BeevenueSpinner />;
 
     type CardGetter = (vm: ShowTagViewModel) => JSX.Element | null;
 
-    const cardGetters: CardGetter[] = [
-      this.getAliasesCard,
-      this.getImplicationsCard
-    ];
+    const cardGetters: CardGetter[] = [getAliasesCard, getImplicationsCard];
 
     const wrapper = (x: CardGetter, idx: number) => {
-      if (!this.state.tag) {
+      if (!tag) {
         return null;
       }
 
       return (
         <nav className="level" key={idx}>
-          <div className="level-item">{x.bind(this)(this.state.tag)}</div>
+          <div className="level-item">{x(tag)}</div>
         </nav>
       );
     };
 
-    return <>{cardGetters.map((g, idx) => wrapper.bind(this)(g, idx))}</>;
-  }
-  private getAliasesCard(tag: ShowTagViewModel): JSX.Element | null {
+    return <>{cardGetters.map(wrapper)}</>;
+  };
+  const getAliasesCard = (tag: ShowTagViewModel): JSX.Element | null => {
     const getCurrentAliases = () => {
       if (tag.aliases.length === 0) return null;
       return (
@@ -135,7 +115,7 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
                 {a}
                 <a
                   className="beevenue-alias-delete delete is-small"
-                  onClick={e => this.removeAlias(a)}
+                  onClick={e => removeAlias(a)}
                 />
               </li>
             </Fragment>
@@ -152,54 +132,46 @@ class TagShowPage extends Component<TagShowPageProps, TagShowPageState, any> {
         <div className="card-content">
           <div className="content">
             {getCurrentAliases()}
-            <AddAliasField
-              tag={this.tagName}
-              onAliasAdded={a => this.onAliasAdded(a)}
-            />
+            <AddAliasField tag={tagName} onAliasAdded={a => onAliasAdded(a)} />
           </div>
         </div>
       </div>
     );
-  }
-
-  private getImplicationsCard(tag: ShowTagViewModel): JSX.Element | null {
-    if (!this.state.tag) return null;
-    return <ImplicationsCard tag={this.state.tag} tagName={this.tagName} />;
-  }
-
-  private onTitleChanged = (newTitle: string): void => {
-    this.props.redirect(`/tag/${newTitle}`);
   };
 
-  private subtitle = () => {
-    if (this.state.tagNotFound || !this.state.tag) {
+  const getImplicationsCard = (tag: ShowTagViewModel): JSX.Element | null => {
+    if (!tag) return null;
+    return <ImplicationsCard tag={tag} tagName={tagName} />;
+  };
+
+  const onTitleChanged = (newTitle: string): void => {
+    dispatch(redirect(`/tag/${newTitle}`, true));
+  };
+
+  const subtitle = () => {
+    if (tagNotFound || !tag) {
       return null;
     }
 
-    return <h3 className="subtitle is-5">Used {this.state.tag.count} times</h3>;
+    return <h3 className="subtitle is-5">Used {tag.count} times</h3>;
   };
 
-  render() {
-    return (
-      <NeedsLoginPage>
-        <div>
-          <h3 className="title is-2">
-            <EditableTitleField
-              initialTitle={this.tagName}
-              onTitleChanged={t => this.onTitleChanged(t)}
-            />
-            <Link to={`/search/${this.tagName}`} className="beevenue-h2-link">
-              <FontAwesomeIcon icon={faSearch} />
-            </Link>
-          </h3>
-          {this.subtitle()}
-          {this.innerContent}
-        </div>
-      </NeedsLoginPage>
-    );
-  }
-}
+  return (
+    <BeevenuePage>
+      <h3 className="title is-2">
+        <EditableTitleField
+          initialTitle={tagName}
+          onTitleChanged={t => onTitleChanged(t)}
+        />
+        <Link to={`/search/${tagName}`} className="beevenue-h2-link">
+          <FontAwesomeIcon icon={faSearch} />
+        </Link>
+      </h3>
+      {subtitle()}
+      {getInnerContent()}
+    </BeevenuePage>
+  );
+};
 
-const x = connect(null, { redirect })(TagShowPage);
-export { x as TagShowPage };
-export default x;
+export { TagShowPage };
+export default TagShowPage;

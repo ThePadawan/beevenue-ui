@@ -1,21 +1,29 @@
 import qs from "qs";
-import { Location } from "history";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { redirect } from "../redux/actions";
 
-interface AddToQsContext {
-  location: Location;
-  redirect: (s: string) => void;
+interface QueryStringRedirectParameters {
+  pageNr: number;
+  pageSize?: number;
 }
 
-export const addToQs = (context: AddToQsContext, q: object): void => {
-  const currentLocation = context.location;
-  const currentQs = qs.parse(context.location.search, {
-    ignoreQueryPrefix: true
-  });
-  const newQs = { ...currentQs, ...q };
-  const newLocation = {
-    ...currentLocation,
-    search: qs.stringify(newQs, { addQueryPrefix: true })
+export const useQueryStringRedirect = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const f = (q: QueryStringRedirectParameters) => {
+    const currentLocation = location;
+    const currentQs = qs.parse(location.search, {
+      ignoreQueryPrefix: true
+    });
+    const newQs = { ...currentQs, ...q };
+    const newLocation = {
+      ...currentLocation,
+      search: qs.stringify(newQs, { addQueryPrefix: true })
+    };
+
+    dispatch(redirect(newLocation.pathname + newLocation.search));
   };
 
-  context.redirect(newLocation.pathname + newLocation.search);
+  return f;
 };

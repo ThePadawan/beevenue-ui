@@ -1,15 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import { MediumProps } from "./mediumProps";
 import { mediaSource } from "../media";
 
-class ImageMedium extends Component<MediumProps> {
-  render() {
-    return (
-      <div>
-        <img src={mediaSource(this.props)} />
-      </div>
-    );
-  }
-}
+const ImageMedium = (props: MediumProps) => {
+  return (
+    <div>
+      <img src={mediaSource(props)} />
+    </div>
+  );
+};
 
 export { ImageMedium };

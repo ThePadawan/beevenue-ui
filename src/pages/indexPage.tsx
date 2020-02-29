@@ -1,133 +1,66 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import qs from "qs";
-import { Location } from "history";
 
 import { BeevenuePage } from "./beevenuePage";
-import { MediumWallPagination } from "../fragments/mediumWallTypes";
-import { Api, LoadMediaParameters } from "../api/api";
-import { connect } from "react-redux";
-import {
-  isSessionSfw,
-  getLoggedInUser,
-  BeevenueUser,
-  Unknown,
-  Anonymous
-} from "../redux/reducers/login";
-import { redirect, setShouldRefresh } from "../redux/actions";
-import { getLastFileUploaded } from "../redux/reducers/fileUpload";
+import { Api } from "../api/api";
+import { useDispatch } from "react-redux";
+import { setShouldRefresh } from "../redux/actions";
 import { paginationParamsFromQuery } from "./pagination";
-import { shouldRefresh } from "../redux/reducers/refresh";
-import { isSpeedTagging } from "../redux/reducers/speedTagging";
+import { Anonymous, Unknown } from "../redux/store";
+import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
+import { useLocation } from "react-router-dom";
+import { MediumWallPagination } from "../fragments/mediumWallTypes";
 
 const MediumWall = React.lazy(() => import("../fragments/mediumWall"));
 
-interface IndexPageProps {
-  loggedInUser: BeevenueUser;
-  isSessionSfw: boolean;
-  isSpeedTagging: boolean;
-  media: MediumWallPagination;
-  location: Location;
-  redirect: typeof redirect;
-  shouldRefresh: boolean;
-  setShouldRefresh: typeof setShouldRefresh;
+const IndexPage = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const isSessionSfw = useIsSessionSfw();
+  const shouldRefresh = useBeevenueSelector(
+    store => store.refresh.shouldRefresh
+  );
+  const loggedInUser = useBeevenueSelector(store => store.login.loggedInUser);
+  const lastFileUploaded = useBeevenueSelector(
+    store => store.fileUpload.lastFileUploaded
+  );
 
-  lastFileUploaded: number | null;
-}
+  const [media, setMedia] = useState<MediumWallPagination | null>(null);
 
-class IndexPage extends Component<IndexPageProps, any, any> {
-  public constructor(props: IndexPageProps) {
-    super(props);
-    this.state = { media: null };
-  }
-
-  componentDidMount = () => {
-    this.loadDefaultMedia();
-  };
-
-  componentDidUpdate = (prevProps: IndexPageProps, _: any) => {
-    if (prevProps.isSessionSfw !== this.props.isSessionSfw) {
-      this.loadDefaultMedia();
-      return;
+  useEffect(() => {
+    if (shouldRefresh) {
+      dispatch(setShouldRefresh(false));
     }
 
-    if (prevProps.location.search !== this.props.location.search) {
-      this.loadDefaultMedia();
-      return;
-    }
-
-    if (
-      (prevProps.lastFileUploaded || -Infinity) <
-      (this.props.lastFileUploaded || -Infinity)
-    ) {
-      this.loadDefaultMedia();
-      return;
-    }
-
-    if (prevProps.loggedInUser !== this.props.loggedInUser) {
-      if (
-        this.props.loggedInUser !== Anonymous &&
-        this.props.loggedInUser !== Unknown
-      ) {
-        this.loadDefaultMedia();
-      } else {
-        this.clearMedia();
-      }
-      return;
-    }
-
-    if (
-      prevProps.shouldRefresh !== this.props.shouldRefresh &&
-      this.props.shouldRefresh
-    ) {
-      this.props.setShouldRefresh(false);
-      this.loadDefaultMedia();
-      return;
-    }
-  };
-
-  private clearMedia = () => {
-    this.setState({ media: null });
-  };
-
-  private get currentQueryString(): any {
-    return qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
-  }
-
-  private loadDefaultMedia = () => {
-    let q = this.currentQueryString;
+    let q = qs.parse(location.search, { ignoreQueryPrefix: true });
     const paginationParams = paginationParamsFromQuery(q);
-    this.loadMedia(paginationParams);
-  };
 
-  private loadMedia = (params: LoadMediaParameters) => {
-    this.clearMedia();
-    Api.loadMedia(params).then(
+    setMedia(null);
+    Api.loadMedia(paginationParams).then(
       res => {
-        this.setState({ media: res.data });
+        setMedia(res.data);
       },
       _ => {}
     );
-  };
+  }, [
+    dispatch,
+    location.search,
+    isSessionSfw,
+    lastFileUploaded,
+    loggedInUser,
+    shouldRefresh
+  ]);
 
-  render = () => {
-    const inner =
-      this.props.loggedInUser === Anonymous ? null : (
-        <MediumWall media={this.state.media} {...this.props} />
-      );
+  useEffect(() => {
+    if (loggedInUser === Anonymous || loggedInUser === Unknown) {
+      setMedia(null);
+    }
+  }, [loggedInUser]);
 
-    return <BeevenuePage {...this.props}>{inner}</BeevenuePage>;
-  };
-}
+  let inner = null;
+  if (loggedInUser !== Anonymous && media) inner = <MediumWall media={media} />;
 
-const mapStateToProps = (state: any) => {
-  return {
-    shouldRefresh: shouldRefresh(state.refresh),
-    lastFileUploaded: getLastFileUploaded(state.fileUpload),
-    loggedInUser: getLoggedInUser(state.login),
-    isSpeedTagging: isSpeedTagging(state.speedTagging),
-    isSessionSfw: isSessionSfw(state.login)
-  };
+  return <BeevenuePage>{inner}</BeevenuePage>;
 };
 
-const x = connect(mapStateToProps, { redirect, setShouldRefresh })(IndexPage);
-export { x as IndexPage };
+export { IndexPage };

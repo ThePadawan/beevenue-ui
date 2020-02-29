@@ -9,7 +9,7 @@ import {
 
 export class BeevenueNotificationVisitorImpl
   implements BeevenueNotificationVisitor {
-  private readonly elements: (string | JSX.Element)[] = [];
+  readonly elements: (string | JSX.Element)[] = [];
   visitComposite(c: CompositeContent): void {
     c.contents.forEach(cc => cc.visit(this));
   }

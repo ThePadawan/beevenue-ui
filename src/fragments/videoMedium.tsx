@@ -1,16 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { MediumProps } from "./mediumProps";
 import { mediaSource } from "../media";
 
-class VideoMedium extends Component<MediumProps> {
-  render() {
-    return (
-      <div>
-        <video autoPlay={true} controls loop src={mediaSource(this.props)} />
-      </div>
-    );
-  }
-}
+const VideoMedium = (props: MediumProps) => {
+  return (
+    <div>
+      <video autoPlay={true} controls loop src={mediaSource(props)} />
+    </div>
+  );
+};
 
 export { VideoMedium };

@@ -1,15 +1,10 @@
-import { NEW_SEARCH_RESULTS, NEW_SEARCH_QUERY } from "../actionTypes";
+import { NEW_SEARCH_QUERY } from "../actionTypes";
+import { SearchStore } from "../store";
 
-const initialState = { searchResults: null, searchQuery: "" };
+const initialState: SearchStore = { searchQuery: "" };
 
-const search = (state: any = initialState, action: any): any => {
+const search = (state: SearchStore = initialState, action: any): any => {
   switch (action.type) {
-    case NEW_SEARCH_RESULTS: {
-      return {
-        ...state,
-        searchResults: action.payload
-      };
-    }
     case NEW_SEARCH_QUERY: {
       return {
         ...state,
@@ -20,14 +15,6 @@ const search = (state: any = initialState, action: any): any => {
       return state;
     }
   }
-};
-
-export const getSearchQuery = (store: any) => {
-  return store.searchQuery;
-};
-
-export const getSearchResults = (store: any) => {
-  return store.searchResults;
 };
 
 export default search;

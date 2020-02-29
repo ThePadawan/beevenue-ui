@@ -2,7 +2,6 @@ import {
   LOGIN,
   LOGIN_ANONYMOUS,
   LOGOUT,
-  NEW_SEARCH_RESULTS,
   ADD_NOTIFICATION,
   DISMISS_NOTIFICATION,
   DISMISS_ALL_NOTIFICATIONS,
@@ -51,11 +50,6 @@ export const logout = () => ({
   payload: {}
 });
 
-export const addSearchResults = (searchResults: any[]) => ({
-  type: NEW_SEARCH_RESULTS,
-  payload: searchResults
-});
-
 export const setSearchQuery = (query: string) => ({
   type: NEW_SEARCH_QUERY,
   payload: query
@@ -81,16 +75,19 @@ export const dismissNotification = (id: BeevenueNotificationId) => ({
 
 export const dismissAllNotifications = () => ({
   type: DISMISS_ALL_NOTIFICATIONS
-})
+});
 
 export const stopRedirecting = () => ({
   type: REDIRECT,
   payload: null
 });
 
-export const redirect = (location: string) => ({
+export const redirect = (location: string, doReplace?: boolean) => ({
   type: REDIRECT,
-  payload: location
+  payload: {
+    target: location,
+    doReplace: doReplace || false
+  }
 });
 
 export const setShouldRefresh = (shouldRefresh: boolean) => ({

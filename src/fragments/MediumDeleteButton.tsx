@@ -1,75 +1,64 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 
 interface MediumDeleteButtonProps {
   onConfirm: () => void;
 }
 
-class MediumDeleteButton extends Component<MediumDeleteButtonProps, any, any> {
-  public constructor(props: MediumDeleteButtonProps) {
-    super(props);
-    this.state = { isShowingModel: false };
-  }
+const MediumDeleteButton = (props: MediumDeleteButtonProps) => {
+  const [isShowingModel, setIsShowingModel] = useState(false);
 
-  public onClick = () => {
-    this.setState({ isShowingModel: true });
+  const onClick = () => {
+    setIsShowingModel(true);
   };
 
-  public onCloseModal = () => {
-    this.setState({ isShowingModel: false });
+  const onCloseModal = () => {
+    setIsShowingModel(false);
   };
 
-  public onConfirm = () => {
-    this.props.onConfirm();
-    this.onCloseModal();
+  const onConfirm = () => {
+    props.onConfirm();
+    onCloseModal();
   };
 
-  render() {
-    let maybeModal = null;
-    if (this.state.isShowingModel) {
-      maybeModal = (
-        <div className="modal is-active">
-          <div
-            className="modal-background"
-            onClick={e => this.onCloseModal()}
-          />
+  let maybeModal = null;
+  if (isShowingModel) {
+    maybeModal = (
+      <div className="modal is-active">
+        <div className="modal-background" onClick={e => onCloseModal()} />
 
-          <div className="modal-card">
-            <header className="modal-card-head">
-              <p className="modal-card-title">Confirm</p>
-              <button
-                className="delete"
-                aria-label="close"
-                onClick={e => this.onCloseModal()}
-              />
-            </header>
-            <section className="modal-card-body">
-              Are you sure you want to delete this?
-            </section>
-            <footer className="modal-card-foot">
-              <button
-                className="button is-danger"
-                onClick={e => this.onConfirm()}
-              >
-                Definitely delete forever
-              </button>
-              <button className="button" onClick={e => this.onCloseModal()}>
-                Cancel
-              </button>
-            </footer>
-          </div>
+        <div className="modal-card">
+          <header className="modal-card-head">
+            <p className="modal-card-title">Confirm</p>
+            <button
+              className="delete"
+              aria-label="close"
+              onClick={e => onCloseModal()}
+            />
+          </header>
+          <section className="modal-card-body">
+            Are you sure you want to delete this?
+          </section>
+          <footer className="modal-card-foot">
+            <button className="button is-danger" onClick={e => onConfirm()}>
+              Definitely delete forever
+            </button>
+            <button className="button" onClick={e => onCloseModal()}>
+              Cancel
+            </button>
+          </footer>
         </div>
-      );
-    }
-
-    return (
-      <>
-        {maybeModal}
-        <button className="button" onClick={e => this.onClick()}>
-          Delete
-        </button>
-      </>
+      </div>
     );
   }
-}
+
+  return (
+    <>
+      {maybeModal}
+      <button className="button" onClick={e => onClick()}>
+        Delete
+      </button>
+    </>
+  );
+};
 
 export { MediumDeleteButton };

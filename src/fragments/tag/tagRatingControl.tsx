@@ -1,29 +1,32 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Api } from "../../api/api";
+import { Tag } from "../../tag";
 
-class TagRatingControl extends Component<any, any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { ...this.props };
-  }
+interface TagRatingControlProps {
+  tag: Tag;
+  prefix: string;
+}
 
-  private onRatingChange = (newRating: string) => {
-    Api.Tags.patch(this.state.tag.tag, { rating: newRating }).then(success => {
-      this.setState({ ...this.state, tag: success.data });
+const TagRatingControl = (props: TagRatingControlProps) => {
+  const [tag, setTag] = useState<Tag>(props.tag);
+
+  const onRatingChange = (newRating: string) => {
+    Api.Tags.patch(tag.tag, { rating: newRating }).then(success => {
+      setTag(success.data);
     });
   };
 
-  ratingElement = (rating: string) => {
-    const name = `${this.props.prefix}-tag-${this.state.tag.tag}`;
+  const ratingElement = (rating: string) => {
+    const name = `${props.prefix}-tag-${tag.tag}`;
     const id = `${name}-rating-${rating}`;
     return (
       <div className="beevenue-tag-rating" key={id}>
         <input
           className="is-checkradio"
           type="radio"
-          checked={this.state.tag.rating === rating}
+          checked={tag.rating === rating}
           name={name}
-          onChange={e => this.onRatingChange(e.target.value)}
+          onChange={e => onRatingChange(e.target.value)}
           value={rating}
           id={id}
         />
@@ -32,9 +35,7 @@ class TagRatingControl extends Component<any, any, any> {
     );
   };
 
-  render() {
-    return <>{["s", "q", "e"].map(this.ratingElement)}</>;
-  }
-}
+  return <>{["s", "q", "e"].map(ratingElement)}</>;
+};
 
 export { TagRatingControl };

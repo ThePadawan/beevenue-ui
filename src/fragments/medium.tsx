@@ -1,37 +1,31 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { VideoMedium } from "./videoMedium";
 import { ImageMedium } from "./imageMedium";
 import { MediumProps } from "./mediumProps";
 import { SimilarMedia } from "./similarMedia";
 
-class Medium extends Component<MediumProps, {}, any> {
-  public constructor(props: MediumProps) {
-    super(props);
+const Medium = (props: MediumProps) => {
+  let innerComponent;
+  switch (props.mime_type) {
+    case "video/mp4":
+    case "video/webm":
+      innerComponent = <VideoMedium {...props} />;
+      break;
+    case "image/jpeg":
+    case "image/jpg":
+    case "image/gif":
+    case "image/png":
+      innerComponent = <ImageMedium {...props} />;
+      break;
   }
 
-  render() {
-    let innerComponent;
-    switch (this.props.mime_type) {
-      case "video/mp4":
-      case "video/webm":
-        innerComponent = <VideoMedium {...this.props} />;
-        break;
-      case "image/jpeg":
-      case "image/jpg":
-      case "image/gif":
-      case "image/png":
-        innerComponent = <ImageMedium {...this.props} />;
-        break;
-    }
-
-    return (
-      <>
-        {innerComponent}
-        <SimilarMedia media={this.props.similar} />
-      </>
-    );
-  }
-}
+  return (
+    <>
+      {innerComponent}
+      <SimilarMedia media={props.similar} />
+    </>
+  );
+};
 
 export { Medium };

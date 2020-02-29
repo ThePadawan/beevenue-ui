@@ -4,30 +4,16 @@ import {
   LOGIN_ANONYMOUS,
   SET_SFW_SESSION
 } from "../actionTypes";
+import { LoginStore, Unknown, Anonymous } from "../store";
 
-interface IAnonymous {}
-export const Anonymous: IAnonymous = {};
-interface IUnknown {}
-export const Unknown: IUnknown = {};
-
-export type BeevenueUser = string | number | IAnonymous | IUnknown;
-
-interface BeevenueStore {
-  loggedInUser: BeevenueUser;
-  loggedInRole: string | null;
-  sfwSession: boolean;
-
-  serverVersion: string;
-}
-
-const initialState = {
+const initialState: LoginStore = {
   loggedInUser: Unknown,
   loggedInRole: null,
   sfwSession: true,
   serverVersion: "unknown"
 };
 
-const doLogin = (state: BeevenueStore, action: any) => {
+const doLogin = (state: LoginStore, action: any) => {
   const result = {
     ...state,
     loggedInUser: action.payload.id,
@@ -38,7 +24,7 @@ const doLogin = (state: BeevenueStore, action: any) => {
   return result;
 };
 
-const doLoginAnonymous = (state: BeevenueStore) => {
+const doLoginAnonymous = (state: LoginStore) => {
   return {
     ...state,
     loggedInUser: Anonymous,
@@ -46,7 +32,7 @@ const doLoginAnonymous = (state: BeevenueStore) => {
   };
 };
 
-const doLogout = (state: BeevenueStore) => {
+const doLogout = (state: LoginStore) => {
   return {
     ...state,
     loggedInUser: Anonymous,
@@ -54,10 +40,7 @@ const doLogout = (state: BeevenueStore) => {
   };
 };
 
-const login = (
-  state: BeevenueStore = initialState,
-  action: any
-): BeevenueStore => {
+const login = (state: LoginStore = initialState, action: any): LoginStore => {
   switch (action.type) {
     case LOGIN:
       return doLogin(state, action);
@@ -75,22 +58,6 @@ const login = (
       return state;
     }
   }
-};
-
-export const getLoggedInUser = (store: BeevenueStore) => {
-  return store.loggedInUser;
-};
-
-export const getLoggedInRole = (store: BeevenueStore) => {
-  return store.loggedInRole;
-};
-
-export const isSessionSfw = (store: BeevenueStore) => {
-  return store.sfwSession;
-};
-
-export const getServerVersion = (store: BeevenueStore) => {
-  return store.serverVersion;
 };
 
 export default login;

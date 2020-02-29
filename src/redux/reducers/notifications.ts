@@ -1,11 +1,18 @@
-import { 
+import {
   ADD_NOTIFICATION,
   DISMISS_NOTIFICATION,
-  DISMISS_ALL_NOTIFICATIONS } from "../actionTypes";
+  DISMISS_ALL_NOTIFICATIONS
+} from "../actionTypes";
+import { NotificationStore } from "../store";
 
-const initialState = { notifications: [] };
+const initialState: NotificationStore = {
+  notifications: {}
+};
 
-const notifications = (state: any = initialState, action: any): any => {
+const notifications = (
+  state: NotificationStore = initialState,
+  action: any
+): any => {
   switch (action.type) {
     case ADD_NOTIFICATION: {
       const newNotifications = {
@@ -29,10 +36,6 @@ const notifications = (state: any = initialState, action: any): any => {
       return state;
     }
   }
-};
-
-export const getNotifications = (store: any) => {
-  return store.notifications;
 };
 
 export default notifications;

@@ -1,40 +1,26 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React from "react";
+import { useDispatch } from "react-redux";
 
 import { redirect, setSearchQuery } from "../redux/actions";
 
 import { LoginPanel, SearchPanel, UploadPanel, LinksPanel } from "./panels";
 
-import {
-  getLoggedInUser,
-  getLoggedInRole,
-  BeevenueUser,
-  Anonymous
-} from "../redux/reducers/login";
-import { Location } from "history";
 import { SpeedTaggerPanel } from "./panels/speedTaggerPanel";
+import { Anonymous } from "../redux/store";
+import { useBeevenueSelector } from "../redux/selectors";
 
-interface SidebarProps {
-  location: Location;
-  loggedInUser: BeevenueUser;
-  loggedInRole: string | null;
-  redirect: typeof redirect;
-  setSearchQuery: typeof setSearchQuery;
-}
+const Sidebar = () => {
+  const loggedInUser = useBeevenueSelector(store => store.login.loggedInUser);
+  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
 
-class Sidebar extends Component<SidebarProps, any, any> {
-  public constructor(props: SidebarProps) {
-    super(props);
-  }
+  const dispatch = useDispatch();
 
-  private get elements(): JSX.Element[] {
-    const linksPanel = (
-      <LinksPanel isAdmin={this.props.loggedInRole === "admin"} />
-    );
-    const searchPanel = <SearchPanel {...this.props} />;
+  const getElements = (): JSX.Element[] => {
+    const linksPanel = <LinksPanel isAdmin={loggedInRole === "admin"} />;
+    const searchPanel = <SearchPanel />;
     const loginPanel = <LoginPanel />;
 
-    if (this.props.loggedInRole === "admin") {
+    if (loggedInRole === "admin") {
       return [
         searchPanel,
         <UploadPanel />,
@@ -42,47 +28,37 @@ class Sidebar extends Component<SidebarProps, any, any> {
         loginPanel,
         <SpeedTaggerPanel />
       ];
-    } else if (this.props.loggedInUser === Anonymous) {
+    } else if (loggedInUser === Anonymous) {
       return [loginPanel];
     } else {
       return [searchPanel, linksPanel, loginPanel];
     }
-  }
+  };
 
-  private onHomeButtonClicked = (e: any) => {
+  const onHomeButtonClicked = (e: any) => {
     e.preventDefault();
-    this.props.setSearchQuery("");
-    this.props.redirect("/");
+    dispatch(setSearchQuery(""));
+    dispatch(redirect("/"));
   };
 
-  render() {
-    return (
-      <div className="beevenue-sidebar">
-        <nav className="level beevenue-home">
-          <div className="level-item">
-            <h2 className="title">
-              <a href="#" onClick={e => this.onHomeButtonClicked(e)}>
-                Home
-              </a>
-            </h2>
-          </div>
+  return (
+    <div className="beevenue-sidebar">
+      <nav className="level beevenue-home">
+        <div className="level-item">
+          <h2 className="title">
+            <a href="#" onClick={e => onHomeButtonClicked(e)}>
+              Home
+            </a>
+          </h2>
+        </div>
+      </nav>
+      {getElements().map((e, idx) => (
+        <nav className="level" key={idx}>
+          <div className="level-item">{e}</div>
         </nav>
-        {this.elements.map((e, idx) => (
-          <nav className="level" key={idx}>
-            <div className="level-item">{e}</div>
-          </nav>
-        ))}
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state: any) => {
-  return {
-    loggedInUser: getLoggedInUser(state.login),
-    loggedInRole: getLoggedInRole(state.login)
-  };
+      ))}
+    </div>
+  );
 };
 
-const x = connect(mapStateToProps, { redirect, setSearchQuery })(Sidebar);
-export { x as Sidebar };
+export { Sidebar };

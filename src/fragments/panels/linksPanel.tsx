@@ -1,21 +1,21 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { RandomRuleViolationButton } from "../rules/randomRuleViolationLink";
+import { RandomRuleViolationLink } from "../rules/randomRuleViolationLink";
 
 interface LinksPanelProps {
   isAdmin: boolean;
 }
 
-class LinksPanel extends Component<LinksPanelProps, any, any> {
-  private get cardContent() {
+const LinksPanel = (props: LinksPanelProps) => {
+  const cardContent = () => {
     let items = [
       <Link to="/tags">Tags</Link>,
       <Link to="/tagStats">Tag statistics</Link>
     ];
 
-    if (this.props.isAdmin) {
+    if (props.isAdmin) {
       items.push(<Link to="/rules">Configure rules</Link>);
-      items.push(<RandomRuleViolationButton />);
+      items.push(<RandomRuleViolationLink />);
     }
 
     return (
@@ -27,18 +27,16 @@ class LinksPanel extends Component<LinksPanelProps, any, any> {
         </ul>
       </div>
     );
-  }
+  };
 
-  render() {
-    return (
-      <div className="card beevenue-sidebar-card">
-        <div className="card-header">
-          <p className="card-header-title">Links</p>
-        </div>
-        {this.cardContent}
+  return (
+    <div className="card beevenue-sidebar-card">
+      <div className="card-header">
+        <p className="card-header-title">Links</p>
       </div>
-    );
-  }
-}
+      {cardContent()}
+    </div>
+  );
+};
 
 export { LinksPanel };

@@ -1,68 +1,68 @@
-import React, { Component, FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
 
+import { setFileUploaded } from "../../redux/actions";
 import { Api } from "../../api/api";
+import { useDispatch } from "react-redux";
 
-interface UploadPanelState {
-  files: FileList | null;
-  doneCount: number;
-}
+const UploadPanel = () => {
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [doneCount, setDoneCount] = useState(0);
 
-class UploadPanel extends Component<any, UploadPanelState, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { files: null, doneCount: 0 };
-  }
+  const dispatch = useDispatch();
 
-  public async onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
 
-    if (this.state.files === null) {
+    if (files === null) {
       return;
     }
 
-    for (let i = 0; i < this.state.files.length; ++i) {
-      const f = this.state.files[i];
-      await this.uploadFile(f);
+    for (let i = 0; i < files.length; ++i) {
+      const f = files[i];
+      await uploadFile(f);
     }
   }
 
-  private async uploadFile(f: File) {
+  async function uploadFile(f: File) {
     await Api.uploadMedium(f).finally(() => {
-      this.incrementDoneCount();
+      incrementDoneCount();
     });
   }
 
-  private incrementDoneCount = () => {
-    const newState = { ...this.state, doneCount: this.state.doneCount + 1 };
-    if (this.state.files && newState.doneCount === this.state.files.length) {
-      this.setState(newState);
+  const incrementDoneCount = () => {
+    const newDoneCount = doneCount + 1;
+    if (files && newDoneCount === files.length) {
+      setDoneCount(newDoneCount);
+      dispatch(setFileUploaded());
 
       setTimeout(() => {
-        this.setState({ ...this.state, files: null, doneCount: 0 });
+        setFiles(null);
+        setDoneCount(0);
       }, 5000);
     }
   };
 
-  public onChange(files: FileList | null) {
-    this.setState({ ...this.state, files: files, doneCount: 0 });
-  }
+  const onChange = (files: FileList | null) => {
+    setFiles(files);
+    setDoneCount(0);
+  };
 
-  private get progressBarClasses() {
+  const getProgressBarClasses = () => {
     let result = "beevenue-batch-upload progress";
-    if (!this.state.files) {
+    if (!files) {
       return result;
     }
 
-    if (this.state.doneCount === this.state.files.length) {
+    if (doneCount === files.length) {
       return result + " is-success";
     }
 
     return result + " is-warning";
-  }
+  };
 
-  private get box() {
+  const getBox = () => {
     return (
       <div className="file is-boxed">
         <label className="file-label">
@@ -71,46 +71,44 @@ class UploadPanel extends Component<any, UploadPanelState, any> {
             multiple={true}
             type="file"
             name="medium"
-            onChange={e => this.onChange(e.target.files)}
+            onChange={e => onChange(e.target.files)}
           />
           <span className="file-cta">
             <FontAwesomeIcon icon={faUpload} />
             <span className="file-label">Select files</span>
           </span>
-          {this.state.files === null ? null : (
+          {files === null ? null : (
             <progress
-              className={this.progressBarClasses}
-              value={this.state.doneCount}
-              max={this.state.files.length}
+              className={getProgressBarClasses()}
+              value={doneCount}
+              max={files.length}
             />
           )}
         </label>
       </div>
     );
-  }
+  };
 
-  render() {
-    return (
-      <div className="card beevenue-sidebar-card">
-        <div className="card-header">
-          <p className="card-header-title">Upload</p>
-        </div>
-        <div className="card-content">
-          <form method="POST" onSubmit={e => this.onSubmit(e)}>
-            <div className="field">{this.box}</div>
-            <div className="field">
-              <input
-                type="submit"
-                className="button"
-                disabled={this.state.files === null}
-                value="Go"
-              />
-            </div>
-          </form>
-        </div>
+  return (
+    <div className="card beevenue-sidebar-card">
+      <div className="card-header">
+        <p className="card-header-title">Upload</p>
       </div>
-    );
-  }
-}
+      <div className="card-content">
+        <form method="POST" onSubmit={e => onSubmit(e)}>
+          <div className="field">{getBox()}</div>
+          <div className="field">
+            <input
+              type="submit"
+              className="button"
+              disabled={files === null}
+              value="Go"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export { UploadPanel };

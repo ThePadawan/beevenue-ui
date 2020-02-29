@@ -1,8 +1,9 @@
 import { SET_SHOULD_REFRESH } from "../actionTypes";
+import { RefreshStore } from "../store";
 
-const initialState = { shouldRefresh: false };
+const initialState: RefreshStore = { shouldRefresh: false };
 
-const refresh = (state: any = initialState, action: any): any => {
+const refresh = (state: RefreshStore = initialState, action: any): any => {
   switch (action.type) {
     case SET_SHOULD_REFRESH:
       return {
@@ -12,10 +13,6 @@ const refresh = (state: any = initialState, action: any): any => {
     default:
       return state;
   }
-};
-
-export const shouldRefresh = (store: any) => {
-  return store.shouldRefresh;
 };
 
 export default refresh;

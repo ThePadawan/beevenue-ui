@@ -3,10 +3,17 @@ import {
   TOGGLE_SPEED_TAGGING_ITEM,
   CLEAR_SPEED_TAGGING_ITEMS
 } from "../actionTypes";
+import { SpeedTaggingStore } from "../store";
 
-const initialState = { isSpeedTagging: false, speedTaggingItems: [] };
+const initialState: SpeedTaggingStore = {
+  isSpeedTagging: false,
+  speedTaggingItems: []
+};
 
-const speedTagging = (state: any = initialState, action: any): any => {
+const speedTagging = (
+  state: SpeedTaggingStore = initialState,
+  action: any
+): any => {
   switch (action.type) {
     case SET_SPEED_TAGGING:
       const newIsSpeedTagging = !state.isSpeedTagging;
@@ -41,14 +48,6 @@ const speedTagging = (state: any = initialState, action: any): any => {
     default:
       return state;
   }
-};
-
-export const isSpeedTagging = (store: any) => {
-  return store.isSpeedTagging;
-};
-
-export const getSpeedTaggingItems = (store: any) => {
-  return store.speedTaggingItems;
 };
 
 export default speedTagging;

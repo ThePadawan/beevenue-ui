@@ -1,11 +1,10 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Api } from "../api/api";
 import { Rating } from "../api/show";
 import { BeevenueSpinner } from "./beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
-import isEqual from "lodash-es/isEqual";
 
 interface MissingTagsProps {
   id: number;
@@ -13,73 +12,47 @@ interface MissingTagsProps {
   rating: Rating;
 }
 
-interface MissingTagsState {
-  missing: string[] | null;
-}
+const MissingTags = (props: MissingTagsProps) => {
+  const [missing, setMissing] = useState<string[] | null>(null);
 
-class MissingTags extends Component<MissingTagsProps, MissingTagsState, any> {
-  public constructor(props: MissingTagsProps) {
-    super(props);
-    this.state = { missing: null };
-  }
-
-  componentDidUpdate = (oldProps: MissingTagsProps) => {
-    if (!isEqual(this.props.tags, oldProps.tags)) {
-      this.load();
-    }
-
-    if (!isEqual(this.props.rating, oldProps.rating)) {
-      this.load();
-    }
-  };
-
-  componentDidMount = () => {
-    this.load();
-  };
-
-  private load = () => {
-    this.setState({ ...this.state, missing: null });
-    Api.Tags.getMissing(this.props.id).then(
+  useEffect(() => {
+    setMissing(null);
+    Api.Tags.getMissing(props.id).then(
       res => {
-        this.setState({
-          ...this.state,
-          missing: res.data[`${this.props.id}`]
-        });
+        setMissing(res.data[`${props.id}`]);
       },
       err => {
         console.error(err);
       }
     );
-  };
+  }, [props.id, props.tags, props.rating]);
 
-  render() {
-    let inner = null;
-    if (this.state.missing === null) {
-      inner = <BeevenueSpinner />;
-    } else if (this.state.missing.length === 0) {
-      inner = <FontAwesomeIcon icon={faCheck} color="green" />;
-    } else {
-      inner = (
-        <>
-          <span>
-            <FontAwesomeIcon icon={faTimes} color="red" />
-          </span>
-          <span>{this.state.missing}</span>
-        </>
-      );
-    }
-
-    return (
-      <div className="beevenue-missing-tags card">
-        <header className="card-header">
-          <p className="card-header-title">Consistency</p>
-        </header>
-        <div className="card-content">
-          <div className="content">{inner}</div>
-        </div>
-      </div>
+  let inner = null;
+  if (missing === null) {
+    inner = <BeevenueSpinner />;
+  } else if (missing.length === 0) {
+    inner = <FontAwesomeIcon icon={faCheck} color="green" />;
+  } else {
+    inner = (
+      <>
+        <span>
+          <FontAwesomeIcon icon={faTimes} color="red" />
+        </span>
+        <span>{missing}</span>
+      </>
     );
   }
-}
+
+  return (
+    <div className="beevenue-missing-tags card">
+      <header className="card-header">
+        <p className="card-header-title">Consistency</p>
+      </header>
+      <div className="card-content">
+        <div className="content">{inner}</div>
+      </div>
+    </div>
+  );
+};
 
 export { MissingTags };

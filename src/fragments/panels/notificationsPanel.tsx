@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { getNotifications } from "../../redux/reducers/notifications";
+import React from "react";
+import { useDispatch } from "react-redux";
 import {
   dismissNotification,
   dismissAllNotifications
@@ -8,32 +7,26 @@ import {
 
 import {
   BeevenueNotificationId,
-  BeevenueNotificationMap,
   BeevenueNotificationLevel
 } from "../../notifications";
+import { useBeevenueSelector } from "../../redux/selectors";
 
-interface NotificationsPanelProps {
-  dismissAll: typeof dismissAllNotifications;
-  dismissNotification: typeof dismissNotification;
-  notifications: BeevenueNotificationMap;
-}
+const NotificationsPanel = () => {
+  const dispatch = useDispatch();
+  const notifications = useBeevenueSelector(
+    store => store.notifications.notifications
+  );
 
-class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { notifications: [] };
-  }
+  const dismiss = (id: BeevenueNotificationId): void => {
+    dispatch(dismissNotification(id));
+  };
 
-  public dismiss(id: BeevenueNotificationId): void {
-    this.props.dismissNotification(id);
-  }
-
-  public dismissAll(e: any): void {
+  const dismissAll = (e: any): void => {
     e.preventDefault();
-    this.props.dismissAll();
-  }
+    dispatch(dismissAllNotifications());
+  };
 
-  public classFor(level: BeevenueNotificationLevel): string {
+  const classFor = (level: BeevenueNotificationLevel): string => {
     const dict = {
       error: "is-danger",
       warning: "is-warning",
@@ -41,47 +34,29 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
     };
 
     return "beevenue-notification notification " + dict[level];
-  }
+  };
 
-  render() {
-    const notifications = this.getNotificationElements();
-    const maybeDismissAll = this.getDismissAllLink(notifications.length);
-
-    return (
-      <div className="beevenue-notifications-outer">
-        <div className="beevenue-notifications-dismiss-all">
-          {maybeDismissAll}
-        </div>
-        <div className="beevenue-notifications">{notifications}</div>
-      </div>
-    );
-  }
-
-  private getNotificationElements() {
-    const notifications: JSX.Element[] = [];
-    for (let [key, value] of Object.entries(this.props.notifications)) {
+  const getNotificationElements = () => {
+    const notificationElements: JSX.Element[] = [];
+    for (let [key, value] of Object.entries(notifications)) {
       const el = (
-        <div className={this.classFor(value.level)} key={key}>
-          <button
-            className="delete"
-            key={key}
-            onClick={_ => this.dismiss(key)}
-          />
+        <div className={classFor(value.level)} key={key}>
+          <button className="delete" key={key} onClick={_ => dismiss(key)} />
           {value.timestamp.toLocaleTimeString()} {value.content}
         </div>
       );
-      notifications.push(el);
+      notificationElements.push(el);
     }
-    return notifications;
-  }
+    return notificationElements;
+  };
 
-  private getDismissAllLink(notificationCount: number): JSX.Element | null {
+  const getDismissAllLink = (notificationCount: number): JSX.Element | null => {
     if (notificationCount > 0) {
       return (
         <a
           href="#"
           className="beevenue-notifications-dismiss-all-link"
-          onClick={e => this.dismissAll(e)}
+          onClick={e => dismissAll(e)}
         >
           Dismiss all
         </a>
@@ -89,15 +64,19 @@ class NotificationsPanel extends Component<NotificationsPanelProps, any, any> {
     }
 
     return null;
-  }
-}
+  };
 
-const mapStateToProps = (state: any) => {
-  return { notifications: getNotifications(state.notifications) };
+  const notificationElements = getNotificationElements();
+  const maybeDismissAll = getDismissAllLink(notificationElements.length);
+
+  return (
+    <div className="beevenue-notifications-outer">
+      <div className="beevenue-notifications-dismiss-all">
+        {maybeDismissAll}
+      </div>
+      <div className="beevenue-notifications">{notificationElements}</div>
+    </div>
+  );
 };
 
-const x = connect(mapStateToProps, {
-  dismissNotification,
-  dismissAll: dismissAllNotifications
-})(NotificationsPanel);
-export { x as NotificationsPanel };
+export { NotificationsPanel };

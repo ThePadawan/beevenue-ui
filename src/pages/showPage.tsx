@@ -1,13 +1,13 @@
-import React, { Component } from "react";
-import { match } from "react-router";
+import React, { useState, useEffect } from "react";
+import { useRouteMatch } from "react-router";
 
 import TagsInput from "react-tagsinput";
 
 import { Api } from "../api/api";
 import { ShowViewModel, Rating } from "../api/show";
-import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
+import { BeevenuePage } from "./beevenuePage";
 import { Medium } from "../fragments/medium";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   addNotification,
   addNotLoggedInNotification,
@@ -18,30 +18,10 @@ import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { MediumDeleteButton } from "../fragments/MediumDeleteButton";
 import { MissingTags } from "../fragments/missingTags";
 
-import { isSessionSfw, getLoggedInRole } from "../redux/reducers/login";
 import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
 import { Link } from "react-router-dom";
 import { PickAlternateThumbnailWidget } from "../fragments/pickAlternateThumbnailWidget";
-
-interface UnitializedShowPageState {
-  ViewModel: ShowViewModel | null;
-}
-
-interface InitializedShowPageState {
-  ViewModel: ShowViewModel;
-}
-
-type ShowPageState = UnitializedShowPageState | InitializedShowPageState;
-
-interface ShowPageProps extends BeevenuePageProps {
-  isSessionSfw: boolean;
-  loggedInRole: string | null;
-
-  match: match<ShowPageParams>;
-  addNotification: typeof addNotification;
-  addNotLoggedInNotification: typeof addNotLoggedInNotification;
-  redirect: typeof redirect;
-}
+import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 
 interface ShowPageParams {
   id: string;
@@ -58,78 +38,70 @@ const FullRating = (r: Rating): string => {
   return dict[r];
 };
 
-class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
-  public constructor(props: ShowPageProps) {
-    super(props);
-    this.state = { ViewModel: null };
-  }
+const ShowPage = () => {
+  const [viewModel, setViewModel] = useState<ShowViewModel | null>(null);
 
-  private get mediumId(): number {
-    return parseInt(this.props.match.params.id, 10);
-  }
+  const isSessionSfw = useIsSessionSfw();
+  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
 
-  componentDidMount() {
-    this.loadMedium(this.mediumId);
-  }
+  const match = useRouteMatch<ShowPageParams>();
+  const id = parseInt(match.params.id, 10);
 
-  private get userIsAdmin() {
-    return this.props.loggedInRole === "admin";
-  }
+  const dispatch = useDispatch();
 
-  private loadMedium(mediumId: number) {
-    Api.show(mediumId).then(
+  useEffect(() => {
+    // TODO Inelegant - REST response to updateMedium could already
+    // contain this information so we save one round trip.
+    Api.show(id).then(
       res => {
-        this.setState({ ViewModel: res.data as ShowViewModel });
+        setViewModel(res.data as ShowViewModel);
       },
       err => {
         if (err.response.status === 401) {
-          this.props.addNotLoggedInNotification();
+          dispatch(addNotLoggedInNotification());
         }
 
-        this.props.redirect("/");
+        dispatch(redirect("/"));
       }
     );
-  }
+  }, [dispatch, id, isSessionSfw]);
 
-  componentDidUpdate(oldProps: ShowPageProps, oldState: ShowPageState) {
-    if (this.props.isSessionSfw && this.state.ViewModel !== null) {
-      if (this.state.ViewModel.rating !== "s") {
-        this.props.redirect("/");
-        return;
+  const getUserIsAdmin = () => {
+    return loggedInRole === "admin";
+  };
+
+  useEffect(() => {
+    if (isSessionSfw && viewModel !== null) {
+      if (viewModel.rating !== "s") {
+        dispatch(redirect("/"));
       }
     }
+  }, [isSessionSfw, viewModel, dispatch]);
 
-    if (oldProps.isSessionSfw !== this.props.isSessionSfw) {
-      if (this.state.ViewModel !== null) {
-        this.loadMedium(this.state.ViewModel.id);
-      }
-    }
-
-    if (oldProps.match.params.id === this.props.match.params.id) return;
-
-    this.loadMedium(parseInt(this.props.match.params.id, 10));
-  }
-
-  deleteMedium() {
-    Api.deleteMedium(this.mediumId).then(
+  const deleteMedium = () => {
+    Api.deleteMedium(id).then(
       res => {
-        this.props.addNotification({
-          level: "info",
-          contents: ["Deletion successful."]
-        });
-        this.props.redirect("/");
+        dispatch(
+          addNotification({
+            level: "info",
+            contents: ["Successfully deleted medium."]
+          })
+        );
+        dispatch(redirect("/"));
       },
       err => {
-        this.props.addNotification({
-          level: "error",
-          contents: ["Deletion unsuccessful."]
-        });
-        this.props.redirect("/");
+        dispatch(
+          addNotification({
+            level: "error",
+            contents: ["Could not delete medium!"]
+          })
+        );
+        dispatch(redirect("/"));
       }
     );
-  }
+  };
 
-  renderTags(viewModel: ShowViewModel) {
+  const renderTags = (viewModel: ShowViewModel) => {
     if (!viewModel.tags) {
       return null;
     }
@@ -138,7 +110,7 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
       return (
         <>
           {tagComponents}
-          {this.userIsAdmin ? inputComponent : null}
+          {getUserIsAdmin() ? inputComponent : null}
         </>
       );
     };
@@ -183,55 +155,51 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
           <div className="content">
             <TagsInput
               value={viewModel.tags}
-              disabled={this.userIsAdmin ? undefined : true}
+              disabled={getUserIsAdmin() ? undefined : true}
               className="tagsinput field is-grouped is-grouped-multiline input"
               tagProps={{ className: "tags has-addons" }}
               renderTag={renderTag}
               renderLayout={renderLayout}
               onlyUnique={true}
               addKeys={[9, 13, 32, 188]} // Tab, Enter, Space, Comma
-              onChange={(e: any) => this.onTagsChange(e)}
+              onChange={(e: any) => onTagsChange(e)}
             />
           </div>
         </div>
       </div>
     );
-  }
+  };
 
-  updateMedium(newState: InitializedShowPageState) {
-    const params = pick(newState.ViewModel, ["id", "tags", "rating"]);
+  const updateMedium = (newViewModel: ShowViewModel) => {
+    const params = pick(newViewModel, ["id", "tags", "rating"]);
     return Api.updateMedium(params).then(res => {
-      this.setState(newState);
+      setViewModel(newViewModel);
       return res;
     });
-  }
+  };
 
-  onTagsChange(newTags: string[]) {
+  const onTagsChange = (newTags: string[]) => {
     // Technically, the user can't manually enter these characters.
     // However, by pasting them, they can still occur in here.
     const cleanTags = newTags.map(unclean => {
       return unclean.replace(/[\t\r\n ]/g, "");
     });
 
-    const newState = { ...(this.state as InitializedShowPageState) };
-    newState.ViewModel.tags = cleanTags;
-    this.updateMedium(newState).then(res => {
-      // TODO Inelegant - REST response to updateMedium could already
-      // contain this information so we save one round trip.
-      this.loadMedium(this.mediumId);
-    });
-  }
+    const newViewModel = { ...viewModel } as ShowViewModel;
+    newViewModel.tags = cleanTags;
+    updateMedium(newViewModel);
+  };
 
-  onRatingChange(value: string) {
+  const onRatingChange = (value: string) => {
     const newRating = value as Rating;
     if (!newRating) return;
 
-    const newState = { ...(this.state as InitializedShowPageState) };
-    newState.ViewModel.rating = newRating;
-    this.updateMedium(newState);
-  }
+    const newViewModel = { ...viewModel } as ShowViewModel;
+    newViewModel.rating = newRating;
+    updateMedium(newViewModel);
+  };
 
-  renderRating(viewModel: ShowViewModel): JSX.Element | null {
+  const renderRating = (viewModel: ShowViewModel): JSX.Element | null => {
     if (!viewModel.rating) {
       return null;
     }
@@ -244,10 +212,10 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
           <input
             className="is-checkradio"
             type="radio"
-            disabled={this.userIsAdmin ? undefined : true}
+            disabled={getUserIsAdmin() ? undefined : true}
             checked={viewModel.rating === r}
             name="currentRating"
-            onChange={e => this.onRatingChange(e.target.value)}
+            onChange={e => onRatingChange(e.target.value)}
             value={r}
             id={id}
           />
@@ -272,51 +240,36 @@ class ShowPage extends Component<ShowPageProps, ShowPageState, any> {
         </div>
       </div>
     );
-  }
-
-  render() {
-    let view;
-    const viewModel = this.state.ViewModel;
-
-    if (viewModel !== null) {
-      view = (
-        <>
-          <Medium {...viewModel} />
-          {this.renderTags(viewModel)}
-          {this.renderRating(viewModel)}
-          {this.userIsAdmin ? (
-            <>
-              <MissingTags {...viewModel} />
-              <MediumDeleteButton onConfirm={() => this.deleteMedium()} />
-              <RegenerateThumbnailButton mediumId={this.mediumId} />
-              <PickAlternateThumbnailWidget {...viewModel} />
-            </>
-          ) : null}
-        </>
-      );
-    } else {
-      view = <BeevenueSpinner />;
-    }
-
-    return (
-      <BeevenuePage {...this.props}>
-        <div className="beevenue-show-page">{view}</div>
-      </BeevenuePage>
-    );
-  }
-}
-
-const mapStateToProps = (state: any) => {
-  return {
-    loggedInRole: getLoggedInRole(state.login),
-    isSessionSfw: isSessionSfw(state.login)
   };
+
+  let view;
+
+  if (viewModel !== null) {
+    view = (
+      <>
+        <Medium {...viewModel} />
+        {renderTags(viewModel)}
+        {renderRating(viewModel)}
+        {getUserIsAdmin() ? (
+          <>
+            <MissingTags {...viewModel} />
+            <MediumDeleteButton onConfirm={() => deleteMedium()} />
+            <RegenerateThumbnailButton mediumId={id} />
+            <PickAlternateThumbnailWidget {...viewModel} />
+          </>
+        ) : null}
+      </>
+    );
+  } else {
+    view = <BeevenueSpinner />;
+  }
+
+  return (
+    <BeevenuePage>
+      <div className="beevenue-show-page">{view}</div>
+    </BeevenuePage>
+  );
 };
 
-const x = connect(mapStateToProps, {
-  addNotification,
-  addNotLoggedInNotification,
-  redirect
-})(ShowPage);
-export { x as ShowPage };
-export default x;
+export { ShowPage };
+export default ShowPage;

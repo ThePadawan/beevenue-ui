@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Api } from "../../api/api";
 import * as d3 from "d3";
 import { SimilarityData } from "../../api/similarity";
 import { zoomAndDrag } from "./d3util";
+import { useIsSessionSfw } from "../../redux/selectors";
 
 interface NodeDatum extends d3.SimulationNodeDatum {
   id: string;
@@ -107,7 +108,7 @@ const preprocess = (data: SimilarityData, opts: CreateSvgOptions2) => {
 };
 
 const createSvg = (
-  ref: any,
+  ref: SVGSVGElement,
   data: SimilarityData,
   options?: CreateSvgOptions
 ) => {
@@ -209,102 +210,76 @@ const createSvg = (
   return svg.node();
 };
 
-interface TagSimilarityWidgetProps {
-  isSessionSfw: boolean;
-}
+const TagSimilarityWidget = () => {
+  const isSessionSfw = useIsSessionSfw();
+  const [hideSingletonNodes, setHideSingletonNodes] = useState(true);
+  const [simThreshold, setSimThreshold] = useState(0.4);
+  const [similarity, setSimilarity] = useState<SimilarityData | null>(null);
 
-class TagSimilarityWidget extends Component<
-  TagSimilarityWidgetProps,
-  any,
-  any
-> {
-  public constructor(props: TagSimilarityWidgetProps) {
-    super(props);
-    this.state = { hideSingletonNodes: true, simThreshold: 0.4 };
-  }
+  const svgRef = useRef<SVGSVGElement>(null);
 
-  public componentDidMount = () => {
-    this.loadSimilarity();
-  };
+  useEffect(() => {
+    loadSimilarity();
+  }, [isSessionSfw]);
 
-  public componentDidUpdate = (prevProps: TagSimilarityWidgetProps, _: any) => {
-    if (prevProps.isSessionSfw !== this.props.isSessionSfw) {
-      this.loadSimilarity();
-    }
-  };
-
-  private loadSimilarity = () => {
+  const loadSimilarity = () => {
     Api.Tags.getSimilarity().then(res => {
-      this.setState({ ...this.state, similarity: res.data });
-      this.refreshSvg();
+      setSimilarity(res.data as SimilarityData);
     });
   };
 
-  private refreshSvg = () => {
-    createSvg(this.refs.foobar, this.state.similarity, this.state);
+  useEffect(() => {
+    if (similarity === null) return;
+    createSvg(svgRef.current!, similarity!);
+  }, [similarity, hideSingletonNodes, simThreshold]);
+
+  const toggleSingletons = (): void => {
+    setHideSingletonNodes(!hideSingletonNodes);
   };
 
-  private toggleSingletons(): void {
-    this.setState(
-      {
-        ...this.state,
-        hideSingletonNodes: !this.state.hideSingletonNodes
-      },
-      () => this.refreshSvg()
-    );
-  }
-
-  private changeSimThreshold(e: React.ChangeEvent<HTMLInputElement>): void {
+  const changeSimThreshold = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const valueAsNumber = Number.parseFloat(e.currentTarget.value);
-    this.setState(
-      {
-        ...this.state,
-        simThreshold: valueAsNumber
-      },
-      () => this.refreshSvg()
-    );
-  }
+    setSimThreshold(valueAsNumber);
+  };
 
-  render() {
-    return (
-      <div className="card beevenue-sidebar-card">
-        <header className="card-header">
-          <p className="card-header-title">Similarity</p>
-        </header>
-        <div className="card-content">
-          <div className="content" ref="bar">
-            <div className="field">
-              <input
-                type="checkbox"
-                id="hide-singletons-switch"
-                name="hide-singletons-switch"
-                className="switch"
-                defaultChecked={true}
-                onChange={_ => this.toggleSingletons()}
-              />
-              <label htmlFor="hide-singletons-switch">Hide singletons</label>
-            </div>
-            <div className="field">
-              <input
-                className="slider is-fullwidth"
-                name="sim-threshold-slider"
-                step="0.1"
-                min="0"
-                max="1"
-                defaultValue={this.state.simThreshold}
-                onChange={e => this.changeSimThreshold(e)}
-                type="range"
-              />
-              <label htmlFor="sim-threshold-slider">
-                Threshold: {this.state.simThreshold}
-              </label>
-            </div>
-            <svg ref="foobar"></svg>
+  return (
+    <div className="card beevenue-sidebar-card">
+      <header className="card-header">
+        <p className="card-header-title">Similarity</p>
+      </header>
+      <div className="card-content">
+        <div className="content">
+          <div className="field">
+            <input
+              type="checkbox"
+              id="hide-singletons-switch"
+              name="hide-singletons-switch"
+              className="switch"
+              defaultChecked={true}
+              onChange={_ => toggleSingletons()}
+            />
+            <label htmlFor="hide-singletons-switch">Hide singletons</label>
           </div>
+          <div className="field">
+            <input
+              className="slider is-fullwidth"
+              name="sim-threshold-slider"
+              step="0.1"
+              min="0"
+              max="1"
+              defaultValue={simThreshold}
+              onChange={e => changeSimThreshold(e)}
+              type="range"
+            />
+            <label htmlFor="sim-threshold-slider">
+              Threshold: {simThreshold}
+            </label>
+          </div>
+          <svg ref={svgRef}></svg>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export { TagSimilarityWidget };

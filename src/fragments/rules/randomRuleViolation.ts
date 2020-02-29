@@ -1,22 +1,32 @@
 import { Api } from "../../api/api";
 import { addNotification, redirect } from "../../redux/actions";
+import { useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
 
-interface Target {
-  addNotification: typeof addNotification;
-  redirect: typeof redirect;
-}
+export const useRandomRuleViolation = (): (() => void) => {
+  const [isChecking, setIsChecking] = useState(false);
+  const dispatch = useDispatch();
 
-export const getRandomRuleViolation = (target: Target) => {
-  Api.getAnyMissing().then(res => {
-    const mediumIds = Object.keys(res.data);
-    if (mediumIds.length === 0) {
-      target.addNotification({
-        level: "info",
-        contents: ["No rule violations found!"]
-      });
-      target.redirect("/");
-    } else {
-      target.redirect(`/show/${mediumIds[0]}`);
-    }
-  });
+  const doCheck = () => setIsChecking(true);
+
+  useEffect(() => {
+    if (!isChecking) return;
+    Api.getAnyMissing().then(res => {
+      const mediumIds = Object.keys(res.data);
+      if (mediumIds.length === 0) {
+        dispatch(
+          addNotification({
+            level: "info",
+            contents: ["No rule violations found!"]
+          })
+        );
+      } else {
+        // TODO Causes flicker. Check if we can actually see that medium
+        // before redirecting there (or censor it in the server-side response)
+        dispatch(redirect(`/show/${mediumIds[0]}`));
+      }
+    });
+  }, [isChecking, dispatch]);
+
+  return doCheck;
 };

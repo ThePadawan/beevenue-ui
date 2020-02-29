@@ -1,43 +1,33 @@
-import React, { Component } from "react";
+import React from "react";
 import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Api } from "../api/api";
 import { addNotification } from "../redux/actions";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 
 interface RegenerateThumbnailButtonProps {
   mediumId: number;
-
-  addNotification: typeof addNotification;
 }
 
-class RegenerateThumbnailButton extends Component<
-  RegenerateThumbnailButtonProps,
-  any,
-  any
-> {
-  public constructor(props: RegenerateThumbnailButtonProps) {
-    super(props);
-    this.state = { isShowingModel: false };
-  }
+const RegenerateThumbnailButton = (props: RegenerateThumbnailButtonProps) => {
+  const dispatch = useDispatch();
 
-  public onClick = () => {
-    Api.regenerateThumbnail(this.props.mediumId).then((res: any) => {
-      this.props.addNotification({
-        level: "info",
-        contents: ["Successfully created new thumbnails."]
-      });
+  const onClick = () => {
+    Api.regenerateThumbnail(props.mediumId).then((res: any) => {
+      dispatch(
+        addNotification({
+          level: "info",
+          contents: ["Successfully created new thumbnails."]
+        })
+      );
     });
   };
 
-  render() {
-    return (
-      <button className="button is-primary" onClick={e => this.onClick()}>
-        <FontAwesomeIcon icon={faSync} />
-      </button>
-    );
-  }
-}
+  return (
+    <button className="button is-primary" onClick={e => onClick()}>
+      <FontAwesomeIcon icon={faSync} />
+    </button>
+  );
+};
 
-const x = connect(null, { addNotification })(RegenerateThumbnailButton);
-export { x as RegenerateThumbnailButton };
+export { RegenerateThumbnailButton };

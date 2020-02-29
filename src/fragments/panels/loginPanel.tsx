@@ -1,94 +1,63 @@
-import React, { Component, FormEvent } from "react";
-import { connect } from "react-redux";
+import React, { FormEvent, useState, useRef } from "react";
+import { useDispatch } from "react-redux";
 
 import { Api } from "../../api/api";
 import { login, logout, redirect } from "../../redux/actions";
-import {
-  getLoggedInUser,
-  Anonymous,
-  getServerVersion
-} from "../../redux/reducers/login";
 import { SfwButton } from "../sfwButton";
 import { BeevenueSpinner } from "../beevenueSpinner";
 
 import { commitId } from "../../config.json";
+import { Anonymous } from "../../redux/store";
+import { useBeevenueSelector } from "../../redux/selectors";
 
-interface LoginPanelState {
-  username: string;
-  password: string;
+const LoginPanel = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginInProgress, setLoginInProgress] = useState(false);
 
-  loginInProgress: boolean;
-}
+  const loggedInUser = useBeevenueSelector(store => store.login.loggedInUser);
+  const serverVersion = useBeevenueSelector(store => store.login.serverVersion);
 
-interface LoginPanelProps {
-  login: typeof login;
-  logout: typeof logout;
-  redirect: typeof redirect;
-  loggedInUser: string;
+  const dispatch = useDispatch();
 
-  serverVersion: string;
-}
+  const isMounted = useRef(true);
 
-class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { username: "", password: "", loginInProgress: false };
-  }
+  const finish = () => {
+    if (!isMounted.current) return;
+    setLoginInProgress(false);
+  };
 
-  public submitLogin(event: FormEvent) {
-    this.setState({ ...this.state, loginInProgress: true });
+  const submitLogin = (event: FormEvent) => {
+    setLoginInProgress(true);
 
-    Api.login(this.state).then(
-      res => {
+    Api.login({ username, password })
+      .then(res => {
         if (res.status === 200) {
           // The session cookie is set now.
-          this.props.login(res.data);
+          dispatch(login(res.data));
         }
-
-        this.setState({ ...this.state, loginInProgress: false });
-      },
-      err => {
-        this.setState({ ...this.state, loginInProgress: false });
-      }
-    );
+      })
+      .finally(finish);
 
     event.preventDefault();
-  }
+  };
 
-  public submitLogout(event: FormEvent) {
+  const submitLogout = (event: FormEvent) => {
     event.preventDefault();
-    this.setState({ ...this.state, loginInProgress: true });
+    setLoginInProgress(true);
 
-    Api.logout().then(
-      res => {
+    Api.logout()
+      .then(res => {
         if (res.status === 200) {
           // The session cookie is unset now.
-          this.props.logout();
-          this.props.redirect("/");
+          dispatch(logout());
+          dispatch(redirect("/"));
         }
-        this.setState({ ...this.state, loginInProgress: false });
-      },
-      err => {
-        this.setState({ ...this.state, loginInProgress: false });
-      }
-    );
-  }
+      })
+      .finally(finish);
+  };
 
-  public handlePasswordChange(event: FormEvent<HTMLInputElement>) {
-    this.setState({
-      ...this.state,
-      password: event.currentTarget.value
-    });
-  }
-
-  public handleUsernameChange(event: FormEvent<HTMLInputElement>) {
-    this.setState({
-      ...this.state,
-      username: event.currentTarget.value
-    });
-  }
-
-  private get usernameField() {
+  const getUsernameField = () => {
     return (
       <div className="field">
         <input
@@ -96,13 +65,13 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
           type="text"
           name="beevenue-username"
           placeholder="Username"
-          onChange={e => this.handleUsernameChange(e)}
+          onChange={e => setUsername(e.currentTarget.value)}
         />
       </div>
     );
-  }
+  };
 
-  private get passwordField() {
+  const getPasswordField = () => {
     return (
       <div className="field">
         <input
@@ -111,38 +80,38 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
           type="password"
           name="beevenue-password"
           placeholder="Password"
-          onChange={e => this.handlePasswordChange(e)}
+          onChange={e => setPassword(e.currentTarget.value)}
         />
       </div>
     );
-  }
+  };
 
-  private get form() {
+  const getForm = () => {
     return (
-      <form onSubmit={e => this.submitLogin(e)}>
-        {this.usernameField}
-        {this.passwordField}
+      <form onSubmit={e => submitLogin(e)}>
+        {getUsernameField()}
+        {getPasswordField()}
         <div className="field">
           <button className="button">Login</button>
         </div>
       </form>
     );
-  }
+  };
 
-  private renderLogin() {
+  const renderLogin = () => {
     return (
       <div className="card beevenue-sidebar-card">
         <div className="card-header">
           <p className="card-header-title">Login</p>
         </div>
         <div className="card-content">
-          <div className="content">{this.form}</div>
+          <div className="content">{getForm()}</div>
         </div>
       </div>
     );
-  }
+  };
 
-  private renderLogout() {
+  const renderLogout = () => {
     return (
       <div className="card beevenue-sidebar-card">
         <div className="card-header">
@@ -151,10 +120,10 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
         <div className="card-content">
           <div className="content">
             <SfwButton />
-            <div>Server version: {this.props.serverVersion}</div>
+            <div>Server version: {serverVersion}</div>
             <div>UI version: {commitId}</div>
             <div>
-              <form onSubmit={e => this.submitLogout(e)}>
+              <form onSubmit={e => submitLogout(e)}>
                 <div className="field">
                   <button className="button">Logout</button>
                 </div>
@@ -164,26 +133,19 @@ class LoginPanel extends Component<LoginPanelProps, LoginPanelState, any> {
         </div>
       </div>
     );
-  }
-
-  render() {
-    if (this.state.loginInProgress) {
-      return <BeevenueSpinner />;
-    }
-    if (this.props.loggedInUser === Anonymous) {
-      return this.renderLogin();
-    } else {
-      return this.renderLogout();
-    }
-  }
-}
-
-const mapStateToProps = (state: any) => {
-  return {
-    loggedInUser: getLoggedInUser(state.login),
-    serverVersion: getServerVersion(state.login)
   };
+
+  if (loginInProgress) {
+    isMounted.current = false;
+    return <BeevenueSpinner />;
+  }
+  isMounted.current = true;
+
+  if (loggedInUser === Anonymous) {
+    return renderLogin();
+  } else {
+    return renderLogout();
+  }
 };
 
-const x = connect(mapStateToProps, { login, logout, redirect })(LoginPanel);
-export { x as LoginPanel };
+export { LoginPanel };

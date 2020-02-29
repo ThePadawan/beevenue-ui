@@ -1,42 +1,35 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
+import { BeevenuePage } from "./beevenuePage";
 
 import { redirect } from "../redux/actions";
-import { match } from "react-router";
+import { useRouteMatch } from "react-router";
 
 interface WildcardPageParams {
   whatever: string;
 }
 
-interface WildcardPageProps extends BeevenuePageProps {
-  match: match<WildcardPageParams>;
-  redirect: typeof redirect;
-}
+const WildcardPage = () => {
+  const match = useRouteMatch<WildcardPageParams>();
+  const { whatever } = match.params;
 
-class WildcardPage extends Component<WildcardPageProps, any, any> {
-  public constructor(props: WildcardPageProps) {
-    super(props);
-  }
+  const dispatch = useDispatch();
 
-  componentDidMount() {
-    if (this.props.match.params.whatever) {
-      this.props.redirect("/");
+  useEffect(() => {
+    if (whatever) {
+      dispatch(redirect("/"));
     }
-  }
+  }, [dispatch, whatever]);
 
-  render() {
-    return (
-      <BeevenuePage {...this.props}>
-        <div className="column">
-          <h1 className="title">Title</h1>
-        </div>
-      </BeevenuePage>
-    );
-  }
-}
+  return (
+    <BeevenuePage>
+      <div className="column">
+        <h1 className="title">Title</h1>
+      </div>
+    </BeevenuePage>
+  );
+};
 
-const x = connect(null, { redirect })(WildcardPage);
-export { x as WildcardPage };
-export default x;
+export { WildcardPage };
+export default WildcardPage;

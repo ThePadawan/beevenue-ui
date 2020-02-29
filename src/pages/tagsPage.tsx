@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useState, useEffect } from "react";
 
 import { Api } from "../api/api";
 import sortBy from "lodash-es/sortBy";
@@ -8,53 +7,23 @@ import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
 import { TagRatingControl } from "../fragments/tag/tagRatingControl";
-import { BeevenuePage, BeevenuePageProps } from "./beevenuePage";
-import { getLoggedInRole, isSessionSfw } from "../redux/reducers/login";
-import { Rating } from "../api/show";
+import { BeevenuePage } from "./beevenuePage";
+import { Tag } from "../tag";
+import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 
-interface Tag {
-  rating: Rating;
-  tag: string;
-  impliedByThisCount: number;
-  implyingThisCount: number;
-  mediaCount: number;
-}
+const TagsPage = () => {
+  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
+  const isSessionSfw = useIsSessionSfw();
 
-interface TagsPageProps extends BeevenuePageProps {
-  isSessionSfw: boolean;
-  loggedInRole: string | null;
-}
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [filter, setFilter] = useState<string>("");
 
-interface TagsPageState {
-  tags: Tag[];
-  filter: string;
-}
-
-class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = { tags: [], filter: "" };
-  }
-
-  public componentDidMount = () => {
-    this.loadTags();
-  };
-
-  public componentDidUpdate = (prevProps: TagsPageProps, _: any) => {
-    if (
-      this.props.loggedInRole !== "admin" &&
-      prevProps.isSessionSfw !== this.props.isSessionSfw
-    ) {
-      this.loadTags();
-    }
-  };
-
-  private loadTags = () => {
+  const loadTags = () => {
     Api.Tags.getStatistics().then(
       res => {
         let tags = res.data;
         tags = sortBy(tags, t => t.mediaCount).reverse();
-        this.setState({ ...this.state, tags: tags });
+        setTags(tags);
       },
       err => {
         console.error(err);
@@ -62,20 +31,20 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
     );
   };
 
-  private filteredTags = () => {
+  useEffect(() => {
+    loadTags();
+  }, [loggedInRole, isSessionSfw]);
+
+  const getFilteredTags = () => {
     try {
-      const regex = new RegExp(this.state.filter);
-      return this.state.tags.filter(t => regex.test(t.tag));
+      const regex = new RegExp(filter);
+      return tags.filter(t => regex.test(t.tag));
     } catch {
-      return this.state.tags;
+      return tags;
     }
   };
 
-  private onChange(filter: string) {
-    this.setState({ ...this.state, filter });
-  }
-
-  private renderContent = () => {
+  const renderContent = () => {
     return (
       <>
         <div className="content beevenue-tags-filter">
@@ -83,8 +52,8 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
             className="input"
             type="text"
             placeholder="Filter"
-            value={this.state.filter}
-            onChange={e => this.onChange(e.currentTarget.value)}
+            value={filter}
+            onChange={e => setFilter(e.currentTarget.value)}
           />
         </div>
         <div>
@@ -97,31 +66,31 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
                 <th>Media</th>
               </tr>
             </thead>
-            <tbody>{this.filteredTags().map(this.renderTag)}</tbody>
+            <tbody>{getFilteredTags().map(renderTag)}</tbody>
           </table>
           <div className="is-hidden-tablet">
-            {this.filteredTags().map(this.renderTagMobile)}
+            {getFilteredTags().map(renderTagMobile)}
           </div>
         </div>
       </>
     );
   };
 
-  private isAdmin = () => {
-    return this.props.loggedInRole === "admin";
+  const isAdmin = () => {
+    return loggedInRole === "admin";
   };
 
-  private tagLink = (t: Tag) => {
+  const tagLink = (t: Tag) => {
     let url = `/search/${t.tag}`;
-    if (this.isAdmin()) {
+    if (isAdmin()) {
       url = `/tag/${t.tag}`;
     }
 
     return <Link to={url}>{t.tag}</Link>;
   };
 
-  private renderTag = (t: Tag): JSX.Element => {
-    const ratingCell = this.isAdmin() ? (
+  const renderTag = (t: Tag): JSX.Element => {
+    const ratingCell = isAdmin() ? (
       <TagRatingControl tag={t} prefix="large" />
     ) : (
       <p>{t.rating}</p>
@@ -129,27 +98,27 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
 
     return (
       <tr key={t.tag}>
-        <td>{this.tagLink(t)}</td>
-        <td>{this.maybeRenderTooltip(t)}</td>
+        <td>{tagLink(t)}</td>
+        <td>{maybeRenderTooltip(t)}</td>
         <td>{ratingCell}</td>
         <td className="has-text-centered">{t.mediaCount}</td>
       </tr>
     );
   };
 
-  private renderTagMobile = (t: Tag): JSX.Element => {
+  const renderTagMobile = (t: Tag): JSX.Element => {
     return (
       <nav className="level" key={t.tag}>
         <div className="card">
           <header className="card-header">
             <p className="card-header-title">
-              {this.tagLink(t)}
-              {this.maybeRenderTooltip(t)}
+              {tagLink(t)}
+              {maybeRenderTooltip(t)}
             </p>
           </header>
           <div className="card-content">
             <p className="subtitle">Used {t.mediaCount} times</p>
-            {this.isAdmin() ? (
+            {isAdmin() ? (
               <TagRatingControl tag={t} prefix="small" />
             ) : (
               <p>{t.rating}</p>
@@ -160,7 +129,7 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
     );
   };
 
-  private maybeRenderTooltip = (t: Tag): React.ReactNode => {
+  const maybeRenderTooltip = (t: Tag): React.ReactNode => {
     if (t.mediaCount === 0 && t.implyingThisCount > 0) {
       const title =
         "This tag is not used on any media, but implied by other tags." +
@@ -172,22 +141,10 @@ class TagsPage extends Component<TagsPageProps, TagsPageState, any> {
     return null;
   };
 
-  render() {
-    const content =
-      this.state.tags.length > 0 ? this.renderContent() : <BeevenueSpinner />;
+  const content = tags.length > 0 ? renderContent() : <BeevenueSpinner />;
 
-    return <BeevenuePage {...this.props}>{content}</BeevenuePage>;
-  }
-}
-
-const mapStateToProps = (state: any): TagsPageProps => {
-  return {
-    ...state,
-    loggedInRole: getLoggedInRole(state.login),
-    isSessionSfw: isSessionSfw(state.login)
-  };
+  return <BeevenuePage>{content}</BeevenuePage>;
 };
 
-const x = connect(mapStateToProps, null)(TagsPage);
-export { x as TagsPage };
-export default x;
+export { TagsPage };
+export default TagsPage;
