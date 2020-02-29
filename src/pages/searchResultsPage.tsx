@@ -38,8 +38,6 @@ const SearchResultsPage = () => {
     store => store.refresh.shouldRefresh
   );
 
-  const searchQuery = useBeevenueSelector(store => store.search.searchQuery);
-
   const isSessionSfw = useIsSessionSfw();
 
   const match = useRouteMatch<SearchResultsPageParams>();
@@ -70,31 +68,34 @@ const SearchResultsPage = () => {
     if (shouldRefresh) {
       dispatch(setShouldRefresh(false));
     }
+  }, [dispatch, shouldRefresh]);
 
-    doSearch(searchQuery);
-  }, [
-    location.search,
-    dispatch,
-    isSessionSfw,
-    doSearch,
-    searchQuery,
-    shouldRefresh
-  ]);
+  const getSearchTermsFromRoute = useCallback((): string => {
+    const joinedTags = match.params.extra;
+    if (!joinedTags) return "";
+    const tags = joinedTags.split("/").join(" ");
+    return tags;
+  }, [match.params.extra]);
+
+  // Only do this once (when landing on this page directly)
+  // to correctly initialize global state from that URL.
+  // Local state is then kept in sync with global state
+  // as the source of truth.
+  useEffect(() => {
+    const tagsFromRoute = getSearchTermsFromRoute();
+    dispatch(setSearchQuery(tagsFromRoute));
+  }, [dispatch, getSearchTermsFromRoute]);
 
   useEffect(() => {
-    const getSearchTermsFromRoute = (): string => {
-      const joinedTags = match.params.extra;
-      if (!joinedTags) return "";
-      const tags = joinedTags.split("/").join(" ");
-      return tags;
-    };
-
-    const tagsFromRoute = getSearchTermsFromRoute();
-
-    if (tagsFromRoute !== searchQuery) dispatch(setSearchQuery(tagsFromRoute));
-
-    doSearch(tagsFromRoute);
-  }, [location, match, dispatch, doSearch, searchQuery]);
+    doSearch(getSearchTermsFromRoute());
+  }, [
+    location.search,
+    match,
+    dispatch,
+    doSearch,
+    isSessionSfw,
+    getSearchTermsFromRoute
+  ]);
 
   let inner = null;
   if (doShowSpinner) {

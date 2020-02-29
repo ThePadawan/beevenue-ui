@@ -1,7 +1,11 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { redirect, setShouldRefresh } from "../../redux/actions";
+import {
+  redirect,
+  setShouldRefresh,
+  setSearchQuery
+} from "../../redux/actions";
 import qs from "qs";
 import { useBeevenueSelector } from "../../redux/selectors";
 import { useLocation } from "react-router-dom";
@@ -10,20 +14,26 @@ const SearchPanel = () => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const initialSearchTerms = useBeevenueSelector(
+  const globalSearchTerms = useBeevenueSelector(
     store => store.search.searchQuery
   );
 
-  const [searchTerms, setSearchTerms] = useState(initialSearchTerms || "");
+  const [searchTerms, setSearchTerms] = useState(globalSearchTerms || "");
 
   // Note that isn't superfluous. It keeps our state in sync with modifications
   // to the route params.
   useEffect(() => {
-    if (initialSearchTerms) setSearchTerms(initialSearchTerms);
-  }, [initialSearchTerms]);
+    setSearchTerms(globalSearchTerms);
+  }, [globalSearchTerms]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (searchTerms === "") {
+      dispatch(setSearchQuery(""));
+      dispatch(redirect("/"));
+      return;
+    }
 
     // Redirect to new search results. Keep query parameter "pageSize"
     // if it is set.
