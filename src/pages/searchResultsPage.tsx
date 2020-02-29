@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouteMatch, useLocation } from "react-router";
 import qs from "qs";
 
@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 import { setSearchQuery, setShouldRefresh } from "../redux/actions";
 
-import { Api, SearchParameters } from "../api/api";
+import { Api } from "../api/api";
 import { Thumbs, MediumWallPagination } from "../fragments/mediumWallTypes";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
@@ -38,6 +38,8 @@ const SearchResultsPage = () => {
     store => store.refresh.shouldRefresh
   );
 
+  const searchQuery = useBeevenueSelector(store => store.search.searchQuery);
+
   const isSessionSfw = useIsSessionSfw();
 
   const match = useRouteMatch<SearchResultsPageParams>();
@@ -45,58 +47,65 @@ const SearchResultsPage = () => {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [doShowSpinner, setDoShowSpinner] = useState(false);
 
-  useEffect(() => {
-    if (shouldRefresh) {
-      dispatch(setShouldRefresh(false));
-    }
+  const doSearch = useCallback(
+    (s: string) => {
+      const q = qs.parse(location.search, { ignoreQueryPrefix: true });
+      const paginationParams = paginationParamsFromQuery(q);
+      const queryParams = { ...paginationParams, q: s };
 
-    const getSearchTerms = (): string => {
-      const joinedTags = match.params.extra;
-      if (!joinedTags) return "";
-      const tags = joinedTags.split("/").join(" ");
-      return tags;
-    };
-
-    const getCurrentQueryString = (): any => {
-      return qs.parse(location.search, { ignoreQueryPrefix: true });
-    };
-
-    const doSearch = (params: SearchParameters) => {
       setResults(null);
       setDoShowSpinner(true);
-      Api.search(params).then(
+      Api.search(queryParams).then(
         res => {
           setResults(res.data);
           setDoShowSpinner(false);
         },
         _ => {}
       );
-    };
+    },
+    [location]
+  );
 
-    const tags = getSearchTerms();
-    if (tags === "") {
-      console.warn("Searching with empty tags!");
-      return;
+  useEffect(() => {
+    if (shouldRefresh) {
+      dispatch(setShouldRefresh(false));
     }
 
-    dispatch(setSearchQuery(tags));
+    doSearch(searchQuery);
+  }, [
+    location.search,
+    dispatch,
+    isSessionSfw,
+    doSearch,
+    searchQuery,
+    shouldRefresh
+  ]);
 
-    let q = getCurrentQueryString();
-    const paginationParams = paginationParamsFromQuery(q);
-    const queryParams = { ...paginationParams, q: tags };
-    doSearch(queryParams);
-  }, [shouldRefresh, location, match, dispatch, isSessionSfw]);
+  useEffect(() => {
+    const getSearchTermsFromRoute = (): string => {
+      const joinedTags = match.params.extra;
+      if (!joinedTags) return "";
+      const tags = joinedTags.split("/").join(" ");
+      return tags;
+    };
+
+    const tagsFromRoute = getSearchTermsFromRoute();
+
+    if (tagsFromRoute !== searchQuery) dispatch(setSearchQuery(tagsFromRoute));
+
+    doSearch(tagsFromRoute);
+  }, [location, match, dispatch, doSearch, searchQuery]);
 
   let inner = null;
   if (doShowSpinner) {
-    inner = <BeevenueSpinner />;
+    inner = () => <BeevenueSpinner />;
   } else if (!results || !results.items || results.items.length === 0) {
-    inner = <h2 className="title is-2">No results found.</h2>;
+    inner = () => <h2 className="title is-2">No results found.</h2>;
   } else {
-    inner = <MediumWall media={results} />;
+    inner = () => <MediumWall media={results} />;
   }
 
-  return <BeevenuePage>{inner}</BeevenuePage>;
+  return <BeevenuePage>{inner()}</BeevenuePage>;
 };
 
 export { SearchResultsPage };
