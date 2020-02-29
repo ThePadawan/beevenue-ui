@@ -7,14 +7,19 @@ import { stopRedirecting } from "./redux/actions";
 export const useRedirect = () => {
   const dispatch = useDispatch();
   const redirection = useBeevenueSelector(store => store.redirect.redirection);
+
   useEffect(() => {
     const r = redirection;
-    if (r && history.location.pathname !== r.target) {
+
+    // TODO Check history.location.pathname !== r.target carefully.
+
+    if (r) {
       if (r.doReplace) {
         history.replace(r.target);
       } else {
         history.push(r.target);
       }
+
       dispatch(stopRedirecting());
     }
   }, [redirection, dispatch]);

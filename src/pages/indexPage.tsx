@@ -44,7 +44,7 @@ const IndexPage = () => {
     );
   }, [
     dispatch,
-    location.search,
+    location,
     isSessionSfw,
     lastFileUploaded,
     loggedInUser,
