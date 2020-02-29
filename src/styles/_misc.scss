@@ -57,3 +57,18 @@
 .beevenue-tag-rating {
   display: inline;
 }
+
+.beevenue-medium-tags {
+  margin-top: 2rem;
+}
+
+.beevenue-missing-tags {
+  min-height: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.beevenue-medium-action-button {
+  margin-right: 1rem;
+}

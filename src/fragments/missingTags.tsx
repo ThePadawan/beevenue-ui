@@ -31,25 +31,35 @@ const MissingTags = (props: MissingTagsProps) => {
   if (missing === null) {
     inner = <BeevenueSpinner />;
   } else if (missing.length === 0) {
-    inner = <FontAwesomeIcon icon={faCheck} color="green" />;
-  } else {
     inner = (
-      <>
-        <span>
-          <FontAwesomeIcon icon={faTimes} color="red" />
-        </span>
-        <span>{missing}</span>
-      </>
+      <FontAwesomeIcon
+        title="Tags are consistent!"
+        size="2x"
+        icon={faCheck}
+        color="green"
+      />
     );
+  } else {
+    inner = missing.map((m, idx) => (
+      <div className="beevenue-missing-tag" key={`missing-${idx}`}>
+        <span>
+          <FontAwesomeIcon
+            title="Tags are inconsistent"
+            size="2x"
+            icon={faTimes}
+            color="red"
+          />
+        </span>
+        &nbsp;
+        <span>{m}</span>
+      </div>
+    ));
   }
 
   return (
-    <div className="beevenue-missing-tags card">
-      <header className="card-header">
-        <p className="card-header-title">Consistency</p>
-      </header>
+    <div className="card">
       <div className="card-content">
-        <div className="content">{inner}</div>
+        <div className="content beevenue-missing-tags">{inner}</div>
       </div>
     </div>
   );

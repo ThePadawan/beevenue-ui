@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 
 interface MediumDeleteButtonProps {
   onConfirm: () => void;
@@ -54,8 +56,12 @@ const MediumDeleteButton = (props: MediumDeleteButtonProps) => {
   return (
     <>
       {maybeModal}
-      <button className="button" onClick={e => onClick()}>
-        Delete
+      <button
+        className="button is-danger beevenue-medium-action-button"
+        title="Delete"
+        onClick={e => onClick()}
+      >
+        <FontAwesomeIcon icon={faTrash} />
       </button>
     </>
   );

@@ -24,7 +24,11 @@ const RegenerateThumbnailButton = (props: RegenerateThumbnailButtonProps) => {
   };
 
   return (
-    <button className="button is-primary" onClick={e => onClick()}>
+    <button
+      className="button is-primary beevenue-medium-action-button"
+      title="Regenerate thumbnail"
+      onClick={e => onClick()}
+    >
       <FontAwesomeIcon icon={faSync} />
     </button>
   );

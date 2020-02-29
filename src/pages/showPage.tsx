@@ -147,26 +147,19 @@ const ShowPage = () => {
     };
 
     return (
-      <div className="card">
-        <header className="card-header">
-          <p className="card-header-title">Tags</p>
-        </header>
-        <div className="card-content">
-          <div className="content">
-            <TagsInput
-              value={viewModel.tags}
-              disabled={getUserIsAdmin() ? undefined : true}
-              className="tagsinput field is-grouped is-grouped-multiline input"
-              tagProps={{ className: "tags has-addons" }}
-              renderTag={renderTag}
-              renderLayout={renderLayout}
-              onlyUnique={true}
-              addKeys={[9, 13, 32, 188]} // Tab, Enter, Space, Comma
-              onChange={(e: any) => onTagsChange(e)}
-            />
-          </div>
-        </div>
-      </div>
+      <nav className="level beevenue-medium-tags">
+        <TagsInput
+          value={viewModel.tags}
+          disabled={getUserIsAdmin() ? undefined : true}
+          className="tagsinput field is-grouped is-grouped-multiline input"
+          tagProps={{ className: "tags has-addons" }}
+          renderTag={renderTag}
+          renderLayout={renderLayout}
+          onlyUnique={true}
+          addKeys={[9, 13, 32, 188]} // Tab, Enter, Space, Comma
+          onChange={(e: any) => onTagsChange(e)}
+        />
+      </nav>
     );
   };
 
@@ -228,9 +221,6 @@ const ShowPage = () => {
 
     return (
       <div className="card">
-        <header className="card-header">
-          <p className="card-header-title">Rating</p>
-        </header>
         <div className="card-content">
           <div className="content">
             <div className="field beevenue-ratings">
@@ -253,9 +243,16 @@ const ShowPage = () => {
         {getUserIsAdmin() ? (
           <>
             <MissingTags {...viewModel} />
-            <MediumDeleteButton onConfirm={() => deleteMedium()} />
-            <RegenerateThumbnailButton mediumId={id} />
             <PickAlternateThumbnailWidget {...viewModel} />
+
+            <div className="card beevenue-sidebar-card">
+              <div className="card-content">
+                <div className="content">
+                  <MediumDeleteButton onConfirm={() => deleteMedium()} />
+                  <RegenerateThumbnailButton mediumId={id} />
+                </div>
+              </div>
+            </div>
           </>
         ) : null}
       </>
