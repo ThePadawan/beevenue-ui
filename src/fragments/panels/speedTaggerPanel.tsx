@@ -14,8 +14,8 @@ import { useBeevenueSelector } from "../../redux/selectors";
 const SpeedTaggerPanel = () => {
   const dispatch = useDispatch();
 
-  const speedTaggingItems = useBeevenueSelector(
-    store => store.speedTagging.speedTaggingItems
+  const speedTaggingItems = useBeevenueSelector(store =>
+    store.speedTagging.speedTaggingItems.slice()
   );
   const isSpeedTagging = useBeevenueSelector(
     store => store.speedTagging.isSpeedTagging
