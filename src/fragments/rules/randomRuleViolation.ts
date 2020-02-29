@@ -11,21 +11,25 @@ export const useRandomRuleViolation = (): (() => void) => {
 
   useEffect(() => {
     if (!isChecking) return;
-    Api.getAnyMissing().then(res => {
-      const mediumIds = Object.keys(res.data);
-      if (mediumIds.length === 0) {
-        dispatch(
-          addNotification({
-            level: "info",
-            contents: ["No rule violations found!"]
-          })
-        );
-      } else {
-        // TODO Causes flicker. Check if we can actually see that medium
-        // before redirecting there (or censor it in the server-side response)
-        dispatch(redirect(`/show/${mediumIds[0]}`));
-      }
-    });
+    Api.getAnyMissing()
+      .then(res => {
+        const mediumIds = Object.keys(res.data);
+        if (mediumIds.length === 0) {
+          dispatch(
+            addNotification({
+              level: "info",
+              contents: ["No rule violations found!"]
+            })
+          );
+        } else {
+          // TODO Causes flicker. Check if we can actually see that medium
+          // before redirecting there (or censor it in the server-side response)
+          dispatch(redirect(`/show/${mediumIds[0]}`));
+        }
+      })
+      .finally(() => {
+        setIsChecking(false);
+      });
   }, [isChecking, dispatch]);
 
   return doCheck;
