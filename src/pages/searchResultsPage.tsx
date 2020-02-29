@@ -90,7 +90,6 @@ const SearchResultsPage = () => {
     doSearch(getSearchTermsFromRoute());
   }, [
     location.search,
-    match,
     dispatch,
     doSearch,
     isSessionSfw,
