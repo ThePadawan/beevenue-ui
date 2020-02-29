@@ -8,10 +8,10 @@ import { useDispatch } from "react-redux";
 import { setSearchQuery, setShouldRefresh } from "../redux/actions";
 
 import { Api, SearchParameters } from "../api/api";
-import { Thumbs } from "../fragments/mediumWallTypes";
+import { Thumbs, MediumWallPagination } from "../fragments/mediumWallTypes";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
-import { useBeevenueSelector } from "../redux/selectors";
+import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 
 const MediumWall = React.lazy(() => import("../fragments/mediumWall"));
 
@@ -23,11 +23,8 @@ interface SearchResultItem {
   thumbs: Thumbs;
 }
 
-interface SearchResults {
+interface SearchResults extends MediumWallPagination {
   items: SearchResultItem[];
-  pageCount: number;
-  pageNumber: number;
-  pageSize: number;
 }
 
 interface SearchResultsPageParams {
@@ -40,6 +37,8 @@ const SearchResultsPage = () => {
   const shouldRefresh = useBeevenueSelector(
     store => store.refresh.shouldRefresh
   );
+
+  const isSessionSfw = useIsSessionSfw();
 
   const match = useRouteMatch<SearchResultsPageParams>();
 
@@ -86,7 +85,7 @@ const SearchResultsPage = () => {
     const paginationParams = paginationParamsFromQuery(q);
     const queryParams = { ...paginationParams, q: tags };
     doSearch(queryParams);
-  }, [shouldRefresh, location, match, dispatch]);
+  }, [shouldRefresh, location, match, dispatch, isSessionSfw]);
 
   let inner = null;
   if (doShowSpinner) {
