@@ -9,9 +9,7 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
 import { AddAliasField } from "../fragments/tag/addAliasField";
 import { ImplicationsCard } from "../fragments/tag/implicationsCard";
 import { EditableTitleField } from "../fragments/tag/editableTitleField";
-import { redirect } from "../redux/actions";
 import { BeevenuePage } from "./beevenuePage";
-import { useDispatch } from "react-redux";
 
 interface ShowTagViewModel {
   aliases: string[];
@@ -25,32 +23,11 @@ interface TagShowPageParams {
   name: string;
 }
 
-const TagShowPage = () => {
-  const dispatch = useDispatch();
-  const match = useRouteMatch<TagShowPageParams>();
-
-  const [tag, setTag] = useState<ShowTagViewModel | null>(null);
-  const [tagNotFound, setTagNotFound] = useState(false);
-
-  const tagName = match.params.name;
-
-  useLoginRequired();
-
-  useEffect(() => {
-    Api.Tags.show(tagName).then(
-      res => {
-        setTag(res.data);
-      },
-      err => {
-        setTagNotFound(true);
-      }
-    );
-  }, [tagName]);
-
+const getAliasHandlers = (
+  tag: ShowTagViewModel,
+  setTag: (m: ShowTagViewModel) => void
+) => {
   const onAliasAdded = (a: string): void => {
-    if (!tag) return;
-
-    // Signal React to behave
     const newAliases = tag.aliases.slice();
     newAliases.push(a);
     tag.aliases = newAliases;
@@ -59,11 +36,7 @@ const TagShowPage = () => {
   };
 
   const onAliasRemoved = (a: string): void => {
-    if (!tag) return;
-
-    // Signal React to behave
     const newAliases = tag.aliases.slice();
-
     const maybeIdx = newAliases.indexOf(a);
     if (maybeIdx > -1) {
       newAliases.splice(maybeIdx, 1);
@@ -73,11 +46,48 @@ const TagShowPage = () => {
     setTag(tag);
   };
 
+  return { onAliasAdded, onAliasRemoved };
+};
+
+const useInitialTagLoad = (
+  tagName: string,
+  setTag: (m: ShowTagViewModel) => void,
+  setTagNotFound: (b: boolean) => void
+) => {
+  useEffect(() => {
+    Api.Tags.show(tagName).then(
+      res => {
+        setTag(res.data);
+      },
+      err => {
+        setTagNotFound(true);
+      }
+    );
+  }, [tagName, setTag, setTagNotFound]);
+};
+
+const useTag = () => {
+  const match = useRouteMatch<TagShowPageParams>();
+  const tagName = match.params.name;
+  const [tag, setTag] = useState<ShowTagViewModel | null>(null);
+  const [tagNotFound, setTagNotFound] = useState(false);
+  const { onAliasAdded, onAliasRemoved } = getAliasHandlers(tag!, setTag);
+
+  useInitialTagLoad(tagName, setTag, setTagNotFound);
+
   const removeAlias = (a: string): void => {
     Api.Tags.removeAlias(tagName, a).then(_ => {
       onAliasRemoved(a);
     });
   };
+
+  return { tag, tagName, removeAlias, onAliasAdded, tagNotFound };
+};
+
+const TagShowPage = () => {
+  const { tag, tagName, removeAlias, onAliasAdded, tagNotFound } = useTag();
+
+  useLoginRequired();
 
   const getInnerContent = () => {
     if (tagNotFound) {
@@ -87,7 +97,6 @@ const TagShowPage = () => {
     if (!tag) return <BeevenueSpinner />;
 
     type CardGetter = (vm: ShowTagViewModel) => JSX.Element | null;
-
     const cardGetters: CardGetter[] = [getAliasesCard, getImplicationsCard];
 
     const wrapper = (x: CardGetter, idx: number) => {
@@ -104,6 +113,7 @@ const TagShowPage = () => {
 
     return <>{cardGetters.map(wrapper)}</>;
   };
+
   const getAliasesCard = (tag: ShowTagViewModel): JSX.Element | null => {
     const getCurrentAliases = () => {
       if (tag.aliases.length === 0) return null;
@@ -144,25 +154,17 @@ const TagShowPage = () => {
     return <ImplicationsCard tag={tag} tagName={tagName} />;
   };
 
-  const onTitleChanged = (newTitle: string): void => {
-    dispatch(redirect(`/tag/${newTitle}`, true));
-  };
-
   const subtitle = () => {
     if (tagNotFound || !tag) {
       return null;
     }
-
     return <h3 className="subtitle is-5">Used {tag.count} times</h3>;
   };
 
   return (
     <BeevenuePage>
       <h3 className="title is-2">
-        <EditableTitleField
-          initialTitle={tagName}
-          onTitleChanged={t => onTitleChanged(t)}
-        />
+        <EditableTitleField initialTitle={tagName} />
         <Link to={`/search/${tagName}`} className="beevenue-h2-link">
           <FontAwesomeIcon icon={faSearch} />
         </Link>

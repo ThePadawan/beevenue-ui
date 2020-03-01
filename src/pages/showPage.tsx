@@ -1,53 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { useRouteMatch } from "react-router";
 
-import TagsInput from "react-tagsinput";
-
 import { Api } from "../api/api";
 import { ShowViewModel, Rating } from "../api/show";
 import { BeevenuePage } from "./beevenuePage";
 import { Medium } from "../fragments/medium";
 import { useDispatch } from "react-redux";
-import {
-  addNotification,
-  addNotLoggedInNotification,
-  redirect
-} from "../redux/actions";
+import { addNotLoggedInNotification, redirect } from "../redux/actions";
 import pick from "lodash-es/pick";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
-import { MediumDeleteButton } from "../fragments/MediumDeleteButton";
-import { MissingTags } from "../fragments/missingTags";
 
-import { RegenerateThumbnailButton } from "../fragments/RegenerateThumbnailButton";
-import { Link } from "react-router-dom";
-import { PickAlternateThumbnailWidget } from "../fragments/pickAlternateThumbnailWidget";
 import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
+import { ShowPageTagsCard } from "../fragments/showPageTagsCard";
+import { ShowPageRatingCard } from "../fragments/showPageRatingCard";
+import { ShowPageAdminCard } from "../fragments/showPageAdminCard";
 
 interface ShowPageParams {
   id: string;
 }
 
-const FullRating = (r: Rating): string => {
-  const dict = {
-    u: "Unknown",
-    s: "Safe",
-    q: "Questionable",
-    e: "Explicit"
-  };
+const useClosePageOnSfw = (viewModel: ShowViewModel | null) => {
+  const dispatch = useDispatch();
+  const isSessionSfw = useIsSessionSfw();
 
-  return dict[r];
+  useEffect(() => {
+    if (isSessionSfw && viewModel !== null) {
+      if (viewModel.rating !== "s") {
+        dispatch(redirect("/"));
+      }
+    }
+  }, [isSessionSfw, viewModel, dispatch]);
 };
 
-const ShowPage = () => {
-  const [viewModel, setViewModel] = useState<ShowViewModel | null>(null);
-
+const useRefreshOnUpdate = (setViewModel: (vm: ShowViewModel) => void) => {
+  const dispatch = useDispatch();
   const isSessionSfw = useIsSessionSfw();
-  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
 
   const match = useRouteMatch<ShowPageParams>();
   const id = parseInt(match.params.id, 10);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     // TODO Inelegant - REST response to updateMedium could already
@@ -64,113 +54,26 @@ const ShowPage = () => {
         dispatch(redirect("/"));
       }
     );
-  }, [dispatch, id, isSessionSfw]);
+  }, [dispatch, id, isSessionSfw, setViewModel]);
 
-  const getUserIsAdmin = () => {
-    return loggedInRole === "admin";
-  };
+  return id;
+};
 
-  useEffect(() => {
-    if (isSessionSfw && viewModel !== null) {
-      if (viewModel.rating !== "s") {
-        dispatch(redirect("/"));
-      }
-    }
-  }, [isSessionSfw, viewModel, dispatch]);
+const updateMedium = (
+  setViewModel: (vm: ShowViewModel) => void,
+  newViewModel: ShowViewModel
+) => {
+  const params = pick(newViewModel, ["id", "tags", "rating"]);
+  return Api.updateMedium(params).then(res => {
+    setViewModel(newViewModel);
+    return res;
+  });
+};
 
-  const deleteMedium = () => {
-    Api.deleteMedium(id).then(
-      res => {
-        dispatch(
-          addNotification({
-            level: "info",
-            contents: ["Successfully deleted medium."]
-          })
-        );
-        dispatch(redirect("/"));
-      },
-      err => {
-        dispatch(
-          addNotification({
-            level: "error",
-            contents: ["Could not delete medium!"]
-          })
-        );
-        dispatch(redirect("/"));
-      }
-    );
-  };
-
-  const renderTags = (viewModel: ShowViewModel) => {
-    if (!viewModel.tags) {
-      return null;
-    }
-
-    const renderLayout = (tagComponents: any, inputComponent: any) => {
-      return (
-        <>
-          {tagComponents}
-          {getUserIsAdmin() ? inputComponent : null}
-        </>
-      );
-    };
-
-    const renderTag = (props: any) => {
-      const {
-        tag,
-        key,
-        disabled,
-        onRemove,
-        classNameRemove,
-        getTagDisplayValue,
-        ...other
-      } = props;
-
-      const displayValue = getTagDisplayValue(tag);
-
-      const linkTarget = disabled
-        ? `/search/${displayValue}`
-        : `/tag/${displayValue}`;
-
-      return (
-        <div className="control" key={key}>
-          <div {...other}>
-            <Link to={linkTarget}>
-              <span className="tag">{displayValue}</span>
-            </Link>
-            {!disabled && (
-              <a className="tag is-delete" onClick={e => onRemove(key)} />
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    return (
-      <nav className="level beevenue-medium-tags">
-        <TagsInput
-          value={viewModel.tags}
-          disabled={getUserIsAdmin() ? undefined : true}
-          className="tagsinput field is-grouped is-grouped-multiline input"
-          tagProps={{ className: "tags has-addons" }}
-          renderTag={renderTag}
-          renderLayout={renderLayout}
-          onlyUnique={true}
-          addKeys={[9, 13, 32, 188]} // Tab, Enter, Space, Comma
-          onChange={(e: any) => onTagsChange(e)}
-        />
-      </nav>
-    );
-  };
-
-  const updateMedium = (newViewModel: ShowViewModel) => {
-    const params = pick(newViewModel, ["id", "tags", "rating"]);
-    return Api.updateMedium(params).then(res => {
-      setViewModel(newViewModel);
-      return res;
-    });
-  };
-
+const onChange = (
+  viewModel: ShowViewModel | null,
+  setViewModel: (vm: ShowViewModel) => void
+) => {
   const onTagsChange = (newTags: string[]) => {
     // Technically, the user can't manually enter these characters.
     // However, by pasting them, they can still occur in here.
@@ -180,7 +83,7 @@ const ShowPage = () => {
 
     const newViewModel = { ...viewModel } as ShowViewModel;
     newViewModel.tags = cleanTags;
-    updateMedium(newViewModel);
+    updateMedium(setViewModel, newViewModel);
   };
 
   const onRatingChange = (value: string) => {
@@ -189,72 +92,33 @@ const ShowPage = () => {
 
     const newViewModel = { ...viewModel } as ShowViewModel;
     newViewModel.rating = newRating;
-    updateMedium(newViewModel);
+    updateMedium(setViewModel, newViewModel);
   };
+  return { onTagsChange, onRatingChange };
+};
 
-  const renderRating = (viewModel: ShowViewModel): JSX.Element | null => {
-    if (!viewModel.rating) {
-      return null;
-    }
+const useSetup = () => {
+  const [viewModel, setViewModel] = useState<ShowViewModel | null>(null);
+  const id = useRefreshOnUpdate(setViewModel);
+  useClosePageOnSfw(viewModel);
 
-    const ratingElementFor = (r: Rating): JSX.Element => {
-      const fullRating = FullRating(r);
-      const id = `currentRating${fullRating}`;
-      return (
-        <div className="beevenue-rating" key={id}>
-          <input
-            className="is-checkradio"
-            type="radio"
-            disabled={getUserIsAdmin() ? undefined : true}
-            checked={viewModel.rating === r}
-            name="currentRating"
-            onChange={e => onRatingChange(e.target.value)}
-            value={r}
-            id={id}
-          />
-          <label htmlFor={id}>{fullRating}</label>
-        </div>
-      );
-    };
+  const { onTagsChange, onRatingChange } = onChange(viewModel, setViewModel);
+  return { viewModel, id, onTagsChange, onRatingChange };
+};
 
-    const ratings: Rating[] = ["s", "q", "e"];
-
-    return (
-      <div className="card">
-        <div className="card-content">
-          <div className="content">
-            <div className="field beevenue-ratings">
-              {ratings.map(ratingElementFor)}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+const ShowPage = () => {
+  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
+  const { viewModel, id, onTagsChange, onRatingChange } = useSetup();
+  const userIsAdmin = loggedInRole === "admin";
 
   let view;
-
   if (viewModel !== null) {
     view = (
       <>
         <Medium {...viewModel} />
-        {renderTags(viewModel)}
-        {renderRating(viewModel)}
-        {getUserIsAdmin() ? (
-          <>
-            <MissingTags {...viewModel} />
-            <PickAlternateThumbnailWidget {...viewModel} />
-
-            <div className="card beevenue-sidebar-card">
-              <div className="card-content">
-                <div className="content">
-                  <MediumDeleteButton onConfirm={() => deleteMedium()} />
-                  <RegenerateThumbnailButton mediumId={id} />
-                </div>
-              </div>
-            </div>
-          </>
-        ) : null}
+        <ShowPageTagsCard {...{ viewModel, userIsAdmin, onTagsChange }} />
+        <ShowPageRatingCard {...{ viewModel, userIsAdmin, onRatingChange }} />
+        <ShowPageAdminCard {...{ viewModel, userIsAdmin, mediumId: id }} />
       </>
     );
   } else {

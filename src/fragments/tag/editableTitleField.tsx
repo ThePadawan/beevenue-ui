@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { Api } from "../../api/api";
+import { useDispatch } from "react-redux";
+import { redirect } from "../../redux/actions";
 
 interface EditableTitleFieldProps {
   initialTitle: string;
-  onTitleChanged?: (newTitle: string) => void;
 }
 
 const EditableTitleField = (props: EditableTitleFieldProps) => {
   const [currentTitle, setCurrentTitle] = useState(props.initialTitle);
   const [isBeingEdited, setIsBeingEdited] = useState(false);
+  const dispatch = useDispatch();
+
+  const onTitleChanged = (newTitle: string): void => {
+    dispatch(redirect(`/tag/${newTitle}`, true));
+  };
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,10 +41,7 @@ const EditableTitleField = (props: EditableTitleFieldProps) => {
       tag: currentTitle
     }).then(_ => {
       setIsBeingEdited(false);
-
-      if (props.onTitleChanged) {
-        props.onTitleChanged(currentTitle || "");
-      }
+      onTitleChanged(currentTitle || "");
     });
   };
 
