@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Api } from "../api/api";
 import { useLoginRequired } from "./loginRequired";
@@ -6,12 +6,12 @@ import { Link, useRouteMatch } from "react-router-dom";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
-import { AddAliasField } from "../fragments/tag/addAliasField";
 import { ImplicationsCard } from "../fragments/tag/implicationsCard";
 import { EditableTitleField } from "../fragments/tag/editableTitleField";
 import { BeevenuePage } from "./beevenuePage";
+import TagShowPageAliasCard from "../fragments/tag/tagShowPageAliasCard";
 
-interface ShowTagViewModel {
+export interface ShowTagViewModel {
   aliases: string[];
   count: number;
 
@@ -22,32 +22,6 @@ interface ShowTagViewModel {
 interface TagShowPageParams {
   name: string;
 }
-
-const getAliasHandlers = (
-  tag: ShowTagViewModel,
-  setTag: (m: ShowTagViewModel) => void
-) => {
-  const onAliasAdded = (a: string): void => {
-    const newAliases = tag.aliases.slice();
-    newAliases.push(a);
-    tag.aliases = newAliases;
-
-    setTag(tag);
-  };
-
-  const onAliasRemoved = (a: string): void => {
-    const newAliases = tag.aliases.slice();
-    const maybeIdx = newAliases.indexOf(a);
-    if (maybeIdx > -1) {
-      newAliases.splice(maybeIdx, 1);
-    }
-
-    tag.aliases = newAliases;
-    setTag(tag);
-  };
-
-  return { onAliasAdded, onAliasRemoved };
-};
 
 const useInitialTagLoad = (
   tagName: string,
@@ -71,88 +45,35 @@ const useTag = () => {
   const tagName = match.params.name;
   const [tag, setTag] = useState<ShowTagViewModel | null>(null);
   const [tagNotFound, setTagNotFound] = useState(false);
-  const { onAliasAdded, onAliasRemoved } = getAliasHandlers(tag!, setTag);
+
+  const onAliasAdded = (a: string): void => {
+    const newAliases = tag!.aliases.slice();
+    newAliases.push(a);
+    tag!.aliases = newAliases;
+
+    setTag(tag);
+  };
+
+  const onAliasRemoved = (a: string): void => {
+    const newAliases = tag!.aliases.slice();
+    const maybeIdx = newAliases.indexOf(a);
+    if (maybeIdx > -1) {
+      newAliases.splice(maybeIdx, 1);
+    }
+
+    tag!.aliases = newAliases;
+    setTag(tag);
+  };
 
   useInitialTagLoad(tagName, setTag, setTagNotFound);
 
-  const removeAlias = (a: string): void => {
-    Api.Tags.removeAlias(tagName, a).then(_ => {
-      onAliasRemoved(a);
-    });
-  };
-
-  return { tag, tagName, removeAlias, onAliasAdded, tagNotFound };
+  return { tag, tagName, onAliasRemoved, onAliasAdded, tagNotFound };
 };
 
 const TagShowPage = () => {
-  const { tag, tagName, removeAlias, onAliasAdded, tagNotFound } = useTag();
+  const { tag, tagName, onAliasRemoved, onAliasAdded, tagNotFound } = useTag();
 
   useLoginRequired();
-
-  const getInnerContent = () => {
-    if (tagNotFound) {
-      return <div>No such tag</div>;
-    }
-
-    if (!tag) return <BeevenueSpinner />;
-
-    type CardGetter = (vm: ShowTagViewModel) => JSX.Element | null;
-    const cardGetters: CardGetter[] = [getAliasesCard, getImplicationsCard];
-
-    const wrapper = (x: CardGetter, idx: number) => {
-      if (!tag) {
-        return null;
-      }
-
-      return (
-        <nav className="level" key={idx}>
-          <div className="level-item">{x(tag)}</div>
-        </nav>
-      );
-    };
-
-    return <>{cardGetters.map(wrapper)}</>;
-  };
-
-  const getAliasesCard = (tag: ShowTagViewModel): JSX.Element | null => {
-    const getCurrentAliases = () => {
-      if (tag.aliases.length === 0) return null;
-      return (
-        <ul>
-          {tag.aliases.sort().map(a => (
-            <Fragment key={a}>
-              <li>
-                {a}
-                <a
-                  className="beevenue-alias-delete delete is-small"
-                  onClick={e => removeAlias(a)}
-                />
-              </li>
-            </Fragment>
-          ))}
-        </ul>
-      );
-    };
-
-    return (
-      <div className="card beevenue-sidebar-card">
-        <header className="card-header">
-          <p className="card-header-title">Aliases</p>
-        </header>
-        <div className="card-content">
-          <div className="content">
-            {getCurrentAliases()}
-            <AddAliasField tag={tagName} onAliasAdded={a => onAliasAdded(a)} />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const getImplicationsCard = (tag: ShowTagViewModel): JSX.Element | null => {
-    if (!tag) return null;
-    return <ImplicationsCard tag={tag} tagName={tagName} />;
-  };
 
   const subtitle = () => {
     if (tagNotFound || !tag) {
@@ -160,6 +81,25 @@ const TagShowPage = () => {
     }
     return <h3 className="subtitle is-5">Used {tag.count} times</h3>;
   };
+
+  let inner = null;
+  if (!tag) {
+    inner = <BeevenueSpinner />;
+  } else if (tagNotFound) {
+    inner = <div>No such tag</div>;
+  } else {
+    inner = (
+      <>
+        <TagShowPageAliasCard
+          tag={tag}
+          tagName={tagName}
+          onAliasAdded={onAliasAdded}
+          onAliasRemoved={onAliasRemoved}
+        />
+        <ImplicationsCard tag={tag} tagName={tagName} />
+      </>
+    );
+  }
 
   return (
     <BeevenuePage>
@@ -170,7 +110,7 @@ const TagShowPage = () => {
         </Link>
       </h3>
       {subtitle()}
-      {getInnerContent()}
+      {inner}
     </BeevenuePage>
   );
 };
