@@ -175,10 +175,6 @@ const Api = {
     }
   },
 
-  getProblems(): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`thumbnails/missing`));
-  },
-
   loadMedia(params: LoadMediaParameters): AxiosPromise<any> {
     return _notification_wrapper(axiosClient.get(`media`, { params }));
   },

@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { setSearchQuery, setShouldRefresh } from "../redux/actions";
 
 import { Api } from "../api/api";
-import { Thumbs, MediumWallPagination } from "../fragments/mediumWallTypes";
+import { MediumWallPagination } from "../fragments/mediumWallTypes";
 import { paginationParamsFromQuery } from "./pagination";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
@@ -20,7 +20,6 @@ interface SearchResultItem {
   aspectRatio: string | null;
   tinyThumbnail: string | null;
   hash: string;
-  thumbs: Thumbs;
 }
 
 interface SearchResults extends MediumWallPagination {

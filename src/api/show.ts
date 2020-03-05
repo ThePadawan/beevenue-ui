@@ -1,5 +1,4 @@
 import { MimeType } from "../media";
-import { Thumbs } from "../fragments/mediumWallTypes";
 
 export type Rating = "u" | "s" | "q" | "e";
 
@@ -8,8 +7,6 @@ export interface PartialShowViewModel {
   hash: string;
   mime_type: MimeType;
   rating: Rating;
-  thumbs: Thumbs;
-
   tags: Array<any>;
 }
 

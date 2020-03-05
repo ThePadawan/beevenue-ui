@@ -9,23 +9,13 @@ interface SimilarMediaProps {
 }
 
 const SimilarMedia = (props: SimilarMediaProps) => {
-  const thumbs = (r: PartialShowViewModel) => {
-    return (
-      <picture>
-        <source
-          srcSet={`${backendUrl}${r.thumbs[600]}`}
-          media="(min-width: 769px)"
-        />
-        <img src={`${backendUrl}${r.thumbs[240]}`} />
-      </picture>
-    );
-  };
-
   return (
     <div className="beevenue-similar-media">
       {props.media.map(s => (
         <div className="beevenue-similar-medium" key={s.id}>
-          <Link to={`/show/${s.id}`}>{thumbs(s)}</Link>
+          <Link to={`/show/${s.id}`}>
+            <img src={`${backendUrl}/thumbs/${s.id}`} />
+          </Link>
         </div>
       ))}
     </div>
