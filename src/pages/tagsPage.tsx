@@ -20,7 +20,7 @@ const useFoo = () => {
   useEffect(() => {
     Api.Tags.getStatistics().then(
       res => {
-        let tags = res.data;
+        let tags = res.data.tags;
         tags = sortBy(tags, t => t.mediaCount).reverse();
         setTags(tags);
       },
