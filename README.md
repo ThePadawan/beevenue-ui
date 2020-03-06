@@ -1,4 +1,5 @@
 [![Build Status](https://semaphoreci.com/api/v1/thepadawan/beevenue-ui/branches/master/shields_badge.svg)](https://semaphoreci.com/thepadawan/beevenue-ui)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Maintainability](https://api.codeclimate.com/v1/badges/97420d44e8f3d5c1e91f/maintainability)](https://codeclimate.com/github/ThePadawan/beevenue-ui/maintainability)
 
 # Beevenue
