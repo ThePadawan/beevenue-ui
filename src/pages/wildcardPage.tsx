@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 
 import { BeevenuePage } from "./beevenuePage";
 
-import { redirect } from "../redux/actions";
 import { useRouteMatch } from "react-router";
+import { forceRedirect } from "../redirect";
 
 interface WildcardPageParams {
   whatever: string;
@@ -14,13 +13,11 @@ const WildcardPage = () => {
   const match = useRouteMatch<WildcardPageParams>();
   const { whatever } = match.params;
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
     if (whatever) {
-      dispatch(redirect("/"));
+      forceRedirect("/");
     }
-  }, [dispatch, whatever]);
+  }, [whatever]);
 
   return (
     <BeevenuePage>

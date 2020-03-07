@@ -2,12 +2,13 @@ import React, { FormEvent, useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 
 import { Api } from "../../api/api";
-import { logout, redirect } from "../../redux/actions";
+import { logout } from "../../redux/actions";
 import { SfwButton } from "../sfwButton";
 import { BeevenueSpinner } from "../beevenueSpinner";
 
 import { commitId } from "../../config.json";
 import { useBeevenueSelector } from "../../redux/selectors";
+import { forceRedirect } from "../../redirect";
 
 const LoggedInPanel = () => {
   const [loginInProgress, setLoginInProgress] = useState(false);
@@ -32,7 +33,7 @@ const LoggedInPanel = () => {
         if (res.status === 200) {
           // The session cookie is unset now.
           dispatch(logout());
-          dispatch(redirect("/"));
+          forceRedirect("/");
         }
       })
       .finally(finish);

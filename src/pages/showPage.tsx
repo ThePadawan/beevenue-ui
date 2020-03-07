@@ -6,7 +6,7 @@ import { ShowViewModel, Rating } from "../api/show";
 import { BeevenuePage } from "./beevenuePage";
 import { Medium } from "../fragments/medium";
 import { useDispatch } from "react-redux";
-import { addNotLoggedInNotification, redirect } from "../redux/actions";
+import { addNotLoggedInNotification } from "../redux/actions";
 import pick from "lodash-es/pick";
 import { BeevenueSpinner } from "../fragments/beevenueSpinner";
 
@@ -14,6 +14,7 @@ import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 import { ShowPageTagsCard } from "../fragments/showPageTagsCard";
 import { ShowPageRatingCard } from "../fragments/showPageRatingCard";
 import { ShowPageAdminCard } from "../fragments/showPageAdminCard";
+import { forceRedirect } from "../redirect";
 
 interface ShowPageParams {
   id: string;
@@ -26,7 +27,7 @@ const useClosePageOnSfw = (viewModel: ShowViewModel | null) => {
   useEffect(() => {
     if (isSessionSfw && viewModel !== null) {
       if (viewModel.rating !== "s") {
-        dispatch(redirect("/"));
+        forceRedirect("/");
       }
     }
   }, [isSessionSfw, viewModel, dispatch]);
@@ -51,7 +52,7 @@ const useRefreshOnUpdate = (setViewModel: (vm: ShowViewModel) => void) => {
           dispatch(addNotLoggedInNotification());
         }
 
-        dispatch(redirect("/"));
+        forceRedirect("/");
       }
     );
   }, [dispatch, id, isSessionSfw, setViewModel]);

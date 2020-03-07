@@ -1,13 +1,14 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 
-import { redirect, setSearchQuery } from "../redux/actions";
+import { setSearchQuery } from "../redux/actions";
 
 import { LoginPanel, SearchPanel, UploadPanel, LinksPanel } from "./panels";
 
 import { SpeedTaggerPanel } from "./panels/speedTaggerPanel";
 import { Anonymous } from "../redux/store";
 import { useBeevenueSelector } from "../redux/selectors";
+import { forceRedirect } from "../redirect";
 
 const Sidebar = () => {
   const loggedInUser = useBeevenueSelector(store => store.login.loggedInUser);
@@ -38,7 +39,7 @@ const Sidebar = () => {
   const onHomeButtonClicked = (e: any) => {
     e.preventDefault();
     dispatch(setSearchQuery(""));
-    dispatch(redirect("/"));
+    forceRedirect("/");
   };
 
   return (

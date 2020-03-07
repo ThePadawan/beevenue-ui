@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 
-import { addNotLoggedInNotification, redirect } from "../redux/actions";
+import { addNotLoggedInNotification } from "../redux/actions";
 import { useBeevenueSelector } from "../redux/selectors";
+import { forceRedirect } from "../redirect";
 
 const useLoginRequired = () => {
   const loggedInRole = useBeevenueSelector(store => {
@@ -15,7 +16,7 @@ const useLoginRequired = () => {
   useEffect(() => {
     if (!isLoggedIn || loggedInRole !== "admin") {
       addNotLoggedInNotification();
-      redirect("/", true);
+      forceRedirect("/", true);
     }
   });
 };

@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { Api } from "../api/api";
 import { useDispatch } from "react-redux";
-import { addNotification, redirect } from "../redux/actions";
+import { addNotification } from "../redux/actions";
+import { forceRedirect } from "../redirect";
 
 interface MediumDeleteButtonProps {
   mediumId: number;
@@ -30,7 +31,7 @@ const doConfirm = (dispatch: (x: any) => void, mediumId: number) => {
       }
     )
     .finally(() => {
-      dispatch(redirect("/"));
+      forceRedirect("/");
     });
 };
 

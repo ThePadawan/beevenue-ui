@@ -1,26 +1,15 @@
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
 import history from "./history";
-import { useBeevenueSelector } from "./redux/selectors";
-import { stopRedirecting } from "./redux/actions";
 
-export const useRedirect = () => {
-  const dispatch = useDispatch();
-  const redirection = useBeevenueSelector(store => store.redirect.redirection);
+export const forceRedirect = (target: string, doReplace?: boolean) => {
+  let actualDoReplace = false;
 
-  useEffect(() => {
-    const r = redirection;
+  if (doReplace !== undefined) {
+    actualDoReplace = doReplace;
+  }
 
-    // TODO Check history.location.pathname !== r.target carefully.
-
-    if (r) {
-      if (r.doReplace) {
-        history.replace(r.target);
-      } else {
-        history.push(r.target);
-      }
-
-      dispatch(stopRedirecting());
-    }
-  }, [redirection, dispatch]);
+  if (actualDoReplace) {
+    history.replace(target);
+  } else {
+    history.push(target);
+  }
 };

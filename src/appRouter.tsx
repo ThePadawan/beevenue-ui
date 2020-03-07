@@ -9,7 +9,6 @@ import { IndexPage, ShowPage } from "./pages";
 import history from "./history";
 import { Api } from "./api/api";
 import { login, loginAnonymous } from "./redux/actions";
-import { useRedirect } from "./redirect";
 
 const WildcardPage = React.lazy(() => import("./pages/wildcardPage"));
 const TagStatisticsPage = React.lazy(() => import("./pages/tagStatisticsPage"));
@@ -20,8 +19,6 @@ const SearchResultsPage = React.lazy(() => import("./pages/searchResultsPage"));
 
 const AppRouter = () => {
   const [hasUser, setHasUser] = useState(false);
-
-  useRedirect();
 
   const dispatch = useDispatch();
 

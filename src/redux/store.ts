@@ -30,10 +30,6 @@ export interface RedirectInfo {
   doReplace: boolean;
 }
 
-export interface RedirectStore {
-  redirection: RedirectInfo | null;
-}
-
 export interface RefreshStore {
   shouldRefresh: boolean;
 }
@@ -53,7 +49,6 @@ export interface BeevenueStore extends Store {
 
   search: SearchStore;
   notifications: NotificationStore;
-  redirect: RedirectStore;
   speedTagging: SpeedTaggingStore;
   refresh: RefreshStore;
 }

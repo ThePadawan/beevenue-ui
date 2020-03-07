@@ -1,8 +1,7 @@
 import qs from "qs";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { redirect } from "../redux/actions";
 import { useCallback } from "react";
+import { forceRedirect } from "../redirect";
 
 interface QueryStringRedirectParameters {
   pageNr: number;
@@ -10,7 +9,6 @@ interface QueryStringRedirectParameters {
 }
 
 export const useQueryStringRedirect = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const f = useCallback(
     (q: QueryStringRedirectParameters) => {
@@ -24,9 +22,9 @@ export const useQueryStringRedirect = () => {
         search: qs.stringify(newQs, { addQueryPrefix: true })
       };
 
-      dispatch(redirect(newLocation.pathname + newLocation.search));
+      forceRedirect(newLocation.pathname + newLocation.search);
     },
-    [location, dispatch]
+    [location]
   );
 
   return f;

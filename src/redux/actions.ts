@@ -6,7 +6,6 @@ import {
   DISMISS_NOTIFICATION,
   DISMISS_ALL_NOTIFICATIONS,
   NEW_SEARCH_QUERY,
-  REDIRECT,
   SET_SFW_SESSION,
   SET_FILE_UPLOADED,
   SET_SPEED_TAGGING,
@@ -75,19 +74,6 @@ export const dismissNotification = (id: BeevenueNotificationId) => ({
 
 export const dismissAllNotifications = () => ({
   type: DISMISS_ALL_NOTIFICATIONS
-});
-
-export const stopRedirecting = () => ({
-  type: REDIRECT,
-  payload: null
-});
-
-export const redirect = (location: string, doReplace?: boolean) => ({
-  type: REDIRECT,
-  payload: {
-    target: location,
-    doReplace: doReplace || false
-  }
 });
 
 export const setShouldRefresh = (shouldRefresh: boolean) => ({

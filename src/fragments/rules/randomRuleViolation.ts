@@ -1,7 +1,8 @@
 import { Api } from "../../api/api";
-import { addNotification, redirect } from "../../redux/actions";
+import { addNotification } from "../../redux/actions";
 import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
+import { forceRedirect } from "../../redirect";
 
 export const useRandomRuleViolation = (): (() => void) => {
   const [isChecking, setIsChecking] = useState(false);
@@ -24,7 +25,7 @@ export const useRandomRuleViolation = (): (() => void) => {
         } else {
           // TODO Causes flicker. Check if we can actually see that medium
           // before redirecting there (or censor it in the server-side response)
-          dispatch(redirect(`/show/${mediumIds[0]}`));
+          forceRedirect(`/show/${mediumIds[0]}`);
         }
       })
       .finally(() => {

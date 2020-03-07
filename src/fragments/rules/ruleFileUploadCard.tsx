@@ -1,183 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Api } from "../../api/api";
-import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-type Validity = "invalid" | "valid" | "validating" | "unknown";
+import {
+  RuleFileUploadCardButton,
+  RuleFileStatus,
+  STATUS_INITIAL
+} from "./ruleFileUploadCardButton";
 
 interface RuleFileUploadCardProps {
   onUploaded: () => void;
 }
 
-const RuleFileUploadCard = (props: RuleFileUploadCardProps) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState("Select a file to upload");
-  const [validity, setValidity] = useState<Validity>("unknown");
+const onAcceptWrapper = (
+  s: RuleFileStatus,
+  setStatus: (s: RuleFileStatus) => void,
+  onUploaded: () => void,
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+) => {
+  e.preventDefault();
 
-  const readFile = (f: File): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const tempResult = reader.result;
+  if (s.status !== "valid") {
+    return;
+  }
 
-        if (!tempResult) {
-          return;
-        }
+  Api.Rules.uploadJson(s.data).then(success => {
+    setStatus(STATUS_INITIAL);
+    onUploaded();
+  });
+};
 
-        if (typeof tempResult !== "string") {
-          return;
-        }
+const buttonClassName = (extra?: string): string => {
+  let result = "button";
+  if (extra) {
+    result += ` ${extra}`;
+  }
 
-        try {
-          const parsed = JSON.parse(tempResult);
-          resolve(parsed);
-        } catch (e) {
-          reject(e);
-        }
-      };
-      reader.readAsText(f);
-    });
-  };
+  return result;
+};
 
-  const suspiciousFile = (reason: string) => {
-    setStatus(`That doesn't look like a rules file: ${reason}`);
-  };
-
-  const onChange = (f: FileList | null) => {
-    if (!f) return;
-    if (f.length > 1) return;
-
-    const file = f[0];
-
-    if (file.size > 500 * 1024) {
-      return suspiciousFile("it is bigger than 500 KB");
-    } else if (file.type !== "application/json") {
-      return suspiciousFile(
-        `it has the Mime-Type '${file.type}' and not 'application/json'.`
-      );
-    }
-
-    setValidity("validating");
-
-    readFile(file)
-      .then(Api.Rules.validateJson)
-      .then(
-        success => {
-          if (success.data.ok === false) {
-            setStatus(`This is not valid: ${success.data.data}`);
-            setValidity("invalid");
-          } else {
-            setFile(file);
-            setStatus(`This is valid and contains ${success.data.data} rules`);
-            setValidity("valid");
-          }
-        },
-        err => {
-          setStatus(`This is not valid: ${err}`);
-          setValidity("invalid");
-        }
-      );
-  };
-
-  const onAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-
-    if (!file) return;
-    readFile(file)
-      .then(Api.Rules.uploadJson)
-      .then(success => {
-        setFile(null);
-        setStatus("This uploaded successfully");
-        setValidity("unknown");
-        props.onUploaded();
-      });
-  };
-
-  const buttonClassName = (extra?: string): string => {
-    let result = "button";
-    if (extra) {
-      result += ` ${extra}`;
-    }
-    if (validity === "validating") {
-      result += " is-loading";
-    }
-
-    return result;
-  };
-
-  const getAcceptButtonClassName = () => {
-    if (validity === "valid") {
-      return buttonClassName("is-success");
-    }
-
-    if (validity === "invalid") {
-      return buttonClassName("is-danger");
-    }
+const useAcceptButtonStyling = (s: RuleFileStatus) => {
+  const acceptButtonClassName = useMemo(() => {
+    if (s.status === "valid") return buttonClassName("is-success");
+    if (s.status === "invalid") return buttonClassName("is-danger");
+    if (s.status === "validating") return buttonClassName("is-loading");
 
     return buttonClassName();
-  };
+  }, [s]);
 
-  const getIsAcceptButtonDisabled = (): boolean | undefined => {
-    if (validity === "invalid" || validity === "unknown") {
+  const isAcceptButtonDisabled = useMemo(() => {
+    if (s.status === "invalid" || s.status === "validating") {
       return true;
     }
-
     return undefined;
+  }, [s]);
+
+  return {
+    acceptButtonClassName,
+    isAcceptButtonDisabled
   };
+};
+
+const useForm = (
+  s: RuleFileStatus,
+  setStatus: (s: RuleFileStatus) => void,
+  onUploaded: () => void,
+  onAccept: typeof onAcceptWrapper
+) => {
+  const {
+    acceptButtonClassName,
+    isAcceptButtonDisabled
+  } = useAcceptButtonStyling(s);
+  return (
+    <form>
+      <button
+        className={acceptButtonClassName}
+        onClick={e => onAccept(s, setStatus, onUploaded, e)}
+        disabled={isAcceptButtonDisabled}
+      >
+        <span className="icon">
+          <FontAwesomeIcon icon={faCheck} />
+        </span>
+      </button>
+    </form>
+  );
+};
+
+const wrap = (inner: JSX.Element): JSX.Element => {
+  return (
+    <nav className="level">
+      <div className="level-item">
+        <div className="card beevenue-sidebar-card">
+          <header className="card-header">
+            <p className="card-header-title">Upload rules file</p>
+          </header>
+          <div className="card-content">
+            <div className="content">{inner}</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+const RuleFileUploadCard = (props: RuleFileUploadCardProps) => {
+  const [status, setStatus] = useState<RuleFileStatus>(STATUS_INITIAL);
+  const form = useForm(status, setStatus, props.onUploaded, onAcceptWrapper);
 
   const getUploadBox = () => {
     return (
       <>
-        <div className="file is-boxed">
-          <label className="file-label">
-            <input
-              className="file-input"
-              multiple={false}
-              type="file"
-              name="medium"
-              onChange={e => onChange(e.target.files)}
-            />
-            <span className="file-cta">
-              <FontAwesomeIcon icon={faUpload} />
-              <span className="file-label">Upload rules file</span>
-            </span>
-          </label>
-        </div>
-
-        <div>{status}</div>
-
-        <form>
-          <button
-            className={getAcceptButtonClassName()}
-            onClick={e => onAccept(e)}
-            disabled={getIsAcceptButtonDisabled()}
-          >
-            <span className="icon">
-              <FontAwesomeIcon icon={faCheck} />
-            </span>
-          </button>
-        </form>
+        <RuleFileUploadCardButton onStatusChanged={setStatus} />
+        <div>{status?.description}</div>
+        {form}
       </>
     );
   };
 
-  return (
-    <>
-      <nav className="level">
-        <div className="level-item">
-          <div className="card beevenue-sidebar-card">
-            <header className="card-header">
-              <p className="card-header-title">Upload rules file</p>
-            </header>
-            <div className="card-content">
-              <div className="content">{getUploadBox()}</div>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </>
-  );
+  return wrap(getUploadBox());
 };
 
 export { RuleFileUploadCard };
