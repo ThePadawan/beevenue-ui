@@ -23,8 +23,6 @@ export const useRandomRuleViolation = (): (() => void) => {
             })
           );
         } else {
-          // TODO Causes flicker. Check if we can actually see that medium
-          // before redirecting there (or censor it in the server-side response)
           forceRedirect(`/show/${mediumIds[0]}`);
         }
       })

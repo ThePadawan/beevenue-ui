@@ -41,8 +41,6 @@ const useRefreshOnUpdate = (setViewModel: (vm: ShowViewModel) => void) => {
   const id = parseInt(match.params.id, 10);
 
   useEffect(() => {
-    // TODO Inelegant - REST response to updateMedium could already
-    // contain this information so we save one round trip.
     Api.show(id).then(
       res => {
         setViewModel(res.data as ShowViewModel);
@@ -63,11 +61,11 @@ const useRefreshOnUpdate = (setViewModel: (vm: ShowViewModel) => void) => {
 const updateMedium = (
   setViewModel: (vm: ShowViewModel) => void,
   newViewModel: ShowViewModel
-) => {
+): void => {
   const params = pick(newViewModel, ["id", "tags", "rating"]);
-  return Api.updateMedium(params).then(res => {
-    setViewModel(newViewModel);
-    return res;
+  setViewModel(newViewModel);
+  Api.updateMedium(params).then(res => {
+    setViewModel(res.data as ShowViewModel);
   });
 };
 
