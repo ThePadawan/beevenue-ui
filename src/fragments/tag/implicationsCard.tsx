@@ -33,107 +33,106 @@ const updateArrays = (
   setter(newArray);
 };
 
-const ImplicationsCard = (props: ImplicationsCardProps) => {
-  const [implyingThis, setImplyingThis] = useState(props.tag.implying_this);
+const listHelper = (list: string[], callback: (s: string) => void) => {
+  if (list.length === 0) return null;
+  return (
+    <ul>
+      {list.map(a => (
+        <Fragment key={a}>
+          <li>
+            {a}
+            <a
+              className="beevenue-alias-delete delete is-small"
+              onClick={e => callback(a)}
+            />
+          </li>
+        </Fragment>
+      ))}
+    </ul>
+  );
+};
+
+const removeHelper = (
+  apiCall: Promise<any>,
+  current: string[],
+  setter: (a: string[]) => void,
+  a: string
+) => {
+  return apiCall.then(
+    res => {
+      updateArrays("Remove", current, setter, a);
+    },
+    err => {
+      console.log(err);
+    }
+  );
+};
+
+const useImplied = (props: ImplicationsCardProps) => {
+  const { tagName } = props;
   const [impliedByThis, setImpliedByThis] = useState(props.tag.implied_by_this);
 
-  const { tagName } = props;
-
   const getImpliedByThis = useMemo((): any => {
-    const removeImpliedByThis = (a: string): void => {
-      Api.Tags.removeImplication(tagName, a).then(
-        res => {
-          updateArrays("Remove", impliedByThis, setImpliedByThis, a);
-        },
-        err => {
-          console.log(err);
-        }
+    const removeImpliedByThis = (a: string) =>
+      removeHelper(
+        Api.Tags.removeImplication(tagName, a),
+        impliedByThis,
+        setImpliedByThis,
+        a
       );
-    };
-
-    const getListImpliedByThis = () => {
-      if (impliedByThis.length === 0) return null;
-      return (
-        <ul>
-          {impliedByThis.map(a => (
-            <Fragment key={a}>
-              <li>
-                {a}
-                <a
-                  className="beevenue-alias-delete delete is-small"
-                  onClick={e => removeImpliedByThis(a)}
-                />
-              </li>
-            </Fragment>
-          ))}
-        </ul>
-      );
-    };
-
-    const onImpliedByThisAdded = (a: string): void => {
-      updateArrays("Add", impliedByThis, setImpliedByThis, a);
-    };
 
     return (
       <div>
         Implied by this:
-        {getListImpliedByThis()}
+        {listHelper(impliedByThis, removeImpliedByThis)}
         <AddImplicationField
           tag={tagName}
           mode={"ImpliedByThis"}
-          onImplicationAdded={a => onImpliedByThisAdded(a)}
+          onImplicationAdded={a =>
+            updateArrays("Add", impliedByThis, setImpliedByThis, a)
+          }
         />
       </div>
     );
   }, [impliedByThis, tagName]);
 
+  return getImpliedByThis;
+};
+
+const useImplying = (props: ImplicationsCardProps) => {
+  const { tagName } = props;
+  const [implyingThis, setImplyingThis] = useState(props.tag.implying_this);
+
   const getImplyingThis = useMemo((): any => {
-    const removeImplyingThis = (a: string): void => {
-      Api.Tags.removeImplication(a, tagName).then(
-        res => {
-          updateArrays("Remove", implyingThis, setImplyingThis, a);
-        },
-        err => {
-          console.log(err);
-        }
+    const removeImplyingThis = (a: string) =>
+      removeHelper(
+        Api.Tags.removeImplication(a, tagName),
+        implyingThis,
+        setImplyingThis,
+        a
       );
-    };
-
-    const getListImplyingThis = () => {
-      if (implyingThis.length === 0) return null;
-      return (
-        <ul>
-          {implyingThis.map(a => (
-            <Fragment key={a}>
-              <li>
-                {a}
-                <a
-                  className="beevenue-alias-delete delete is-small"
-                  onClick={e => removeImplyingThis(a)}
-                />
-              </li>
-            </Fragment>
-          ))}
-        </ul>
-      );
-    };
-
-    const onImplyingThisAdded = (a: string): void => {
-      updateArrays("Add", implyingThis, setImplyingThis, a);
-    };
 
     return (
       <div>
         Implying this:
-        {getListImplyingThis()}
+        {listHelper(implyingThis, removeImplyingThis)}
         <AddImplicationField
           tag={tagName}
           mode={"ImplyingThis"}
-          onImplicationAdded={a => onImplyingThisAdded(a)}
+          onImplicationAdded={a =>
+            updateArrays("Add", implyingThis, setImplyingThis, a)
+          }
         />
       </div>
     );
   }, [implyingThis, tagName]);
+
+  return getImplyingThis;
+};
+
+const ImplicationsCard = (props: ImplicationsCardProps) => {
+  const getImpliedByThis = useImplied(props);
+  const getImplyingThis = useImplying(props);
 
   return (
     <div className="card beevenue-sidebar-card">
