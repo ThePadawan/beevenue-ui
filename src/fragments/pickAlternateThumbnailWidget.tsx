@@ -27,12 +27,8 @@ const usePicks = (id: number, pickCount: number) => {
   const [isLoading, setIsLoading] = useState(false);
   const [picks, setPicks] = useState<string[] | null>(null);
 
-  const startLoading = () => {
-    setIsLoading(true);
-  };
-
   const onClick = () => {
-    startLoading();
+    setIsLoading(true);
     Api.Medium.generateThumbnailPicks(id, pickCount).then(success => {
       setIsLoading(false);
       setPicks(success.data.thumbs);
@@ -40,11 +36,9 @@ const usePicks = (id: number, pickCount: number) => {
   };
 
   const choosePick = (i: number) => {
-    if (!picks) {
-      return;
-    }
+    if (!picks) return;
 
-    startLoading();
+    setIsLoading(true);
     Api.Medium.selectThumbnailPick(id, i, picks.length).then(success => {
       setIsLoading(false);
       setPicks(null);
