@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons/faUpload";
 
@@ -20,7 +20,8 @@ const getOnChangeHandler = (
 
 const useSubmitHandler = () => {
   const [files, setFiles] = useState<FileList | null>(null);
-  const [doneCount, setDoneCount] = useState(0);
+  const doneCount = useRef(0);
+  const [visibleDoneCount, setVisibleDoneCount] = useState(0);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -34,21 +35,27 @@ const useSubmitHandler = () => {
   const dispatch = useDispatch();
   async function uploadFile(f: File) {
     await Api.uploadMedium(f).finally(() => {
-      const newDoneCount = doneCount + 1;
-      if (files && newDoneCount === files.length) {
-        setDoneCount(newDoneCount);
+      doneCount.current = doneCount.current + 1;
+      setVisibleDoneCount(c => c + 1);
+
+      if (files && doneCount.current === files.length) {
         dispatch(setFileUploaded());
 
         setTimeout(() => {
           setFiles(null);
-          setDoneCount(0);
+          doneCount.current = 0;
+          setVisibleDoneCount(0);
         }, 5000);
       }
     });
   }
 
+  const setDoneCount = (i: number) => {
+    doneCount.current = i;
+  };
+
   const onChange = getOnChangeHandler(setFiles, setDoneCount);
-  return { files, onChange, doneCount, onSubmit };
+  return { files, onChange, doneCount: visibleDoneCount, onSubmit };
 };
 
 const getProgressBarClasses = (doneCount: number, files: FileList | null) => {
