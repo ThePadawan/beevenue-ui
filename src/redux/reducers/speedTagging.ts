@@ -3,7 +3,7 @@ import {
   TOGGLE_SPEED_TAGGING_ITEM,
   CLEAR_SPEED_TAGGING_ITEMS
 } from "../actionTypes";
-import { SpeedTaggingStore } from "../store";
+import { SpeedTaggingStore } from "../storeTypes";
 
 const initialState: SpeedTaggingStore = {
   isSpeedTagging: false,

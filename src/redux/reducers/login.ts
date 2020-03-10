@@ -4,7 +4,7 @@ import {
   LOGIN_ANONYMOUS,
   SET_SFW_SESSION
 } from "../actionTypes";
-import { LoginStore, Unknown, Anonymous } from "../store";
+import { LoginStore, Unknown, Anonymous } from "../storeTypes";
 
 const initialState: LoginStore = {
   loggedInUser: Unknown,

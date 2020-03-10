@@ -3,7 +3,7 @@ import {
   DISMISS_NOTIFICATION,
   DISMISS_ALL_NOTIFICATIONS
 } from "../actionTypes";
-import { NotificationStore } from "../store";
+import { NotificationStore } from "../storeTypes";
 
 const initialState: NotificationStore = {
   notifications: {}

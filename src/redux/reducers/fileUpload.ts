@@ -1,5 +1,5 @@
 import { SET_FILE_UPLOADED } from "../actionTypes";
-import { FileUploadStore } from "../store";
+import { FileUploadStore } from "../storeTypes";
 
 const initialState: FileUploadStore = { lastFileUploaded: -Infinity };
 

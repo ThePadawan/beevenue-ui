@@ -60,21 +60,27 @@ const _notification_wrapper = (p: AxiosPromise<any>): AxiosPromise<any> => {
 };
 
 const Api = {
-  show(id: number): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`medium/${id}`));
-  },
-
-  getAnyMissing(): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`tags/missing/any`));
-  },
-
   Medium: {
+    delete(id: number): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.delete(`medium/${id}`));
+    },
     generateThumbnailPicks(mediumId: number, n: number): AxiosPromise<any> {
       return axiosClient.get(`medium/${mediumId}/thumbnail/picks/${n}`, {
         // This could potentially take a really long time. Turn off timeouts
         // completely for this request.
         timeout: 0
       });
+    },
+    load(params: LoadMediaParameters): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get(`media`, { params }));
+    },
+    regenerateThumbnail(mediumId: number): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.patch(`thumbnail/${mediumId}`));
+    },
+    search(searchParams: SearchParameters): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.get("search", { params: searchParams })
+      );
     },
     selectThumbnailPick(
       mediumId: number,
@@ -88,16 +94,51 @@ const Api = {
           timeout: 0
         })
       );
+    },
+    show(id: number): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get(`medium/${id}`));
+    },
+    update(params: UpdateMediumParameters): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.patch(
+          `medium/${params.id}`,
+          pick(params, ["rating", "tags"])
+        )
+      );
+    },
+    upload(file: File): AxiosPromise<any> {
+      const fd = new FormData();
+      fd.append("file", file);
+      return _notification_wrapper(axiosClient.post("medium", fd));
     }
   },
 
   Tags: {
-    patch(name: string, body: object): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.patch(`tag/${name}`, body));
+    addAlias(tag: string, alias: string): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.post(`tag/${tag}/aliases/${alias}`)
+      );
     },
 
-    show(name: string): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.get(`tag/${name}`));
+    addImplication(
+      implying_this: string,
+      implied_by_this: string
+    ): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.patch(
+          `tag/${implying_this}/implications/${implied_by_this}`
+        )
+      );
+    },
+
+    batchAdd(tags: string[], mediumIds: number[]): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.post(`tags/batch`, { tags, mediumIds })
+      );
+    },
+
+    getAnyMissing(): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get(`tags/missing/any`));
     },
 
     getImplications(): AxiosPromise<ImplicationData> {
@@ -116,32 +157,13 @@ const Api = {
       return _notification_wrapper(axiosClient.get(`tags/missing/${mediumId}`));
     },
 
-    addAlias(tag: string, alias: string): AxiosPromise<any> {
-      return _notification_wrapper(
-        axiosClient.post(`tag/${tag}/aliases/${alias}`)
-      );
+    patch(name: string, body: object): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.patch(`tag/${name}`, body));
     },
 
     removeAlias(tag: string, alias: string): AxiosPromise<any> {
       return _notification_wrapper(
         axiosClient.delete(`tag/${tag}/aliases/${alias}`)
-      );
-    },
-
-    batchAdd(tags: string[], mediumIds: number[]): AxiosPromise<any> {
-      return _notification_wrapper(
-        axiosClient.post(`tags/batch`, { tags, mediumIds })
-      );
-    },
-
-    addImplication(
-      implying_this: string,
-      implied_by_this: string
-    ): AxiosPromise<any> {
-      return _notification_wrapper(
-        axiosClient.patch(
-          `tag/${implying_this}/implications/${implied_by_this}`
-        )
       );
     },
 
@@ -154,6 +176,10 @@ const Api = {
           `tag/${implying_this}/implications/${implied_by_this}`
         )
       );
+    },
+
+    show(name: string): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get(`tag/${name}`));
     }
   },
 
@@ -175,50 +201,24 @@ const Api = {
     }
   },
 
-  loadMedia(params: LoadMediaParameters): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get(`media`, { params }));
-  },
+  Session: {
+    login(data: LoginParameters): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.post("login", data));
+    },
 
-  deleteMedium(id: number): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.delete(`medium/${id}`));
-  },
+    setSfw(sfw: boolean): AxiosPromise<any> {
+      return _notification_wrapper(
+        axiosClient.patch("sfw", { sfwSession: sfw })
+      );
+    },
 
-  updateMedium(params: UpdateMediumParameters): AxiosPromise<any> {
-    return _notification_wrapper(
-      axiosClient.patch(`medium/${params.id}`, pick(params, ["rating", "tags"]))
-    );
-  },
+    logout(): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.post("logout"));
+    },
 
-  uploadMedium(file: File): AxiosPromise<any> {
-    const fd = new FormData();
-    fd.append("file", file);
-    return _notification_wrapper(axiosClient.post("medium", fd));
-  },
-
-  regenerateThumbnail(mediumId: number): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.patch(`thumbnail/${mediumId}`));
-  },
-
-  login(data: LoginParameters): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.post("login", data));
-  },
-
-  setSfwSession(sfw: boolean): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.patch("sfw", { sfwSession: sfw }));
-  },
-
-  search(searchParams: SearchParameters): AxiosPromise<any> {
-    return _notification_wrapper(
-      axiosClient.get("search", { params: searchParams })
-    );
-  },
-
-  logout(): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.post("logout"));
-  },
-
-  amILoggedIn(): AxiosPromise<any> {
-    return _notification_wrapper(axiosClient.get("login"));
+    amILoggedIn(): AxiosPromise<any> {
+      return _notification_wrapper(axiosClient.get("login"));
+    }
   }
 };
 

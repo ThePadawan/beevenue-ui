@@ -1,5 +1,5 @@
 import { SET_SHOULD_REFRESH } from "../actionTypes";
-import { RefreshStore } from "../store";
+import { RefreshStore } from "../storeTypes";
 
 const initialState: RefreshStore = { shouldRefresh: false };
 

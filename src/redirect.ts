@@ -1,4 +1,4 @@
-import history from "./history";
+import history from "./beevenueHistory";
 
 export const forceRedirect = (target: string, doReplace?: boolean) => {
   let actualDoReplace = false;

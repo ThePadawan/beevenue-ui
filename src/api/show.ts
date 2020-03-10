@@ -1,4 +1,4 @@
-import { MimeType } from "../media";
+import { MimeType } from "../detail/media";
 
 export type Rating = "u" | "s" | "q" | "e";
 

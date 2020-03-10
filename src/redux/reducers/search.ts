@@ -1,5 +1,5 @@
 import { NEW_SEARCH_QUERY } from "../actionTypes";
-import { SearchStore } from "../store";
+import { SearchStore } from "../storeTypes";
 
 const initialState: SearchStore = { searchQuery: "" };
 

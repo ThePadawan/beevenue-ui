@@ -1,4 +1,4 @@
-import { BeevenueStore } from "../store";
+import { BeevenueStore } from "../storeTypes";
 import { useSelector, TypedUseSelectorHook } from "react-redux";
 
 export const useBeevenueSelector: TypedUseSelectorHook<BeevenueStore> = useSelector;

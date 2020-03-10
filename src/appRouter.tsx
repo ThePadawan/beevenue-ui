@@ -1,35 +1,32 @@
 import React, { Suspense, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Router, Route, Switch } from "react-router-dom";
-import debounce from "lodash-es/debounce";
-import { BeevenueSpinner } from "./fragments/beevenueSpinner";
+import { BeevenueSpinner } from "./beevenueSpinner";
 
-import { IndexPage, ShowPage } from "./pages";
-
-import history from "./history";
-import { Api } from "./api/api";
+import history from "./beevenueHistory";
+import { Api } from "api";
 import { login, loginAnonymous } from "./redux/actions";
+import { BeevenuePage } from "./routing/beevenuePage";
 
-const WildcardPage = React.lazy(() => import("./pages/wildcardPage"));
-const TagStatisticsPage = React.lazy(() => import("./pages/tagStatisticsPage"));
-const TagsPage = React.lazy(() => import("./pages/tagsPage"));
-const TagShowPage = React.lazy(() => import("./pages/tagShowPage"));
-const RulesPage = React.lazy(() => import("./pages/rulesPage"));
-const SearchResultsPage = React.lazy(() => import("./pages/searchResultsPage"));
+import { IndexPage } from "./wall/indexPage";
+const SearchResultsPage = React.lazy(() => import("./wall/searchResultsPage"));
+
+const TagStatisticsPage = React.lazy(() => import("./tags/tagStatisticsPage"));
+const TagsPage = React.lazy(() => import("./tags/tagsPage"));
+const TagDetailPage = React.lazy(() => import("./tags/tagShowPage"));
+
+const DetailPage = React.lazy(() => import("./detail/detailPage"));
+
+const RulesPage = React.lazy(() => import("./rules/rulesPage"));
+
+const WildcardPage = React.lazy(() => import("./routing/wildcardPage"));
 
 const AppRouter = () => {
   const [hasUser, setHasUser] = useState(false);
-
   const dispatch = useDispatch();
 
-  const setHasUserDebounced = () => {
-    debounce(() => {
-      setHasUser(true);
-    }, 20)();
-  };
-
   useEffect(() => {
-    Api.amILoggedIn()
+    Api.Session.amILoggedIn()
       .then(res => {
         if (res.data) {
           dispatch(login(res.data));
@@ -38,7 +35,7 @@ const AppRouter = () => {
         }
       })
       .finally(() => {
-        setHasUserDebounced();
+        setHasUser(true);
       });
   }, [dispatch]);
 
@@ -56,18 +53,20 @@ const AppRouter = () => {
 
   return (
     <Router history={history}>
-      <Suspense fallback={fallback}>
-        <Switch>
-          <Route path="/" exact component={IndexPage} />
-          <Route path="/search/:extra(.+)" component={SearchResultsPage} />
-          <Route path="/show/:id" component={ShowPage} />
-          <Route path="/tags" component={TagsPage} />
-          <Route path="/tagStats" component={TagStatisticsPage} />
-          <Route path="/tag/:name" component={TagShowPage} />
-          <Route path="/rules" component={RulesPage} />
-          <Route path="/:whatever" component={WildcardPage} />
-        </Switch>
-      </Suspense>
+      <BeevenuePage>
+        <Suspense fallback={fallback}>
+          <Switch>
+            <Route path="/" exact component={IndexPage} />
+            <Route path="/search/:extra(.+)" component={SearchResultsPage} />
+            <Route path="/show/:id" component={DetailPage} />
+            <Route path="/tags" component={TagsPage} />
+            <Route path="/tagStats" component={TagStatisticsPage} />
+            <Route path="/tag/:name" component={TagDetailPage} />
+            <Route path="/rules" component={RulesPage} />
+            <Route path="/:whatever" component={WildcardPage} />
+          </Switch>
+        </Suspense>
+      </BeevenuePage>
     </Router>
   );
 };
