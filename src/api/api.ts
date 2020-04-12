@@ -109,7 +109,13 @@ const Api = {
     upload(file: File): AxiosPromise<any> {
       const fd = new FormData();
       fd.append("file", file);
-      return _notification_wrapper(axiosClient.post("medium", fd));
+      return _notification_wrapper(
+        axiosClient.post("medium", fd, {
+          // This could potentially take a really long time. Turn off timeouts
+          // completely for this request.
+          timeout: 0
+        })
+      );
     }
   },
 
