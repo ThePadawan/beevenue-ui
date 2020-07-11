@@ -2,7 +2,7 @@ import { backendUrl } from "../config.json";
 
 type ImageMimeType = "image/gif" | "image/png" | "image/jpeg" | "image/jpg";
 
-type VideoMimeType = "video/mp4" | "video/webm";
+type VideoMimeType = "video/mp4" | "video/webm" | "video/x-matroska";
 
 export type MimeType = ImageMimeType | VideoMimeType;
 
@@ -15,7 +15,8 @@ export const MimeTypeToExtension = (id: MimeType): Extension => {
     "image/jpeg": ".jpg",
     "image/jpg": ".jpg",
     "video/mp4": ".mp4",
-    "video/webm": ".webm"
+    "video/webm": ".webm",
+    "video/x-matroska": ".mkv",
   };
 
   return dict[id];
