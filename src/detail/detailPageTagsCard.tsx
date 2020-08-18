@@ -25,7 +25,7 @@ const renderTag = (props: any) => {
           <span className="tag">{displayValue}</span>
         </Link>
         {!disabled && (
-          <a className="tag is-delete" onClick={e => onRemove(key)} />
+          <a className="tag is-delete" onClick={(e) => onRemove(key)} />
         )}
       </div>
     </div>
@@ -53,7 +53,7 @@ const DetailPageTagsCard = (props: DetailPageTagsCardProps) => {
   return (
     <nav className="level beevenue-medium-tags">
       <TagsInput
-        value={viewModel.tags}
+        value={viewModel.tags.sort()}
         disabled={userIsAdmin ? undefined : true}
         className="tagsinput field is-grouped is-grouped-multiline input"
         tagProps={{ className: "tags has-addons" }}
