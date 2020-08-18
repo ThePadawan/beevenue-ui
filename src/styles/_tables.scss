@@ -1,0 +1,11 @@
+.table.is-striped tbody tr:not(.is-selected):nth-child(even).is-error {
+  background-color: hsl(48, 100%, 67%);
+}
+
+.table.is-striped tbody tr:not(.is-selected).is-error {
+  background-color: hsl(48, 100%, 67%);
+}
+
+.beevenue-tag-missing-rating {
+  background-color: hsl(48, 100%, 67%);
+}

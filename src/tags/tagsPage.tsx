@@ -11,19 +11,19 @@ import { Tag } from "./tag";
 import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 
 const useFoo = () => {
-  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
+  const loggedInRole = useBeevenueSelector((store) => store.login.loggedInRole);
   const isSessionSfw = useIsSessionSfw();
   const [tags, setTags] = useState<Tag[]>([]);
   const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
     Api.Tags.getStatistics().then(
-      res => {
+      (res) => {
         let tags = res.data.tags;
-        tags = sortBy(tags, t => t.mediaCount).reverse();
+        tags = sortBy(tags, (t) => t.mediaCount).reverse();
         setTags(tags);
       },
-      err => {
+      (err) => {
         console.error(err);
       }
     );
@@ -33,7 +33,7 @@ const useFoo = () => {
     loggedInRole,
     filter,
     setFilter,
-    tags
+    tags,
   };
 };
 
@@ -66,7 +66,7 @@ const renderTag = (t: Tag, isAdmin: boolean): JSX.Element => {
   );
 
   return (
-    <tr key={t.tag}>
+    <tr key={t.tag} className={t.rating === "u" ? "is-error" : undefined}>
       <td>{tagLink(t, isAdmin)}</td>
       <td>{maybeRenderTooltip(t)}</td>
       <td>{ratingCell}</td>
@@ -76,9 +76,12 @@ const renderTag = (t: Tag, isAdmin: boolean): JSX.Element => {
 };
 
 const renderTagMobile = (t: Tag, isAdmin: boolean): JSX.Element => {
+  const classNames = ["card"];
+  if (t.rating === "u") classNames.push("beevenue-tag-missing-rating");
+
   return (
     <nav className="level" key={t.tag}>
-      <div className="card">
+      <div className={classNames.join(" ")}>
         <header className="card-header">
           <p className="card-header-title">
             {tagLink(t, isAdmin)}
@@ -106,7 +109,7 @@ const renderFilter = (filter: string, setFilter: (s: string) => void) => {
         type="text"
         placeholder="Filter"
         value={filter}
-        onChange={e => setFilter(e.currentTarget.value)}
+        onChange={(e) => setFilter(e.currentTarget.value)}
       />
     </div>
   );
@@ -115,7 +118,7 @@ const renderFilter = (filter: string, setFilter: (s: string) => void) => {
 const renderTable = (filteredTags: Tag[], isAdmin: boolean) => {
   return (
     <div>
-      <table className="table is-hidden-mobile is-striped is-narrow is-hoverable">
+      <table className="beevenue-table table is-hidden-mobile is-striped is-narrow is-hoverable">
         <thead>
           <tr>
             <th>Tag</th>
@@ -124,10 +127,10 @@ const renderTable = (filteredTags: Tag[], isAdmin: boolean) => {
             <th>Media</th>
           </tr>
         </thead>
-        <tbody>{filteredTags.map(t => renderTag(t, isAdmin))}</tbody>
+        <tbody>{filteredTags.map((t) => renderTag(t, isAdmin))}</tbody>
       </table>
       <div className="is-hidden-tablet">
-        {filteredTags.map(t => renderTagMobile(t, isAdmin))}
+        {filteredTags.map((t) => renderTagMobile(t, isAdmin))}
       </div>
     </div>
   );
@@ -136,7 +139,7 @@ const renderTable = (filteredTags: Tag[], isAdmin: boolean) => {
 const getFilteredTags = (tags: Tag[], filter: string): Tag[] => {
   try {
     const regex = new RegExp(filter);
-    return tags.filter(t => regex.test(t.tag));
+    return tags.filter((t) => regex.test(t.tag));
   } catch {
     return tags;
   }
@@ -148,7 +151,7 @@ const TagsPage = () => {
 
   const filteredTags = useMemo(() => getFilteredTags(tags, filter), [
     tags,
-    filter
+    filter,
   ]);
 
   const renderContent = () => {
