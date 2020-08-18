@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import {
   toggleSpeedTagging,
   setShouldRefresh,
-  clearSpeedTaggingItems
+  clearSpeedTaggingItems,
 } from "../../redux/actions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
@@ -21,7 +21,7 @@ const useTagsInputField = () => {
         type="text"
         placeholder="Tags"
         value={tags}
-        onChange={e => setTags(e.currentTarget.value)}
+        onChange={(e) => setTags(e.currentTarget.value)}
       />
     </div>
   );
@@ -35,7 +35,7 @@ const useMarkCheckbox = (dispatch: (x: any) => void) => {
   };
 
   const isSpeedTagging = useBeevenueSelector(
-    store => store.speedTagging.isSpeedTagging
+    (store) => store.speedTagging.isSpeedTagging
   );
 
   return (
@@ -46,7 +46,7 @@ const useMarkCheckbox = (dispatch: (x: any) => void) => {
         name="speed-tagger-switch"
         className="switch"
         defaultChecked={isSpeedTagging}
-        onChange={_ => toggle()}
+        onChange={(_) => toggle()}
       />
       <label htmlFor="speed-tagger-switch">Mark</label>
     </div>
@@ -83,7 +83,7 @@ const getGoButton = (
     <div className="field">
       <a
         className="button"
-        onClick={_ => go(speedTaggingItems, tags, dispatch)}
+        onClick={(_) => go(speedTaggingItems, tags, dispatch)}
       >
         <FontAwesomeIcon icon={faCheck} />
       </a>
@@ -107,7 +107,7 @@ const useForm = (speedTaggingItems: any[]) => {
 };
 
 const SpeedTaggerPanel = () => {
-  const speedTaggingItems = useBeevenueSelector(store =>
+  const speedTaggingItems = useBeevenueSelector((store) =>
     store.speedTagging.speedTaggingItems.slice()
   );
 

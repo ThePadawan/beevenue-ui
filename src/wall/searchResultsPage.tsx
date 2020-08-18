@@ -33,7 +33,7 @@ const SearchResultsPage = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const shouldRefresh = useBeevenueSelector(
-    store => store.refresh.shouldRefresh
+    (store) => store.refresh.shouldRefresh
   );
 
   const isSessionSfw = useIsSessionSfw();
@@ -52,11 +52,11 @@ const SearchResultsPage = () => {
       setResults(null);
       setDoShowSpinner(true);
       Api.Medium.search(queryParams).then(
-        res => {
+        (res) => {
           setResults(res.data);
           setDoShowSpinner(false);
         },
-        _ => {}
+        (_) => {}
       );
     },
     [location]
@@ -91,7 +91,8 @@ const SearchResultsPage = () => {
     dispatch,
     doSearch,
     isSessionSfw,
-    getSearchTermsFromRoute
+    getSearchTermsFromRoute,
+    shouldRefresh,
   ]);
 
   let inner = null;
