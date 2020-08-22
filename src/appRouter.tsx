@@ -18,6 +18,7 @@ const TagDetailPage = React.lazy(() => import("./tags/tagShowPage"));
 const DetailPage = React.lazy(() => import("./detail/detailPage"));
 
 const RulesPage = React.lazy(() => import("./rules/rulesPage"));
+const StatsPage = React.lazy(() => import("./stats/statsPage"));
 
 const WildcardPage = React.lazy(() => import("./routing/wildcardPage"));
 
@@ -27,7 +28,7 @@ const AppRouter = () => {
 
   useEffect(() => {
     Api.Session.amILoggedIn()
-      .then(res => {
+      .then((res) => {
         if (res.data) {
           dispatch(login(res.data));
         } else {
@@ -61,6 +62,7 @@ const AppRouter = () => {
             <Route path="/show/:id" component={DetailPage} />
             <Route path="/tags" component={TagsPage} />
             <Route path="/tagStats" component={TagStatisticsPage} />
+            <Route path="/stats" component={StatsPage} />
             <Route path="/tag/:name" component={TagDetailPage} />
             <Route path="/rules" component={RulesPage} />
             <Route path="/:whatever" component={WildcardPage} />

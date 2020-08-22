@@ -10,10 +10,11 @@ const LinksPanel = (props: LinksPanelProps) => {
   const cardContent = () => {
     let items = [
       <Link to="/tags">Tags</Link>,
-      <Link to="/tagStats">Tag statistics</Link>
+      <Link to="/tagStats">Tag statistics</Link>,
     ];
 
     if (props.isAdmin) {
+      items.push(<Link to="/stats">Statistics</Link>);
       items.push(<Link to="/rules">Configure rules</Link>);
       items.push(<RandomRuleViolationLink />);
     }

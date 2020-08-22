@@ -12,7 +12,7 @@ import { ImplicationData } from "./implications";
 const axiosClient = axios.create({
   baseURL: `${backendUrl}/`,
   timeout: backendTimeoutMs,
-  withCredentials: true
+  withCredentials: true,
 });
 
 interface LoginParameters {
@@ -47,11 +47,11 @@ const dispatcher = (x: any) => {
 const _notification_wrapper = (p: AxiosPromise<any>): AxiosPromise<any> => {
   return new Promise((resolve, reject) => {
     p.then(
-      success => {
+      (success) => {
         dispatcher(success.data);
         resolve(success);
       },
-      error => {
+      (error) => {
         dispatcher(error.response.data);
         reject(error);
       }
@@ -68,7 +68,7 @@ const Api = {
       return axiosClient.get(`medium/${mediumId}/thumbnail/picks/${n}`, {
         // This could potentially take a really long time. Turn off timeouts
         // completely for this request.
-        timeout: 0
+        timeout: 0,
       });
     },
     load(params: LoadMediaParameters): AxiosPromise<any> {
@@ -91,7 +91,7 @@ const Api = {
         axiosClient.patch(`medium/${mediumId}/thumbnail/pick/${i}/${n}`, {
           // This could potentially take a really long time. Turn off timeouts
           // completely for this request.
-          timeout: 0
+          timeout: 0,
         })
       );
     },
@@ -113,10 +113,10 @@ const Api = {
         axiosClient.post("medium", fd, {
           // This could potentially take a really long time. Turn off timeouts
           // completely for this request.
-          timeout: 0
+          timeout: 0,
         })
       );
-    }
+    },
   },
 
   Tags: {
@@ -186,7 +186,7 @@ const Api = {
 
     show(name: string): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get(`tag/${name}`));
-    }
+    },
   },
 
   Rules: {
@@ -204,7 +204,7 @@ const Api = {
 
     uploadJson(json: any): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.post(`rules`, json));
-    }
+    },
   },
 
   Session: {
@@ -224,8 +224,24 @@ const Api = {
 
     amILoggedIn(): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get("login"));
-    }
-  }
+    },
+  },
+
+  Stats: {
+    get(): AxiosPromise<any> {
+      return axiosClient.post("graphql", {
+        query: `{
+          statistics
+          {
+              ratings
+              {
+                  q, s, e, u
+              }
+          }
+        }`,
+      });
+    },
+  },
 };
 
 export { Api };

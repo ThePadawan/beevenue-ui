@@ -44,11 +44,11 @@ const preprocessNodes = (data: SimilarityData) => {
     return groupDict.get(m)!;
   };
 
-  let nodes: NodeDatum[] = Object.keys(data.nodes).map(k => ({
+  let nodes: NodeDatum[] = Object.keys(data.nodes).map((k) => ({
     id: k,
     hasAny: false,
     group: grouper(k),
-    size: data.nodes[k].size
+    size: data.nodes[k].size,
   }));
 
   return nodes;
@@ -66,15 +66,15 @@ const preprocessLinks = (
     for (let [key2, value2] of Object.entries(v)) {
       const v3: any = value2;
       if (v3.similarity < opts.simThreshold) continue;
-      if (links.findIndex(l => l.source === key2 && l.target === key) !== -1)
+      if (links.findIndex((l) => l.source === key2 && l.target === key) !== -1)
         continue;
 
       // Tag nodes if they are involved in any edge (so we can hide them later if we want)
-      let node = nodes.find(n => n.id === key);
+      let node = nodes.find((n) => n.id === key);
       if (node) {
         node.hasAny = true;
       }
-      node = nodes.find(n => n.id === key2);
+      node = nodes.find((n) => n.id === key2);
       if (node) {
         node.hasAny = true;
       }
@@ -83,7 +83,7 @@ const preprocessLinks = (
         source: key,
         target: key2,
         similarity: v3.similarity,
-        relevance: v3.relevance
+        relevance: v3.relevance,
       });
     }
   }
@@ -115,16 +115,16 @@ const createSimulation = (
       "link",
       d3
         .forceLink<NodeDatum, LinkDatum>(links)
-        .id(d => d.id)
-        .strength(l => 2 * l.similarity)
+        .id((d) => d.id)
+        .strength((l) => 2 * l.similarity)
     )
     .force(
       "charge",
-      d3.forceManyBody().strength(_ => -3)
+      d3.forceManyBody().strength((_) => -3)
     )
     .force(
       "collision",
-      d3.forceCollide().radius(_ => 16)
+      d3.forceCollide().radius((_) => 16)
     )
     .force("center", d3.forceCenter(opts.width / 2, opts.height / 2));
 };
@@ -190,7 +190,7 @@ export const createSimilaritySvg = (
     hideSingletonNodes: true,
     simThreshold: 0.4,
     width: 800,
-    height: 800
+    height: 800,
   };
 
   const opts: CreateSvgOptions2 = { ...defaultOptions, ...options };
