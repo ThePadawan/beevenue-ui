@@ -39,7 +39,7 @@ const usePicks = (id: number, pickCount: number) => {
     if (!picks) return;
 
     setIsLoading(true);
-    Api.Medium.selectThumbnailPick(id, i, picks.length).then(success => {
+    Api.Medium.selectThumbnailPick(id, i, pickCount).then(success => {
       setIsLoading(false);
       setPicks(null);
     });
