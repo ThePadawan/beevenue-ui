@@ -77,6 +77,17 @@ const Api = {
     regenerateThumbnail(mediumId: number): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.patch(`thumbnail/${mediumId}`));
     },
+    replace(mediumId: number, file: File) : AxiosPromise<any> {
+      const fd = new FormData();
+      fd.append("file", file);
+      return _notification_wrapper(
+        axiosClient.patch(`medium/${mediumId}/file`, fd, {
+          // This could potentially take a really long time. Turn off timeouts
+          // completely for this request.
+          timeout: 0,
+        })
+      );
+    },
     search(searchParams: SearchParameters): AxiosPromise<any> {
       return _notification_wrapper(
         axiosClient.get("search", { params: searchParams })
@@ -101,7 +112,7 @@ const Api = {
     update(params: UpdateMediumParameters): AxiosPromise<any> {
       return _notification_wrapper(
         axiosClient.patch(
-          `medium/${params.id}`,
+          `medium/${params.id}/metadata`,
           pick(params, ["rating", "tags"])
         )
       );

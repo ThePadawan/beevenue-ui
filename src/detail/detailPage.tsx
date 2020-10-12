@@ -41,10 +41,10 @@ const useRefreshOnUpdate = (setViewModel: (vm: ShowViewModel) => void) => {
 
   useEffect(() => {
     Api.Medium.show(id).then(
-      res => {
+      (res) => {
         setViewModel(res.data as ShowViewModel);
       },
-      err => {
+      (err) => {
         if (err.response.status === 401) {
           dispatch(addNotLoggedInNotification());
         }
@@ -63,7 +63,7 @@ const updateMedium = (
 ): void => {
   const params = pick(newViewModel, ["id", "tags", "rating"]);
   setViewModel(newViewModel);
-  Api.Medium.update(params).then(res => {
+  Api.Medium.update(params).then((res) => {
     setViewModel(res.data as ShowViewModel);
   });
 };
@@ -75,7 +75,7 @@ const onChange = (
   const onTagsChange = (newTags: string[]) => {
     // Technically, the user can't manually enter these characters.
     // However, by pasting them, they can still occur in here.
-    const cleanTags = newTags.map(unclean => {
+    const cleanTags = newTags.map((unclean) => {
       return unclean.replace(/[\t\r\n ]/g, "");
     });
 
@@ -101,12 +101,18 @@ const useSetup = () => {
   useClosePageOnSfw(viewModel);
 
   const { onTagsChange, onRatingChange } = onChange(viewModel, setViewModel);
-  return { viewModel, id, onTagsChange, onRatingChange };
+  return { viewModel, setViewModel, id, onTagsChange, onRatingChange };
 };
 
 const DetailPage = () => {
-  const loggedInRole = useBeevenueSelector(store => store.login.loggedInRole);
-  const { viewModel, id, onTagsChange, onRatingChange } = useSetup();
+  const loggedInRole = useBeevenueSelector((store) => store.login.loggedInRole);
+  const {
+    viewModel,
+    setViewModel,
+    id,
+    onTagsChange,
+    onRatingChange,
+  } = useSetup();
   const userIsAdmin = loggedInRole === "admin";
 
   let view;
@@ -116,7 +122,9 @@ const DetailPage = () => {
         <Medium {...viewModel} />
         <DetailPageTagsCard {...{ viewModel, userIsAdmin, onTagsChange }} />
         <DetailPageRatingCard {...{ viewModel, userIsAdmin, onRatingChange }} />
-        <DetailPageAdminCard {...{ viewModel, userIsAdmin, mediumId: id }} />
+        <DetailPageAdminCard
+          {...{ viewModel, setViewModel, userIsAdmin, mediumId: id }}
+        />
       </>
     );
   } else {
