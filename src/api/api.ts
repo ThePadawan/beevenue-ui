@@ -130,6 +130,15 @@ const Api = {
     },
   },
 
+  Search: {
+    getValidators(): AxiosPromise<any> {
+      return axiosClient.get(`search/validators`);
+    },
+    getSuggestions(q: string): AxiosPromise<any> {
+      return axiosClient.get(`search/suggestions/${q}`);
+    }
+  },
+
   Tags: {
     addAlias(tag: string, alias: string): AxiosPromise<any> {
       return _notification_wrapper(

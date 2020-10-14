@@ -5,3 +5,16 @@
 .beevenue-sidebar > .level.beevenue-home {
   margin-bottom: 1.5rem;
 }
+
+.beevenue-searchbox {
+  max-width: fit-content;
+  min-width: 100%;
+}
+
+.beevenue-searchbox-hint {
+  color: grey;
+
+  &::after {
+    content: "…";
+  }
+}
