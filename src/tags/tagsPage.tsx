@@ -24,7 +24,7 @@ const useSetup = () => {
   useEffect(() => {
     Api.Tags.getSummary().then(
       (res) => {
-        let tags = res.data.tags;
+        let tags: SimpleTag[] = res.data.tags;
         tags = sortBy(tags, (t) => t.mediaCount).reverse();
         setTags(tags);
       },
@@ -63,8 +63,13 @@ const tagLink = (t: SimpleTag, isAdmin: boolean) => {
   return <Link to={url}>{t.tag}</Link>;
 };
 
-const onRatingChange = (tag: string, newRating: string): void => {
+const onRatingChange = (
+  tag: string,
+  el: HTMLInputElement,
+  newRating: string
+): void => {
   Api.Tags.patch(tag, { rating: newRating }); // Ignore result because we don't really care.
+  el.closest("tr")?.removeAttribute("class");
 };
 
 const tagRatingControl = (prefix: string, t: SimpleTag): JSX.Element => {
@@ -79,7 +84,7 @@ const tagRatingControl = (prefix: string, t: SimpleTag): JSX.Element => {
           type="radio"
           defaultChecked={t.rating === rating}
           name={name}
-          onChange={(e) => onRatingChange(t.tag, e.target.value)}
+          onChange={(e) => onRatingChange(t.tag, e.target, e.target.value)}
           value={rating}
           id={id}
         />
