@@ -6,14 +6,19 @@ import { Link } from "react-router-dom";
 import { BeevenueSpinner } from "../beevenueSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
-import { TagRatingControl } from "./tagRatingControl";
-import { Tag } from "./tag";
 import { useBeevenueSelector, useIsSessionSfw } from "../redux/selectors";
 
-const useFoo = () => {
+interface SimpleTag {
+  impliedBySomething: boolean;
+  mediaCount: number;
+  rating: string;
+  tag: string;
+}
+
+const useSetup = () => {
   const loggedInRole = useBeevenueSelector((store) => store.login.loggedInRole);
   const isSessionSfw = useIsSessionSfw();
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<SimpleTag[]>([]);
   const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
@@ -37,8 +42,8 @@ const useFoo = () => {
   };
 };
 
-const maybeRenderTooltip = (t: Tag): React.ReactNode => {
-  if (t.mediaCount === 0 && t.implyingThisCount > 0) {
+const maybeRenderTooltip = (t: SimpleTag): React.ReactNode => {
+  if (t.mediaCount === 0 && t.impliedBySomething) {
     const title =
       "This tag is not used on any media, but implied by other tags." +
       " It will stay in this list.";
@@ -49,7 +54,7 @@ const maybeRenderTooltip = (t: Tag): React.ReactNode => {
   return null;
 };
 
-const tagLink = (t: Tag, isAdmin: boolean) => {
+const tagLink = (t: SimpleTag, isAdmin: boolean) => {
   let url = `/search/${t.tag}`;
   if (isAdmin) {
     url = `/tag/${t.tag}`;
@@ -58,12 +63,36 @@ const tagLink = (t: Tag, isAdmin: boolean) => {
   return <Link to={url}>{t.tag}</Link>;
 };
 
-const renderTag = (t: Tag, isAdmin: boolean): JSX.Element => {
-  const ratingCell = isAdmin ? (
-    <TagRatingControl tag={t} prefix="large" />
-  ) : (
-    <p>{t.rating}</p>
-  );
+const onRatingChange = (tag: string, newRating: string): void => {
+  Api.Tags.patch(tag, { rating: newRating }); // Ignore result because we don't really care.
+};
+
+const tagRatingControl = (prefix: string, t: SimpleTag): JSX.Element => {
+  const name = `${prefix}-tag-${t.tag}`;
+
+  const ratingElement = (rating: string) => {
+    const id = `${name}-rating-${rating}`;
+    return (
+      <div className="beevenue-tag-rating" key={id}>
+        <input
+          className="is-checkradio"
+          type="radio"
+          defaultChecked={t.rating === rating}
+          name={name}
+          onChange={(e) => onRatingChange(t.tag, e.target.value)}
+          value={rating}
+          id={id}
+        />
+        <label htmlFor={id}>{rating}</label>
+      </div>
+    );
+  };
+
+  return <>{["s", "q", "e"].map(ratingElement)}</>;
+};
+
+const renderTag = (t: SimpleTag, isAdmin: boolean): JSX.Element => {
+  const ratingCell = isAdmin ? tagRatingControl("large", t) : <p>{t.rating}</p>;
 
   return (
     <tr key={t.tag} className={t.rating === "u" ? "is-error" : undefined}>
@@ -75,7 +104,7 @@ const renderTag = (t: Tag, isAdmin: boolean): JSX.Element => {
   );
 };
 
-const renderTagMobile = (t: Tag, isAdmin: boolean): JSX.Element => {
+const renderTagMobile = (t: SimpleTag, isAdmin: boolean): JSX.Element => {
   const classNames = ["card"];
   if (t.rating === "u") classNames.push("beevenue-tag-missing-rating");
 
@@ -90,11 +119,7 @@ const renderTagMobile = (t: Tag, isAdmin: boolean): JSX.Element => {
         </header>
         <div className="card-content">
           <p className="subtitle">Used {t.mediaCount} times</p>
-          {isAdmin ? (
-            <TagRatingControl tag={t} prefix="small" />
-          ) : (
-            <p>{t.rating}</p>
-          )}
+          {isAdmin ? tagRatingControl("small", t) : <p>{t.rating}</p>}
         </div>
       </div>
     </nav>
@@ -115,7 +140,7 @@ const renderFilter = (filter: string, setFilter: (s: string) => void) => {
   );
 };
 
-const renderTable = (filteredTags: Tag[], isAdmin: boolean) => {
+const renderTable = (filteredTags: SimpleTag[], isAdmin: boolean) => {
   return (
     <div>
       <table className="beevenue-table table is-hidden-mobile is-striped is-narrow is-hoverable">
@@ -136,7 +161,7 @@ const renderTable = (filteredTags: Tag[], isAdmin: boolean) => {
   );
 };
 
-const getFilteredTags = (tags: Tag[], filter: string): Tag[] => {
+const getFilteredTags = (tags: SimpleTag[], filter: string): SimpleTag[] => {
   try {
     const regex = new RegExp(filter);
     return tags.filter((t) => regex.test(t.tag));
@@ -146,7 +171,7 @@ const getFilteredTags = (tags: Tag[], filter: string): Tag[] => {
 };
 
 const TagsPage = () => {
-  const { loggedInRole, filter, setFilter, tags } = useFoo();
+  const { loggedInRole, filter, setFilter, tags } = useSetup();
   const isAdmin = loggedInRole === "admin";
 
   const filteredTags = useMemo(() => getFilteredTags(tags, filter), [
