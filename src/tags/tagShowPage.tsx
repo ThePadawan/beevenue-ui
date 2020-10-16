@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
@@ -30,10 +30,10 @@ const useInitialTagLoad = (
 ) => {
   useEffect(() => {
     Api.Tags.show(tagName).then(
-      res => {
+      (res) => {
         setTag(res.data);
       },
-      err => {
+      (err) => {
         setTagNotFound(true);
       }
     );
@@ -82,24 +82,25 @@ const TagDetailPage = () => {
     return <h3 className="subtitle is-5">Used {tag.count} times</h3>;
   };
 
-  let inner = null;
-  if (!tag) {
-    inner = <BeevenueSpinner />;
-  } else if (tagNotFound) {
-    inner = <div>No such tag</div>;
-  } else {
-    inner = (
-      <>
-        <TagDetailPageAliasCard
-          tag={tag}
-          tagName={tagName}
-          onAliasAdded={onAliasAdded}
-          onAliasRemoved={onAliasRemoved}
-        />
-        <ImplicationsCard tag={tag} tagName={tagName} />
-      </>
-    );
-  }
+  let inner = useMemo(() => {
+    if (!tag) {
+      return <BeevenueSpinner />;
+    } else if (tagNotFound) {
+      return <div>No such tag</div>;
+    } else {
+      return (
+        <>
+          <TagDetailPageAliasCard
+            tag={tag}
+            tagName={tagName}
+            onAliasAdded={onAliasAdded}
+            onAliasRemoved={onAliasRemoved}
+          />
+          <ImplicationsCard tag={tag} tagName={tagName} />
+        </>
+      );
+    }
+  }, [tag, tagName, onAliasAdded, onAliasRemoved, tagNotFound]);
 
   return (
     <>

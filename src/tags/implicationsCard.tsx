@@ -1,6 +1,7 @@
-import React, { Fragment, useState, useMemo } from "react";
+import React, { Fragment, useState, useMemo, useEffect } from "react";
 import { Api } from "api";
 import { AddImplicationField, Mode } from "./addImplicationField";
+import { Link } from "react-router-dom";
 
 type AddOrRemove = "Add" | "Remove";
 
@@ -35,15 +36,16 @@ const updateArrays = (
 
 const listHelper = (list: string[], callback: (s: string) => void) => {
   if (list.length === 0) return null;
+
   return (
     <ul>
-      {list.map(a => (
+      {list.map((a) => (
         <Fragment key={a}>
           <li>
-            {a}
+            <Link to={`/tag/${a}`}>{a}</Link>
             <a
               className="beevenue-alias-delete delete is-small"
-              onClick={e => callback(a)}
+              onClick={(e) => callback(a)}
             />
           </li>
         </Fragment>
@@ -59,10 +61,10 @@ const removeHelper = (
   a: string
 ) => {
   return apiCall.then(
-    res => {
+    (res) => {
       updateArrays("Remove", current, setter, a);
     },
-    err => {
+    (err) => {
       console.log(err);
     }
   );
@@ -74,6 +76,14 @@ const useHelper = (
   apiDeleteCall: (a: string, tagName: string) => Promise<any>
 ) => {
   const { tagName } = props;
+  // TODO: A props change in tagName doesn't lead to a refresh.
+  // Do we actually need to add a state var for it?
+
+  const [currentTagName, setCurrentTagName] = useState<string>(tagName);
+
+  useEffect(() => {
+    setCurrentTagName(tagName);
+  }, [tagName]);
 
   const initialArray =
     mode === "ImpliedByThis"
@@ -81,22 +91,26 @@ const useHelper = (
       : props.tag.implying_this;
   const [array, setArray] = useState(initialArray);
 
+  useEffect(() => {
+    setArray(initialArray);
+  }, [initialArray]);
+
   return useMemo((): any => {
     const remove = (a: string) =>
-      removeHelper(apiDeleteCall(a, tagName), array, setArray, a);
+      removeHelper(apiDeleteCall(a, currentTagName), array, setArray, a);
 
     return (
       <div>
         {mode === "ImpliedByThis" ? "Implied by this" : "Implying this"}:
         {listHelper(array, remove)}
         <AddImplicationField
-          tag={tagName}
+          tag={currentTagName}
           mode={mode}
-          onImplicationAdded={a => updateArrays("Add", array, setArray, a)}
+          onImplicationAdded={(a) => updateArrays("Add", array, setArray, a)}
         />
       </div>
     );
-  }, [array, tagName, mode, apiDeleteCall]);
+  }, [array, currentTagName, mode, apiDeleteCall]);
 };
 
 const ImplicationsCard = (props: ImplicationsCardProps) => {

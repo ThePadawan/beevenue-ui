@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Api } from "api";
 import { forceRedirect } from "../redirect";
 
@@ -8,6 +8,11 @@ interface EditableTitleFieldProps {
 
 const EditableTitleField = (props: EditableTitleFieldProps) => {
   const [currentTitle, setCurrentTitle] = useState(props.initialTitle);
+
+  useEffect(() => {
+    setCurrentTitle(props.initialTitle);
+  }, [props.initialTitle]);
+
   const [isBeingEdited, setIsBeingEdited] = useState(false);
 
   const onTitleChanged = (newTitle: string): void => {
@@ -36,8 +41,8 @@ const EditableTitleField = (props: EditableTitleFieldProps) => {
     }
 
     Api.Tags.patch(props.initialTitle, {
-      tag: currentTitle
-    }).then(_ => {
+      tag: currentTitle,
+    }).then((_) => {
       setIsBeingEdited(false);
       onTitleChanged(currentTitle || "");
     });
@@ -46,20 +51,20 @@ const EditableTitleField = (props: EditableTitleFieldProps) => {
   let content = null;
   if (isBeingEdited) {
     content = (
-      <form onSubmit={e => onSubmit(e)} className="beevenue-editable-title">
+      <form onSubmit={(e) => onSubmit(e)} className="beevenue-editable-title">
         <input
           className="input"
-          onBlur={e => stopEditing()}
+          onBlur={(e) => stopEditing()}
           type="text"
           autoFocus
           placeholder="Tag title"
-          onChange={e => onChange(e.currentTarget.value)}
+          onChange={(e) => onChange(e.currentTarget.value)}
           value={currentTitle || ""}
         />
       </form>
     );
   } else {
-    content = <span onClick={e => beginEditing()}>"{currentTitle}" tag</span>;
+    content = <span onClick={(e) => beginEditing()}>"{currentTitle}" tag</span>;
   }
 
   return <>{content}</>;

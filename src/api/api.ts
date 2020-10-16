@@ -166,7 +166,7 @@ const Api = {
       return axiosClient.get("tags/similarity");
     },
 
-    getStatistics(): AxiosPromise<any> {
+    getSummary(): AxiosPromise<any> {
       return _notification_wrapper(axiosClient.get("tags"));
     },
 

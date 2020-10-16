@@ -17,7 +17,7 @@ const useFoo = () => {
   const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
-    Api.Tags.getStatistics().then(
+    Api.Tags.getSummary().then(
       (res) => {
         let tags = res.data.tags;
         tags = sortBy(tags, (t) => t.mediaCount).reverse();

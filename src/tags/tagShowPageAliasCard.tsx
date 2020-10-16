@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AddAliasField } from "./addAliasField";
 import { Api } from "api";
 import { ShowTagViewModel } from "./tagShowPage";
@@ -17,13 +17,13 @@ const removeAlias = (
   setAliases: (f: (aliases: string[]) => string[]) => void,
   onAliasRemoved: (a: string) => void
 ): void => {
-  setAliases(x => {
+  setAliases((x) => {
     const indexOfAliasToRemove = x.indexOf(a);
     x.splice(indexOfAliasToRemove);
     return x.slice();
   });
 
-  Api.Tags.removeAlias(tagName, a).then(_ => {
+  Api.Tags.removeAlias(tagName, a).then((_) => {
     onAliasRemoved(a);
   });
 };
@@ -33,21 +33,26 @@ const onAliasAdded = (
   setAliases: (f: (aliases: string[]) => string[]) => void,
   a: string
 ) => {
-  setAliases(x => [...x, a]);
+  setAliases((x) => [...x, a]);
   parentOnAliasAdded(a);
 };
 
 const useAliases = (props: TagDetailPageAliasCardProps) => {
   const [aliases, setAliases] = useState<string[]>(props.tag.aliases);
+
+  useEffect(() => {
+    setAliases(props.tag.aliases);
+  }, [props.tag.aliases]);
+
   const currentAliases =
     aliases.length === 0 ? null : (
       <ul>
-        {aliases.sort().map(a => (
+        {aliases.sort().map((a) => (
           <li key={a}>
             {a}
             <a
               className="beevenue-alias-delete delete is-small"
-              onClick={e =>
+              onClick={(e) =>
                 removeAlias(props.tagName, a, setAliases, props.onAliasRemoved)
               }
             />
@@ -72,7 +77,9 @@ const TagDetailPageAliasCard = (props: TagDetailPageAliasCardProps) => {
           {currentAliases}
           <AddAliasField
             tag={props.tagName}
-            onAliasAdded={a => onAliasAdded(props.onAliasAdded, setAliases, a)}
+            onAliasAdded={(a) =>
+              onAliasAdded(props.onAliasAdded, setAliases, a)
+            }
           />
         </div>
       </div>
