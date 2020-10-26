@@ -52,7 +52,9 @@ const _notification_wrapper = (p: AxiosPromise<any>): AxiosPromise<any> => {
         resolve(success);
       },
       (error) => {
-        dispatcher(error.response.data);
+        if (error.response) {
+          dispatcher(error.response.data);
+        }
         reject(error);
       }
     );
@@ -220,7 +222,7 @@ const Api = {
 
   Session: {
     login(data: LoginParameters): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.post("login", data));
+      return axiosClient.post("login", data);
     },
 
     setSfw(sfw: boolean): AxiosPromise<any> {
@@ -234,7 +236,7 @@ const Api = {
     },
 
     amILoggedIn(): AxiosPromise<any> {
-      return _notification_wrapper(axiosClient.get("login"));
+      return axiosClient.get("login");
     },
   },
 

@@ -9,3 +9,16 @@
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
+.full-page-spinner-innermost > div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.full-page-spinner-status-retrying {
+  visibility: visible;
+}
+
+.full-page-spinner-status-none {
+  visibility: hidden;
+}

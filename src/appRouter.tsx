@@ -23,10 +23,11 @@ const StatsPage = React.lazy(() => import("./stats/statsPage"));
 const WildcardPage = React.lazy(() => import("./routing/wildcardPage"));
 
 const AppRouter = () => {
+  const [countdown, setCountdown] = useState<number>(-1);
   const [hasUser, setHasUser] = useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const tryLoggingIn = () => {
     Api.Session.amILoggedIn()
       .then((res) => {
         if (res.data) {
@@ -34,16 +35,43 @@ const AppRouter = () => {
         } else {
           dispatch(loginAnonymous());
         }
-      })
-      .finally(() => {
         setHasUser(true);
+      })
+      .catch((err) => {
+        let count = 10;
+
+        const interval = setInterval(() => {
+          if (count > 0) {
+            setCountdown(--count);
+          } else {
+            tryLoggingIn();
+            clearInterval(interval);
+          }
+        }, 1000);
       });
-  }, [dispatch]);
+  };
+
+  useEffect(tryLoggingIn, [dispatch]);
+
+  const statusText =
+    countdown > 0
+      ? `Could not connect to backend. Retrying in ${countdown}s…`
+      : "Placeholder text";
+
+  const statusClassName =
+    countdown > 0
+      ? "full-page-spinner-status-retrying"
+      : "full-page-spinner-status-none";
 
   const fallback = (
     <div className="full-page-spinner">
       <div className="full-page-spinner-inner">
-        <BeevenueSpinner />
+        <div className="full-page-spinner-innermost">
+          <BeevenueSpinner />
+        </div>
+        <div>
+          <p className={statusClassName}>{statusText}</p>
+        </div>
       </div>
     </div>
   );
